@@ -261,6 +261,103 @@ section {
     line-height: 1.7;
 }
 
+/* Partners Section */
+.partners {
+    background-color: var(--bg-primary);
+}
+
+.partners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.partner-card {
+    background-color: var(--bg-tertiary);
+    padding: 2.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.partner-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px var(--shadow);
+    border-color: var(--accent);
+}
+
+.partner-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.partner-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.partner-card p {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin: 0;
+}
+
+/* Master Plan Section */
+.master-plan {
+    background-color: var(--bg-secondary);
+}
+
+.plan-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.plan-list {
+    background-color: var(--bg-tertiary);
+    padding: 2.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    list-style: none;
+    counter-reset: plan-counter;
+}
+
+.plan-list li {
+    counter-increment: plan-counter;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    padding-left: 3rem;
+    position: relative;
+}
+
+.plan-list li:last-child {
+    margin-bottom: 0;
+}
+
+.plan-list li::before {
+    content: counter(plan-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* About Section */
 .about {
     background-color: var(--bg-primary);
@@ -465,6 +562,19 @@ html {
     .contact-form {
         padding: 2rem;
     }
+
+    .partners-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .partner-card {
+        padding: 2rem;
+    }
+
+    .plan-list {
+        padding: 2rem;
+    }
 }
 
 /* Responsive Design - Mobile */
@@ -537,6 +647,34 @@ html {
 
     .contact-form {
         padding: 1.5rem;
+    }
+
+    .partners-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .partner-card {
+        padding: 1.5rem;
+    }
+
+    .partner-card h3 {
+        font-size: 1.75rem;
+    }
+
+    .plan-list {
+        padding: 1.5rem;
+    }
+
+    .plan-list li {
+        font-size: 1rem;
+        padding-left: 2.5rem;
+    }
+
+    .plan-list li::before {
+        font-size: 1.25rem;
+        width: 1.75rem;
+        height: 1.75rem;
     }
 }
 
