@@ -71,6 +71,10 @@ body {
     color: var(--text-primary);
 }
 
+.nav-menu-login {
+    display: none;
+}
+
 .nav-actions {
     display: flex;
     align-items: center;
@@ -401,6 +405,7 @@ html {
     }
 
     .nav-menu-login {
+        display: block;
         margin-top: 1rem;
         padding-top: 1rem;
         border-top: 1px solid var(--border-color);
