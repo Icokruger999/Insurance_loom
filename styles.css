@@ -310,54 +310,6 @@ section {
     margin: 0;
 }
 
-/* Master Plan Section */
-.master-plan {
-    background-color: var(--bg-secondary);
-}
-
-.plan-content {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.plan-list {
-    background-color: var(--bg-tertiary);
-    padding: 2.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    list-style: none;
-    counter-reset: plan-counter;
-}
-
-.plan-list li {
-    counter-increment: plan-counter;
-    font-size: 1.125rem;
-    color: var(--text-primary);
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-    padding-left: 3rem;
-    position: relative;
-}
-
-.plan-list li:last-child {
-    margin-bottom: 0;
-}
-
-.plan-list li::before {
-    content: counter(plan-counter);
-    position: absolute;
-    left: 0;
-    top: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 /* About Section */
 .about {
     background-color: var(--bg-primary);
@@ -571,10 +523,6 @@ html {
     .partner-card {
         padding: 2rem;
     }
-
-    .plan-list {
-        padding: 2rem;
-    }
 }
 
 /* Responsive Design - Mobile */
@@ -660,21 +608,6 @@ html {
 
     .partner-card h3 {
         font-size: 1.75rem;
-    }
-
-    .plan-list {
-        padding: 1.5rem;
-    }
-
-    .plan-list li {
-        font-size: 1rem;
-        padding-left: 2.5rem;
-    }
-
-    .plan-list li::before {
-        font-size: 1.25rem;
-        width: 1.75rem;
-        height: 1.75rem;
     }
 }
 
