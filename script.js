@@ -16,26 +16,46 @@ navLinks.forEach(link => {
     });
 });
 
-// Login Button Handler (ready for C# backend integration)
-const loginBtn = document.getElementById('loginBtn');
-const loginBtnMobile = document.getElementById('loginBtnMobile');
+// Login Button Handlers (ready for C# backend integration)
+const brokerLoginBtn = document.getElementById('brokerLoginBtn');
+const brokerLoginBtnMobile = document.getElementById('brokerLoginBtnMobile');
+const policyHolderLoginBtn = document.getElementById('policyHolderLoginBtn');
+const policyHolderLoginBtnMobile = document.getElementById('policyHolderLoginBtnMobile');
 
-function handleLogin(e) {
+function handleBrokerLogin(e) {
     e.preventDefault();
-    // TODO: Connect to C# backend API endpoint
-    // Example: window.location.href = '/login';
-    // Or: fetch('/api/auth/login', { method: 'POST', ... })
-    console.log('Login button clicked - ready for C# backend integration');
+    // TODO: Connect to C# backend API endpoint for broker login
+    // Example: window.location.href = '/broker/login';
+    // Or: fetch('/api/auth/broker/login', { method: 'POST', ... })
+    console.log('Broker login button clicked - ready for C# backend integration');
     // For now, just show a placeholder message
-    alert('Login functionality will be connected to C# backend');
+    alert('Broker login functionality will be connected to C# backend');
 }
 
-if (loginBtn) {
-    loginBtn.addEventListener('click', handleLogin);
+function handlePolicyHolderLogin(e) {
+    e.preventDefault();
+    // TODO: Connect to C# backend API endpoint for policy holder login
+    // Example: window.location.href = '/policyholder/login';
+    // Or: fetch('/api/auth/policyholder/login', { method: 'POST', ... })
+    console.log('Policy holder login button clicked - ready for C# backend integration');
+    // For now, just show a placeholder message
+    alert('Policy holder login functionality will be connected to C# backend');
 }
 
-if (loginBtnMobile) {
-    loginBtnMobile.addEventListener('click', handleLogin);
+if (brokerLoginBtn) {
+    brokerLoginBtn.addEventListener('click', handleBrokerLogin);
+}
+
+if (brokerLoginBtnMobile) {
+    brokerLoginBtnMobile.addEventListener('click', handleBrokerLogin);
+}
+
+if (policyHolderLoginBtn) {
+    policyHolderLoginBtn.addEventListener('click', handlePolicyHolderLogin);
+}
+
+if (policyHolderLoginBtnMobile) {
+    policyHolderLoginBtnMobile.addEventListener('click', handlePolicyHolderLogin);
 }
 
 // Smooth scroll for anchor links
