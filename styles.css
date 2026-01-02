@@ -71,11 +71,13 @@ body {
 }
 
 .nav-actions {
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 1rem;
+    margin-left: auto;
+    padding-right: 0;
 }
 
 .nav-menu a {
@@ -94,13 +96,13 @@ body {
 }
 
 .btn-login {
-    padding: 0.625rem 1.5rem;
+    padding: 0.5rem 1rem;
     background-color: var(--accent);
     color: var(--text-primary);
     text-decoration: none;
     border-radius: 6px;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
