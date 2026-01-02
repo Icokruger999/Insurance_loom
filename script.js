@@ -16,6 +16,28 @@ navLinks.forEach(link => {
     });
 });
 
+// Login Button Handler (ready for C# backend integration)
+const loginBtn = document.getElementById('loginBtn');
+const loginBtnMobile = document.getElementById('loginBtnMobile');
+
+function handleLogin(e) {
+    e.preventDefault();
+    // TODO: Connect to C# backend API endpoint
+    // Example: window.location.href = '/login';
+    // Or: fetch('/api/auth/login', { method: 'POST', ... })
+    console.log('Login button clicked - ready for C# backend integration');
+    // For now, just show a placeholder message
+    alert('Login functionality will be connected to C# backend');
+}
+
+if (loginBtn) {
+    loginBtn.addEventListener('click', handleLogin);
+}
+
+if (loginBtnMobile) {
+    loginBtnMobile.addEventListener('click', handleLogin);
+}
+
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
