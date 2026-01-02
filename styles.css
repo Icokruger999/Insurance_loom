@@ -50,13 +50,15 @@ body {
 }
 
 .nav-brand {
-    flex: 1;
+    flex: 0 0 auto;
+    margin-right: auto;
 }
 
 .nav-brand h1 {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-primary);
+    margin: 0;
 }
 
 .nav-menu {
@@ -233,8 +235,19 @@ section {
 }
 
 .feature-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
 }
 
 .feature-card h3 {
@@ -386,7 +399,51 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Responsive Design */
+/* Responsive Design - iPad and Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .navbar .container {
+        padding: 0 30px;
+    }
+
+    .nav-brand h1 {
+        font-size: 1.4rem;
+    }
+
+    .nav-menu {
+        gap: 1.5rem;
+    }
+
+    .nav-menu a {
+        font-size: 0.95rem;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.15rem;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .feature-card {
+        padding: 1.75rem;
+    }
+
+    .section-title {
+        font-size: 2.25rem;
+    }
+
+    .contact-form {
+        padding: 2rem;
+    }
+}
+
+/* Responsive Design - Mobile */
 @media (max-width: 768px) {
     .nav-menu {
         position: fixed;
