@@ -77,7 +77,12 @@ body {
     align-items: center;
     gap: 0.5rem;
     margin-left: auto;
-    margin-right: -30px;
+    margin-right: -40px;
+}
+
+.nav-actions .btn-login {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.75rem !important;
 }
 
 .nav-menu a {
@@ -95,20 +100,25 @@ body {
     display: none;
 }
 
-.btn-login {
-    padding: 0.35rem 0.75rem;
+.nav-actions .btn.btn-login,
+.nav-menu-login .btn.btn-login {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 4px;
+    line-height: 1.2;
+    min-width: auto;
+}
+
+.btn.btn-login {
     background-color: var(--accent);
     color: var(--text-primary);
     text-decoration: none;
-    border-radius: 4px;
     font-weight: 600;
-    font-size: 0.75rem;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
     display: inline-block;
     white-space: nowrap;
-    line-height: 1.2;
 }
 
 .btn-login:hover {
