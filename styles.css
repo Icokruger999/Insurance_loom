@@ -46,6 +46,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+}
+
+.nav-brand {
+    flex: 1;
 }
 
 .nav-brand h1 {
@@ -58,6 +63,17 @@ body {
     display: flex;
     list-style: none;
     gap: 2rem;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.nav-actions {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
 }
 
 .nav-menu a {
@@ -73,12 +89,6 @@ body {
 
 .nav-menu-login {
     display: none;
-}
-
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
 }
 
 .btn-login {
@@ -390,6 +400,7 @@ html {
         box-shadow: 0 10px 27px var(--shadow);
         padding: 2rem 0;
         border-top: 1px solid var(--border-color);
+        transform: none;
     }
 
     .nav-menu.active {
