@@ -37,6 +37,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<DebitOrder> DebitOrders { get; set; }
     public DbSet<Beneficiary> Beneficiaries { get; set; }
+    public DbSet<Dependent> Dependents { get; set; }
     public DbSet<CsvImport> CsvImports { get; set; }
     public DbSet<CsvImportError> CsvImportErrors { get; set; }
 
