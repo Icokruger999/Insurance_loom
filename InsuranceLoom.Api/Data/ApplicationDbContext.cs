@@ -135,6 +135,33 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.Relationship).HasColumnName("relationship").HasMaxLength(100);
             entity.Property(e => e.Type).HasColumnName("type").HasMaxLength(50);
+            entity.Property(e => e.IsPrimary).HasColumnName("is_primary");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.HasOne(e => e.PolicyHolder)
+                  .WithMany()
+                  .HasForeignKey(e => e.PolicyHolderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Policy)
+                  .WithMany()
+                  .HasForeignKey(e => e.PolicyId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Dependent Configuration
+        modelBuilder.Entity<Dependent>(entity =>
+        {
+            entity.ToTable("dependents");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.PolicyHolderId).HasColumnName("policy_holder_id");
+            entity.Property(e => e.PolicyId).HasColumnName("policy_id");
+            entity.Property(e => e.FirstName).HasColumnName("first_name");
+            entity.Property(e => e.LastName).HasColumnName("last_name");
+            entity.Property(e => e.MiddleName).HasColumnName("middle_name");
+            entity.Property(e => e.IdNumber).HasColumnName("id_number");
+            entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
+            entity.Property(e => e.Relationship).HasColumnName("relationship").HasMaxLength(100);
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.HasOne(e => e.PolicyHolder)
