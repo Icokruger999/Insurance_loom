@@ -28,8 +28,8 @@ const API_BASE_URL = (() => {
     
     // Production (AWS)
     if (hostname === 'insuranceloom.com' || hostname === 'www.insuranceloom.com') {
-        // Use EC2 IP address (update to api.insuranceloom.com once DNS is configured)
-        return 'http://34.246.222.13/api';
+        // Use HTTPS API subdomain
+        return 'https://api.insuranceloom.com/api';
     }
     
     // Development (localhost)
