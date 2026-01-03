@@ -45,12 +45,14 @@ const brokerLoginForm = document.getElementById('brokerLoginForm');
 const brokerRegisterForm = document.getElementById('brokerRegisterForm');
 
 function openBrokerModal() {
-    if (!brokerModal) {
-        console.error('Broker modal not found');
+    // Get modal element dynamically in case DOM isn't ready when script loads
+    const modal = document.getElementById('brokerModal');
+    if (!modal) {
+        console.error('Broker modal not found in DOM');
         return;
     }
     console.log('Opening broker modal');
-    brokerModal.classList.add('active');
+    modal.classList.add('active');
     // Reset to login tab
     switchTab('login');
 }
