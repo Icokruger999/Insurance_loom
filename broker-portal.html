@@ -18,20 +18,19 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
+                <button class="nav-btn" data-section="create-client">
+                    <span class="nav-text">Create New Client</span>
+                </button>
                 <button class="nav-btn active" data-section="new-clients">
-                    <span class="nav-icon">⏳</span>
                     <span class="nav-text">Pending Approval</span>
                 </button>
                 <button class="nav-btn" data-section="existing-clients">
-                    <span class="nav-icon">📋</span>
                     <span class="nav-text">My Policies</span>
                 </button>
                 <button class="nav-btn" data-section="monthly-report">
-                    <span class="nav-icon">📊</span>
                     <span class="nav-text">Monthly Report</span>
                 </button>
                 <button class="nav-btn" data-section="commission">
-                    <span class="nav-icon">💰</span>
                     <span class="nav-text">Commission</span>
                 </button>
             </nav>
@@ -45,6 +44,17 @@
             <div class="content-header">
                 <h2 id="sectionTitle">Policies Pending Approval</h2>
             </div>
+
+            <!-- Create New Client Section -->
+            <section id="create-client" class="content-section">
+                <div class="section-content">
+                    <h3>Create New Client</h3>
+                    <p>Register a new client and create their policy.</p>
+                    <div id="createClientForm" class="form-container">
+                        <!-- Form will be loaded here -->
+                    </div>
+                </div>
+            </section>
 
             <!-- Policies Pending Approval Section -->
             <section id="new-clients" class="content-section active">

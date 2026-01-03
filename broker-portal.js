@@ -56,6 +56,7 @@ function initNavigation() {
     const sectionTitle = document.getElementById('sectionTitle');
     
     const sectionTitles = {
+        'create-client': 'Create New Client',
         'new-clients': 'Policies Pending Approval',
         'existing-clients': 'My Policies',
         'monthly-report': 'Monthly Report',
@@ -111,6 +112,9 @@ async function loadSectionData(sectionId) {
         const broker = JSON.parse(brokerInfo);
         
         switch (sectionId) {
+            case 'create-client':
+                loadCreateClientForm();
+                break;
             case 'new-clients':
                 await loadPendingApprovalPolicies(broker.id);
                 break;
@@ -183,6 +187,181 @@ async function loadCommission(brokerId) {
     // TODO: Implement
 }
 
+// Load Create Client Form
+function loadCreateClientForm() {
+    const formContainer = document.getElementById('createClientForm');
+    if (!formContainer) return;
+    
+    formContainer.innerHTML = `
+        <form id="newClientForm" class="client-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="firstName" class="required">First Name</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName" class="required">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="required">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="idNumber">ID Number</label>
+                    <input type="text" id="idNumber" name="idNumber">
+                </div>
+                <div class="form-group">
+                    <label for="dateOfBirth">Date of Birth</label>
+                    <input type="date" id="dateOfBirth" name="dateOfBirth">
+                </div>
+                <div class="form-group full-width">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="required">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <small>Client will use this password to log in</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword" class="required">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+            </div>
+            <div class="error-message" id="formError"></div>
+            <div class="success-message" id="formSuccess"></div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Create Client</button>
+            </div>
+        </form>
+    `;
+    
+    // Add form submission handler
+    const form = document.getElementById('newClientForm');
+    if (form) {
+        form.addEventListener('submit', handleCreateClient);
+    }
+    
+    // Add cancel button handler
+    const cancelBtn = document.getElementById('cancelBtn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            form.reset();
+            const errorDiv = document.getElementById('formError');
+            const successDiv = document.getElementById('formSuccess');
+            if (errorDiv) errorDiv.classList.remove('show');
+            if (successDiv) successDiv.classList.remove('show');
+        });
+    }
+}
+
+// Handle Create Client Form Submission
+async function handleCreateClient(e) {
+    e.preventDefault();
+    
+    const errorDiv = document.getElementById('formError');
+    const successDiv = document.getElementById('formSuccess');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Clear previous messages
+    if (errorDiv) errorDiv.classList.remove('show');
+    if (successDiv) successDiv.classList.remove('show');
+    
+    // Get form values
+    const formData = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        idNumber: document.getElementById('idNumber').value.trim(),
+        dateOfBirth: document.getElementById('dateOfBirth').value,
+        address: document.getElementById('address').value.trim(),
+        password: document.getElementById('password').value,
+        confirmPassword: document.getElementById('confirmPassword').value
+    };
+    
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+        if (errorDiv) {
+            errorDiv.textContent = 'Passwords do not match';
+            errorDiv.classList.add('show');
+        }
+        return;
+    }
+    
+    if (formData.password.length < 6) {
+        if (errorDiv) {
+            errorDiv.textContent = 'Password must be at least 6 characters';
+            errorDiv.classList.add('show');
+        }
+        return;
+    }
+    
+    // Disable submit button
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating...';
+    }
+    
+    try {
+        const token = localStorage.getItem('brokerToken');
+        const brokerInfo = JSON.parse(localStorage.getItem('brokerInfo'));
+        
+        // TODO: Replace with actual API endpoint when available
+        // For now, show success message
+        const response = await fetch(`${API_BASE_URL}/policyholder/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone || null,
+                idNumber: formData.idNumber || null,
+                dateOfBirth: formData.dateOfBirth || null,
+                address: formData.address || null,
+                password: formData.password,
+                brokerId: brokerInfo?.id
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            if (successDiv) {
+                successDiv.textContent = `Client created successfully! Policy Number: ${data.policyNumber || 'N/A'}`;
+                successDiv.classList.add('show');
+            }
+            document.getElementById('newClientForm').reset();
+        } else {
+            if (errorDiv) {
+                errorDiv.textContent = data.message || 'Failed to create client. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        }
+    } catch (error) {
+        console.error('Error creating client:', error);
+        if (errorDiv) {
+            errorDiv.textContent = 'Connection error. Please check your internet connection and try again.';
+            errorDiv.classList.add('show');
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Client';
+        }
+    }
+}
+
 // Initialize portal
 document.addEventListener('DOMContentLoaded', () => {
     if (!checkAuth()) {
@@ -193,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initLogout();
     
-    // Load initial section data
-    loadSectionData('new-clients');
+    // Load initial section data (default to Pending Approval)
+    const activeSection = document.querySelector('.nav-btn.active')?.dataset.section || 'new-clients';
+    loadSectionData(activeSection);
 });
