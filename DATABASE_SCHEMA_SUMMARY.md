@@ -3,6 +3,13 @@
 ## Overview
 All form fields from the application are now stored in database tables. The system automatically runs SQL migrations on startup.
 
+**IMPORTANT:** The system now distinguishes between:
+- **Primary Policy Holder** - The main person who owns the policy (stored in `policy_holders` table)
+- **Dependents** - People covered under the policy like children, spouse (stored in `dependents` table)
+- **Beneficiaries** - People who receive benefits when policy holder dies (stored in `beneficiaries` table)
+
+See `POLICY_HOLDER_STRUCTURE.md` for detailed explanation of the structure.
+
 ## Tables and Fields
 
 ### 1. `policy_holders` Table
