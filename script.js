@@ -18,7 +18,6 @@ navLinks.forEach(link => {
 
 // Login Button Handlers
 const loginBtn = document.getElementById('loginBtn');
-const loginBtnMobile = document.getElementById('loginBtnMobile');
 const loginTypeModal = document.getElementById('loginTypeModal');
 const selectBrokerBtn = document.getElementById('selectBrokerBtn');
 const selectManagerBtn = document.getElementById('selectManagerBtn');

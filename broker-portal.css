@@ -1,21 +1,32 @@
 :root {
-    --bg-primary: #0f0f0f;
-    --bg-secondary: #1a1a1a;
-    --bg-tertiary: #252525;
-    --bg-elevated: #1f1f1f;
-    --text-primary: #ffffff;
-    --text-secondary: #d0d0d0;
-    --text-muted: #888888;
-    --border-color: #2a2a2a;
-    --border-hover: #3a3a3a;
-    --accent-color: #2563eb;
-    --accent-hover: #1d4ed8;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #f1f3f5;
+    --bg-elevated: #ffffff;
+    --text-primary: #1a4d2e;
+    --text-secondary: #2d5a3d;
+    --text-muted: #5a7a68;
+    --border-color: #d4e4dc;
+    --border-hover: #b8d4c4;
+    
+    /* Primary brand color - Professional green */
+    --primary-color: #006633;
+    --primary-hover: #004d26;
+    --primary-light: #e6f2ed;
+    --primary-lighter: #f0f8f4;
+    
+    /* Accent colors */
+    --accent-color: #006633;
+    --accent-hover: #004d26;
     --success-color: #10b981;
     --warning-color: #f59e0b;
     --danger-color: #ef4444;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 102, 51, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 102, 51, 0.1), 0 2px 4px -1px rgba(0, 102, 51, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 102, 51, 0.1), 0 4px 6px -2px rgba(0, 102, 51, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 102, 51, 0.1), 0 10px 10px -5px rgba(0, 102, 51, 0.04);
 }
 
 * {
