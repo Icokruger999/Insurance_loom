@@ -1,16 +1,32 @@
 :root {
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2a2a2a;
-    --bg-tertiary: #333333;
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --text-muted: #999999;
-    --border-color: #404040;
-    --accent-color: #4a9eff;
-    --accent-hover: #3a8eef;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #f1f3f5;
+    --bg-elevated: #ffffff;
+    --text-primary: #1a4d2e;
+    --text-secondary: #2d5a3d;
+    --text-muted: #5a7a68;
+    --border-color: #d4e4dc;
+    --border-hover: #b8d4c4;
+    
+    /* Primary brand color - Professional green */
+    --primary-color: #006633;
+    --primary-hover: #004d26;
+    --primary-light: #e6f2ed;
+    --primary-lighter: #f0f8f4;
+    
+    /* Accent colors */
+    --accent-color: #006633;
+    --accent-hover: #004d26;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 102, 51, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 102, 51, 0.1), 0 2px 4px -1px rgba(0, 102, 51, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 102, 51, 0.1), 0 4px 6px -2px rgba(0, 102, 51, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 102, 51, 0.1), 0 10px 10px -5px rgba(0, 102, 51, 0.04);
 }
 
 * {
@@ -20,10 +36,48 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+}
+
+/* Subtle puzzle block pattern background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 20px,
+            rgba(0, 102, 51, 0.02) 20px,
+            rgba(0, 102, 51, 0.02) 21px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 20px,
+            rgba(0, 102, 51, 0.02) 20px,
+            rgba(0, 102, 51, 0.02) 21px
+        ),
+        radial-gradient(circle at 20% 30%, rgba(0, 102, 51, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(230, 242, 237, 0.4) 0%, transparent 50%);
+    background-size: 40px 40px, 40px 40px, 400px 400px, 400px 400px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body > * {
+    position: relative;
+    z-index: 1;
 }
 
 .portal-container {
@@ -35,7 +89,7 @@ body {
 /* Sidebar Styles */
 .sidebar {
     width: 280px;
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-elevated);
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
@@ -44,6 +98,7 @@ body {
     left: 0;
     top: 0;
     z-index: 1000;
+    box-shadow: var(--shadow-sm);
 }
 
 .sidebar-header {
