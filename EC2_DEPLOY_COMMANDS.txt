@@ -1,0 +1,35 @@
+# EC2 Deployment Commands - Copy and paste these on EC2
+
+# Step 1: Connect to EC2 (run this from your local machine)
+# ssh ec2-user@YOUR_EC2_IP
+
+# Step 2: Navigate to API directory
+cd /var/www/api
+
+# Step 3: Pull latest code (or if repo is not there, clone it first)
+git pull origin main
+# OR if you need to clone:
+# git clone https://github.com/Icokruger999/Insurance_loom.git .
+# git checkout main
+
+# Step 4: Build the application
+dotnet publish -c Release -o ./publish
+
+# Step 5: Stop the service
+sudo systemctl stop insuranceloom-api.service
+
+# Step 6: Copy published files
+sudo cp -r ./publish/* /var/www/api/
+
+# Step 7: Set permissions
+sudo chown -R ec2-user:ec2-user /var/www/api
+
+# Step 8: Start the service
+sudo systemctl start insuranceloom-api.service
+
+# Step 9: Check status
+sudo systemctl status insuranceloom-api.service
+
+# Step 10: View logs (optional)
+sudo journalctl -u insuranceloom-api.service -f
+
