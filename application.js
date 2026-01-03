@@ -162,14 +162,16 @@ async function submitApplication() {
     const clientToken = localStorage.getItem('clientToken');
     
     if (!clientToken) {
-        // User not logged in, redirect to client registration/login
-        // Store form data temporarily
-        const formData = collectFormData();
-        sessionStorage.setItem('pendingApplication', JSON.stringify(formData));
-        
-        // Show message and redirect to login
-        if (confirm('You need to create an account or log in to submit your application. Would you like to continue?')) {
-            window.location.href = '/?action=client-login';
+        // User not logged in, show message about creating account
+        if (confirm('You need to create an account to submit your application. Would you like to create an account now? (You can log in if you already have one)')) {
+            // Store form data temporarily
+            const formData = collectFormData();
+            sessionStorage.setItem('pendingApplication', JSON.stringify(formData));
+            sessionStorage.setItem('selectedServiceId', selectedServiceId);
+            sessionStorage.setItem('selectedServiceName', selectedServiceName);
+            
+            // Redirect to home page to show login modal
+            window.location.href = '/?action=client-register';
         }
         return;
     }
