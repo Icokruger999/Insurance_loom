@@ -36,6 +36,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Claim> Claims { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<DebitOrder> DebitOrders { get; set; }
+    public DbSet<Beneficiary> Beneficiaries { get; set; }
     public DbSet<CsvImport> CsvImports { get; set; }
     public DbSet<CsvImportError> CsvImportErrors { get; set; }
 
@@ -89,10 +90,26 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.PolicyNumber).HasColumnName("policy_number");
             entity.Property(e => e.FirstName).HasColumnName("first_name");
             entity.Property(e => e.LastName).HasColumnName("last_name");
+            entity.Property(e => e.MiddleName).HasColumnName("middle_name");
             entity.Property(e => e.IdNumber).HasColumnName("id_number");
             entity.Property(e => e.Phone).HasColumnName("phone");
             entity.Property(e => e.Address).HasColumnName("address");
             entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
+            entity.Property(e => e.Birthplace).HasColumnName("birthplace");
+            entity.Property(e => e.Sex).HasColumnName("sex").HasMaxLength(20);
+            entity.Property(e => e.CivilStatus).HasColumnName("civil_status").HasMaxLength(50);
+            entity.Property(e => e.Occupation).HasColumnName("occupation");
+            entity.Property(e => e.MonthlyIncome).HasColumnName("monthly_income");
+            entity.Property(e => e.MonthlyExpenses).HasColumnName("monthly_expenses");
+            entity.Property(e => e.EmploymentType).HasColumnName("employment_type").HasMaxLength(50);
+            entity.Property(e => e.IncomeTaxNumber).HasColumnName("income_tax_number");
+            entity.Property(e => e.EmploymentStartDate).HasColumnName("employment_start_date");
+            entity.Property(e => e.EmploymentEndDate).HasColumnName("employment_end_date");
+            entity.Property(e => e.AgencyName).HasColumnName("agency_name");
+            entity.Property(e => e.AgencyContactNo).HasColumnName("agency_contact_no");
+            entity.Property(e => e.AgencyAddress).HasColumnName("agency_address");
+            entity.Property(e => e.AgencyEmail).HasColumnName("agency_email");
+            entity.Property(e => e.AgencySignatory).HasColumnName("agency_signatory");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
@@ -101,6 +118,32 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Beneficiary Configuration
+        modelBuilder.Entity<Beneficiary>(entity =>
+        {
+            entity.ToTable("beneficiaries");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.PolicyHolderId).HasColumnName("policy_holder_id");
+            entity.Property(e => e.PolicyId).HasColumnName("policy_id");
+            entity.Property(e => e.FullName).HasColumnName("full_name");
+            entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
+            entity.Property(e => e.Age).HasColumnName("age");
+            entity.Property(e => e.Mobile).HasColumnName("mobile");
+            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.Relationship).HasColumnName("relationship").HasMaxLength(100);
+            entity.Property(e => e.Type).HasColumnName("type").HasMaxLength(50);
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.HasOne(e => e.PolicyHolder)
+                  .WithMany()
+                  .HasForeignKey(e => e.PolicyHolderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Policy)
+                  .WithMany()
+                  .HasForeignKey(e => e.PolicyId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // Manager Configuration
