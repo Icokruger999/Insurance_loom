@@ -42,4 +42,3 @@ The email password needs to be updated in `/var/www/api/appsettings.json` on EC2
      -H "Content-Type: application/json" \
      -d '{"to": "ico@astutetech.co.za"}'
    ```
-
