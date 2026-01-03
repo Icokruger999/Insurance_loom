@@ -38,8 +38,6 @@ const API_BASE_URL = (() => {
 
 // Broker Modal
 const brokerModal = document.getElementById('brokerModal');
-const brokerLoginBtn = document.getElementById('brokerLoginBtn');
-const brokerLoginBtnMobile = document.getElementById('brokerLoginBtnMobile');
 const modalClose = document.querySelector('.modal-close');
 const tabButtons = document.querySelectorAll('.tab-button');
 const tabContents = document.querySelectorAll('.tab-content');
