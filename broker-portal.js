@@ -56,7 +56,7 @@ function initNavigation() {
     const sectionTitle = document.getElementById('sectionTitle');
     
     const sectionTitles = {
-        'create-client': 'Create New Client',
+        'create-client': 'New Application',
         'new-clients': 'Policies Pending Approval',
         'existing-clients': 'My Policies',
         'monthly-report': 'Monthly Report',
@@ -201,15 +201,19 @@ async function loadCreateClientForm() {
         
         formContainer.innerHTML = `
             <form id="newClientForm" class="client-form">
-                <h3 style="margin-bottom: 2rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Client Information</h3>
+                <h3 style="margin-bottom: 2rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Personal Information</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="firstName" class="required">First Name</label>
+                        <label for="lastName" class="required">Last Name (Apelyido)</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName" class="required">First Name (Pangalan)</label>
                         <input type="text" id="firstName" name="firstName" required>
                     </div>
                     <div class="form-group">
-                        <label for="lastName" class="required">Last Name</label>
-                        <input type="text" id="lastName" name="lastName" required>
+                        <label for="middleName">Middle Name (Gitnang Pangalan)</label>
+                        <input type="text" id="middleName" name="middleName">
                     </div>
                     <div class="form-group">
                         <label for="idNumber" class="required">ID Number</label>
@@ -217,8 +221,34 @@ async function loadCreateClientForm() {
                         <small>South African ID number (13 digits)</small>
                     </div>
                     <div class="form-group">
-                        <label for="dateOfBirth" class="required">Date of Birth</label>
+                        <label for="dateOfBirth" class="required">Date of Birth (Petsa ng Kapanganakan)</label>
                         <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="birthplace">Birthplace (Lugar ng Kapanganakan)</label>
+                        <input type="text" id="birthplace" name="birthplace">
+                    </div>
+                    <div class="form-group">
+                        <label for="sex" class="required">Sex (Kasarian)</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">-- Select --</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="civilStatus" class="required">Civil Status (Katayuang Sibil)</label>
+                        <select id="civilStatus" name="civilStatus" required>
+                            <option value="">-- Select --</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Widowed">Widowed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="occupation">Occupation (Trabaho)</label>
+                        <input type="text" id="occupation" name="occupation">
                     </div>
                     <div class="form-group">
                         <label for="email" class="required">Email Address</label>
@@ -230,7 +260,7 @@ async function loadCreateClientForm() {
                         <small>Include country code if international</small>
                     </div>
                     <div class="form-group full-width">
-                        <label for="address" class="required">Physical Address</label>
+                        <label for="address" class="required">Residence Address (Tirahan)</label>
                         <textarea id="address" name="address" rows="3" required></textarea>
                     </div>
                 </div>
