@@ -58,18 +58,18 @@ body {
     color: var(--text-primary);
 }
 
-.broker-info {
+.manager-info {
     padding-top: 1rem;
 }
 
-.broker-name {
+.manager-name {
     font-size: 1rem;
     font-weight: 500;
     color: var(--text-primary);
     margin-bottom: 0.25rem;
 }
 
-.broker-email {
+.manager-email {
     font-size: 0.875rem;
     color: var(--text-muted);
 }
@@ -197,11 +197,37 @@ body {
 .section-content p {
     color: var(--text-secondary);
     line-height: 1.6;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Filter Bar */
+.filter-bar {
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 0.5rem 1rem;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
 }
 
 /* Lists */
-.policies-list {
+.agents-list,
+.policies-list,
+.approval-list,
+.reports-content {
     display: grid;
     gap: 1rem;
 }
@@ -213,7 +239,9 @@ body {
 }
 
 /* Card Styles */
-.policy-card {
+.agent-card,
+.policy-card,
+.approval-card {
     background-color: var(--bg-tertiary);
     padding: 1.5rem;
     border-radius: 8px;
@@ -221,7 +249,9 @@ body {
     transition: all 0.3s ease;
 }
 
-.policy-card:hover {
+.agent-card:hover,
+.policy-card:hover,
+.approval-card:hover {
     border-color: var(--accent-color);
     transform: translateY(-2px);
 }
@@ -253,6 +283,11 @@ body {
 
 .status-approved {
     background-color: var(--success-color);
+    color: white;
+}
+
+.status-rejected {
+    background-color: var(--danger-color);
     color: white;
 }
 

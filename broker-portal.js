@@ -90,11 +90,9 @@ function initLogout() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('brokerToken');
-                localStorage.removeItem('brokerInfo');
-                window.location.href = '/';
-            }
+            localStorage.removeItem('brokerToken');
+            localStorage.removeItem('brokerInfo');
+            window.location.href = '/';
         });
     }
 }

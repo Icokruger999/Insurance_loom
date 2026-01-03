@@ -21,9 +21,12 @@ const loginBtn = document.getElementById('loginBtn');
 const loginBtnMobile = document.getElementById('loginBtnMobile');
 const loginTypeModal = document.getElementById('loginTypeModal');
 const selectBrokerBtn = document.getElementById('selectBrokerBtn');
+const selectManagerBtn = document.getElementById('selectManagerBtn');
 const selectClientBtn = document.getElementById('selectClientBtn');
 const closeLoginTypeModal = document.getElementById('closeLoginTypeModal');
 const clientModal = document.getElementById('clientModal');
+const managerModal = document.getElementById('managerModal');
+const managerLoginForm = document.getElementById('managerLoginForm');
 
 // API Base URL - Automatically detects environment
 const API_BASE_URL = (() => {

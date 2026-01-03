@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Portal - Insurance Loom</title>
+    <link rel="stylesheet" href="manager-portal.css">
+</head>
+<body>
+    <div class="portal-container">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Manager Portal</h1>
+                <div class="manager-info" id="managerInfo">
+                    <p class="manager-name" id="managerName">Loading...</p>
+                    <p class="manager-email" id="managerEmail"></p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-section="agents">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Agents by Region</span>
+                </button>
+                <button class="nav-btn" data-section="pending-policies">
+                    <span class="nav-icon">⏳</span>
+                    <span class="nav-text">Pending Policies</span>
+                </button>
+                <button class="nav-btn" data-section="approvals">
+                    <span class="nav-icon">✅</span>
+                    <span class="nav-text">Approval History</span>
+                </button>
+                <button class="nav-btn" data-section="reports">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Reports</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2 id="sectionTitle">Agents by Region</h2>
+            </div>
+
+            <!-- Agents by Region Section -->
+            <section id="agents" class="content-section active">
+                <div class="section-content">
+                    <div class="filter-bar">
+                        <select id="regionFilter" class="filter-select">
+                            <option value="">All Regions</option>
+                            <option value="north">North</option>
+                            <option value="south">South</option>
+                            <option value="east">East</option>
+                            <option value="west">West</option>
+                        </select>
+                    </div>
+                    <div id="agentsList" class="agents-list">
+                        <p class="loading-text">Loading agents...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pending Policies Section -->
+            <section id="pending-policies" class="content-section">
+                <div class="section-content">
+                    <h3>Policies Requiring Approval</h3>
+                    <p>Review and approve policies submitted by brokers.</p>
+                    <div id="pendingPoliciesList" class="policies-list">
+                        <p class="loading-text">Loading pending policies...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Approval History Section -->
+            <section id="approvals" class="content-section">
+                <div class="section-content">
+                    <h3>Approval History</h3>
+                    <p>View your approval and rejection history.</p>
+                    <div id="approvalHistoryList" class="approval-list">
+                        <p class="loading-text">Loading approval history...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <div class="section-content">
+                    <h3>Reports & Analytics</h3>
+                    <p>View comprehensive reports and analytics.</p>
+                    <div id="reportsContent" class="reports-content">
+                        <p class="loading-text">Loading reports...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="manager-portal.js"></script>
+</body>
+</html>
+
