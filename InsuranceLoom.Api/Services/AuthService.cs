@@ -24,10 +24,8 @@ public class AuthService : IAuthService
         if (existingUser != null)
             throw new ArgumentException("Email already exists");
 
-        // Check if agent number already exists
-        var existingBroker = await _context.Brokers.FirstOrDefaultAsync(b => b.AgentNumber == request.AgentNumber);
-        if (existingBroker != null)
-            throw new ArgumentException("Agent number already exists");
+        // Generate unique agent number
+        string agentNumber = await GenerateUniqueAgentNumberAsync();
 
         // Create user
         var user = new User
@@ -43,18 +41,18 @@ public class AuthService : IAuthService
 
         _context.Users.Add(user);
 
-        // Create broker
+        // Create broker with auto-generated agent number and default commission rate
         var broker = new Broker
         {
             Id = Guid.NewGuid(),
             UserId = user.Id,
-            AgentNumber = request.AgentNumber,
+            AgentNumber = agentNumber,
             FirstName = request.FirstName,
             LastName = request.LastName,
             CompanyName = request.CompanyName,
             Phone = request.Phone,
             LicenseNumber = request.LicenseNumber,
-            CommissionRate = request.CommissionRate,
+            CommissionRate = 5.0m, // Default 5% commission rate
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -77,6 +75,40 @@ public class AuthService : IAuthService
             IsActive = broker.IsActive,
             CreatedAt = broker.CreatedAt
         };
+    }
+
+    private async Task<string> GenerateUniqueAgentNumberAsync()
+    {
+        // Get the highest existing agent number
+        var lastBroker = await _context.Brokers
+            .Where(b => b.AgentNumber.StartsWith("AGT-"))
+            .OrderByDescending(b => b.AgentNumber)
+            .FirstOrDefaultAsync();
+
+        int nextNumber = 1;
+        if (lastBroker != null && !string.IsNullOrEmpty(lastBroker.AgentNumber))
+        {
+            // Extract number from format AGT-XXXXXX
+            var parts = lastBroker.AgentNumber.Split('-');
+            if (parts.Length == 2 && int.TryParse(parts[1], out int lastNumber))
+            {
+                nextNumber = lastNumber + 1;
+            }
+        }
+
+        // Format as AGT-000001, AGT-000002, etc.
+        string agentNumber = $"AGT-{nextNumber:D6}";
+
+        // Double-check uniqueness (shouldn't happen, but safety check)
+        var exists = await _context.Brokers.AnyAsync(b => b.AgentNumber == agentNumber);
+        if (exists)
+        {
+            // If by some chance it exists, try next number
+            nextNumber++;
+            agentNumber = $"AGT-{nextNumber:D6}";
+        }
+
+        return agentNumber;
     }
 
     public async Task<LoginResponse?> BrokerLoginAsync(BrokerLoginRequest request)
