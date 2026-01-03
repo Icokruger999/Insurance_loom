@@ -1,35 +1,81 @@
-# EC2 Deployment Commands - Copy and paste these on EC2
+# EC2 Deployment Commands - Quick Reference
 
-# Step 1: Connect to EC2 (run this from your local machine)
-# ssh ec2-user@YOUR_EC2_IP
+# ============================================
+# OPTION 1: Using Deployment Script (Easiest)
+# ============================================
 
-# Step 2: Navigate to API directory
-cd /var/www/api
+cd /home/ec2-user/Insurance_loom
+./deploy-ec2.sh
 
-# Step 3: Pull latest code (or if repo is not there, clone it first)
+# ============================================
+# OPTION 2: Manual Deployment (Step by Step)
+# ============================================
+
+# Step 1: Navigate to repository
+cd /home/ec2-user/Insurance_loom
+
+# Step 2: Pull latest code
 git pull origin main
-# OR if you need to clone:
-# git clone https://github.com/Icokruger999/Insurance_loom.git .
-# git checkout main
 
-# Step 4: Build the application
-dotnet publish -c Release -o ./publish
+# Step 3: Go to API project
+cd InsuranceLoom.Api
 
-# Step 5: Stop the service
+# Step 4: Stop service
 sudo systemctl stop insuranceloom-api.service
 
-# Step 6: Copy published files
+# Step 5: Build and publish
+dotnet publish -c Release -o ./publish
+
+# Step 6: Copy files to deployment directory
 sudo cp -r ./publish/* /var/www/api/
 
-# Step 7: Set permissions
+# Step 7: Fix permissions
 sudo chown -R ec2-user:ec2-user /var/www/api
 
-# Step 8: Start the service
+# Step 8: Start service
 sudo systemctl start insuranceloom-api.service
 
 # Step 9: Check status
 sudo systemctl status insuranceloom-api.service
 
-# Step 10: View logs (optional)
+# ============================================
+# OPTION 3: All-in-One Command
+# ============================================
+
+cd /home/ec2-user/Insurance_loom && git pull origin main && cd InsuranceLoom.Api && sudo systemctl stop insuranceloom-api.service && dotnet publish -c Release -o ./publish && sudo cp -r ./publish/* /var/www/api/ && sudo chown -R ec2-user:ec2-user /var/www/api && sudo systemctl start insuranceloom-api.service && sudo systemctl status insuranceloom-api.service --no-pager
+
+# ============================================
+# VERIFY DEPLOYMENT
+# ============================================
+
+# Test API endpoint
+curl https://api.insuranceloom.com/api/servicetypes
+
+# View logs
 sudo journalctl -u insuranceloom-api.service -f
 
+# ============================================
+# TROUBLESHOOTING COMMANDS
+# ============================================
+
+# Check service status
+sudo systemctl status insuranceloom-api.service
+
+# View recent logs
+sudo journalctl -u insuranceloom-api.service -n 50 --no-pager
+
+# Restart service
+sudo systemctl restart insuranceloom-api.service
+
+# Check if port is in use
+sudo netstat -tulpn | grep :5000
+
+# Clean and rebuild (if build errors)
+cd /home/ec2-user/Insurance_loom/InsuranceLoom.Api
+dotnet clean
+dotnet restore
+dotnet build -c Release
+
+# Fix permissions (if permission errors)
+sudo chown -R ec2-user:ec2-user /var/www/api
+sudo chmod -R 755 /var/www/api
