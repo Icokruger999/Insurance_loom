@@ -45,37 +45,29 @@ body {
     position: relative;
 }
 
-/* Subtle puzzle block pattern background */
-body::before {
+/* Puzzle piece pattern background - SVG pattern */
+.puzzle-pattern {
+    position: relative;
+    overflow: hidden;
+}
+
+.puzzle-pattern::before {
     content: '';
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-image: 
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 20px,
-            rgba(0, 102, 51, 0.02) 20px,
-            rgba(0, 102, 51, 0.02) 21px
-        ),
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 20px,
-            rgba(0, 102, 51, 0.02) 20px,
-            rgba(0, 102, 51, 0.02) 21px
-        ),
-        radial-gradient(circle at 20% 30%, rgba(0, 102, 51, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(230, 242, 237, 0.4) 0%, transparent 50%);
-    background-size: 40px 40px, 40px 40px, 400px 400px, 400px 400px;
+        url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='puzzle' x='0' y='0' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0,0 L20,0 L20,10 Q20,20 10,20 L10,30 L0,30 Z' fill='%23e6f2ed' opacity='0.3'/%3E%3Cpath d='M20,0 L40,0 L40,20 L30,20 Q20,20 20,10 Z' fill='%23d4e4dc' opacity='0.25'/%3E%3Cpath d='M40,0 L60,0 L60,30 L50,30 L50,20 Q50,20 40,20 Z' fill='%23c8dfd1' opacity='0.2'/%3E%3Cpath d='M0,30 L10,30 L10,40 Q10,50 20,50 L20,60 L0,60 Z' fill='%23b8d4c4' opacity='0.25'/%3E%3Cpath d='M20,50 L40,50 L40,60 L20,60 Z' fill='%23e6f2ed' opacity='0.3'/%3E%3Cpath d='M40,30 L50,30 L50,40 Q50,50 40,50 L40,60 L60,60 L60,30 Z' fill='%23d4e4dc' opacity='0.25'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23puzzle)'/%3E%3C/svg%3E");
+    background-size: 120px 120px;
+    background-repeat: repeat;
+    opacity: 0.4;
     pointer-events: none;
     z-index: 0;
 }
 
-body > * {
+.puzzle-pattern > * {
     position: relative;
     z-index: 1;
 }
@@ -306,6 +298,10 @@ body > * {
     position: relative;
 }
 
+.hero.puzzle-pattern::before {
+    opacity: 0.35;
+}
+
 .hero-title {
     font-size: 3rem;
     font-weight: 700;
@@ -387,6 +383,10 @@ section {
 /* Partners Section */
 .partners {
     background-color: var(--bg-secondary);
+}
+
+.partners.puzzle-pattern::before {
+    opacity: 0.3;
 }
 
 .partners-grid {
