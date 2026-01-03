@@ -42,12 +42,27 @@ sudo apt update && sudo apt upgrade -y
 
 ---
 
-## Step 3: Install .NET 8 Runtime
+## Step 3: Install .NET 8 SDK (Required for Building)
+
+**Note:** We need the SDK (not just runtime) to build the API on EC2.
 
 ### For Amazon Linux 2023:
 ```bash
-# Install .NET 8 Runtime
-sudo dnf install -y dotnet-runtime-8.0
+# Install .NET 8 SDK
+sudo dnf install -y dotnet-sdk-8.0
+
+# Verify installation
+dotnet --version
+# Should show: 8.0.x
+```
+
+### For Amazon Linux 2:
+```bash
+# Add Microsoft repository
+sudo rpm -Uvh https://packages.microsoft.com/config/amazonlinux/2/packages-microsoft-prod.rpm
+
+# Install .NET 8 SDK
+sudo yum install -y dotnet-sdk-8.0
 
 # Verify installation
 dotnet --version
@@ -61,8 +76,8 @@ wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.
 sudo dpkg -i packages-microsoft-prod.deb
 sudo apt update
 
-# Install .NET 8 Runtime
-sudo apt install -y aspnetcore-runtime-8.0
+# Install .NET 8 SDK
+sudo apt install -y dotnet-sdk-8.0
 
 # Verify installation
 dotnet --version
