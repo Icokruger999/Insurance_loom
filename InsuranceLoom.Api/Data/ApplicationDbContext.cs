@@ -45,15 +45,32 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("users");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
+            entity.Property(e => e.UserType).HasColumnName("user_type").HasMaxLength(20);
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.HasIndex(e => e.Email).IsUnique();
-            entity.Property(e => e.UserType).HasMaxLength(20);
         });
 
         // Broker Configuration
         modelBuilder.Entity<Broker>(entity =>
         {
             entity.ToTable("brokers");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.AgentNumber).HasColumnName("agent_number");
+            entity.Property(e => e.FirstName).HasColumnName("first_name");
+            entity.Property(e => e.LastName).HasColumnName("last_name");
+            entity.Property(e => e.CompanyName).HasColumnName("company_name");
+            entity.Property(e => e.Phone).HasColumnName("phone");
+            entity.Property(e => e.LicenseNumber).HasColumnName("license_number");
+            entity.Property(e => e.CommissionRate).HasColumnName("commission_rate");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.HasIndex(e => e.AgentNumber).IsUnique();
             entity.HasOne(e => e.User)
                   .WithMany()
@@ -65,7 +82,18 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<PolicyHolder>(entity =>
         {
             entity.ToTable("policy_holders");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.PolicyNumber).HasColumnName("policy_number");
+            entity.Property(e => e.FirstName).HasColumnName("first_name");
+            entity.Property(e => e.LastName).HasColumnName("last_name");
+            entity.Property(e => e.IdNumber).HasColumnName("id_number");
+            entity.Property(e => e.Phone).HasColumnName("phone");
+            entity.Property(e => e.Address).HasColumnName("address");
+            entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.HasIndex(e => e.PolicyNumber).IsUnique();
             entity.HasOne(e => e.User)
                   .WithMany()
@@ -77,7 +105,20 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Manager>(entity =>
         {
             entity.ToTable("managers");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.FirstName).HasColumnName("first_name");
+            entity.Property(e => e.LastName).HasColumnName("last_name");
+            entity.Property(e => e.Phone).HasColumnName("phone");
+            entity.Property(e => e.EmployeeNumber).HasColumnName("employee_number");
+            entity.Property(e => e.Department).HasColumnName("department");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CanApprovePolicies).HasColumnName("can_approve_policies");
+            entity.Property(e => e.CanManageBrokers).HasColumnName("can_manage_brokers");
+            entity.Property(e => e.CanViewReports).HasColumnName("can_view_reports");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.EmployeeNumber).IsUnique();
             entity.HasOne(e => e.User)
@@ -90,9 +131,19 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Policy>(entity =>
         {
             entity.ToTable("policies");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.PolicyNumber).HasColumnName("policy_number");
             entity.Property(e => e.PolicyHolderId).HasColumnName("policy_holder_id");
             entity.Property(e => e.BrokerId).HasColumnName("broker_id");
             entity.Property(e => e.ServiceTypeId).HasColumnName("service_type_id");
+            entity.Property(e => e.ServiceCode).HasColumnName("service_code");
+            entity.Property(e => e.CoverageAmount).HasColumnName("coverage_amount");
+            entity.Property(e => e.PremiumAmount).HasColumnName("premium_amount");
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
+            entity.Property(e => e.EndDate).HasColumnName("end_date");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.HasIndex(e => e.PolicyNumber).IsUnique();
             entity.HasOne(e => e.PolicyHolder)
                   .WithMany()
@@ -109,6 +160,31 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Document>(entity =>
         {
             entity.ToTable("documents");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.DocumentTypeId).HasColumnName("document_type_id");
+            entity.Property(e => e.PolicyHolderId).HasColumnName("policy_holder_id");
+            entity.Property(e => e.PolicyId).HasColumnName("policy_id");
+            entity.Property(e => e.BrokerId).HasColumnName("broker_id");
+            entity.Property(e => e.FileName).HasColumnName("file_name");
+            entity.Property(e => e.OriginalFileName).HasColumnName("original_file_name");
+            entity.Property(e => e.FilePath).HasColumnName("file_path");
+            entity.Property(e => e.FileSizeBytes).HasColumnName("file_size_bytes");
+            entity.Property(e => e.FileType).HasColumnName("file_type");
+            entity.Property(e => e.FileExtension).HasColumnName("file_extension");
+            entity.Property(e => e.UploadedBy).HasColumnName("uploaded_by");
+            entity.Property(e => e.UploadDate).HasColumnName("upload_date");
+            entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date");
+            entity.Property(e => e.IsExpired).HasColumnName("is_expired");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.VerifiedBy).HasColumnName("verified_by");
+            entity.Property(e => e.VerifiedDate).HasColumnName("verified_date");
+            entity.Property(e => e.RejectionReason).HasColumnName("rejection_reason");
+            entity.Property(e => e.IsEncrypted).HasColumnName("is_encrypted");
+            entity.Property(e => e.Checksum).HasColumnName("checksum");
+            entity.Property(e => e.Metadata).HasColumnName("metadata");
+            entity.Property(e => e.Tags).HasColumnName("tags");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.HasOne(e => e.DocumentType)
                   .WithMany()
                   .HasForeignKey(e => e.DocumentTypeId);
@@ -152,9 +228,37 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Additional table mappings
-        modelBuilder.Entity<ServiceType>().ToTable("service_types");
-        modelBuilder.Entity<DocumentType>().ToTable("document_types");
+        // ServiceType Configuration
+        modelBuilder.Entity<ServiceType>(entity =>
+        {
+            entity.ToTable("service_types");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ServiceCode).HasColumnName("service_code");
+            entity.Property(e => e.ServiceName).HasColumnName("service_name");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+        });
+
+        // DocumentType Configuration  
+        modelBuilder.Entity<DocumentType>(entity =>
+        {
+            entity.ToTable("document_types");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.DocumentCode).HasColumnName("document_code");
+            entity.Property(e => e.DocumentName).HasColumnName("document_name");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.ServiceTypeId).HasColumnName("service_type_id");
+            entity.Property(e => e.IsRequired).HasColumnName("is_required");
+            entity.Property(e => e.IsOptional).HasColumnName("is_optional");
+            entity.Property(e => e.MaxFileSizeMb).HasColumnName("max_file_size_mb");
+            entity.Property(e => e.AllowedFileTypes).HasColumnName("allowed_file_types");
+            entity.Property(e => e.ValidityPeriodDays).HasColumnName("validity_period_days");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+        });
+
+        // Additional table mappings (minimal - add column mappings if errors occur)
         modelBuilder.Entity<ServiceDocumentRequirement>().ToTable("service_document_requirements");
         modelBuilder.Entity<PolicyApprovalHistory>().ToTable("policy_approval_history");
         modelBuilder.Entity<Claim>().ToTable("claims");
