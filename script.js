@@ -63,8 +63,12 @@ async function loadCompanies() {
     }
 }
 
-// Load companies when page loads
-document.addEventListener('DOMContentLoaded', loadCompanies);
+// Load companies and services when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    loadCompanies();
+    loadServicesForDropdown();
+    initServicesDropdown();
+});
 
 // Broker Modal
 const brokerModal = document.getElementById('brokerModal');

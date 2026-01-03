@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Insurance Loom - Our Insurance Application built by Specialized Engineers">
     <title>Insurance Loom - Our Insurance Application built by Specialized Engineers</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles-light.css">
 </head>
 <body>
     <nav class="navbar">
@@ -23,6 +23,21 @@
                 </li>
             </ul>
             <div class="nav-actions">
+                <div class="services-dropdown">
+                    <button class="services-dropdown-btn" id="servicesDropdownBtn">
+                        Apply for Insurance
+                    </button>
+                    <div class="services-dropdown-content" id="servicesDropdown">
+                        <div class="services-dropdown-header">
+                            <h3>Select Insurance Product</h3>
+                        </div>
+                        <ul class="services-dropdown-list" id="servicesList">
+                            <li class="services-dropdown-item">
+                                <p style="padding: 1rem; color: var(--text-muted); text-align: center;">Loading services...</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 <a href="#" class="btn btn-login" id="loginBtn">Login</a>
             </div>
             <button class="nav-toggle" aria-label="Toggle navigation">
@@ -256,6 +271,70 @@
                     <div id="registerError" class="error-message"></div>
                     <div id="registerSuccess" class="success-message"></div>
                     <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Login/Registration Modal -->
+    <div id="clientModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeClientModal">&times;</span>
+            <div class="modal-tabs">
+                <button class="tab-button active" data-tab="client-login">Login</button>
+                <button class="tab-button" data-tab="client-register">Register</button>
+            </div>
+
+            <!-- Client Login Form -->
+            <div id="client-login" class="tab-content active">
+                <h2>Client Login</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9375rem;">
+                    Login to access your policies and applications
+                </p>
+                <form id="clientLoginForm">
+                    <div class="form-group">
+                        <label for="clientEmail">Email</label>
+                        <input type="email" id="clientEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPassword">Password</label>
+                        <input type="password" id="clientPassword" name="password" required>
+                    </div>
+                    <div id="clientLoginError" class="error-message"></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+            </div>
+
+            <!-- Client Registration Form -->
+            <div id="client-register" class="tab-content">
+                <h2>Client Registration</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9375rem;">
+                    Create an account to apply for insurance online
+                </p>
+                <form id="clientRegisterForm">
+                    <div class="form-group">
+                        <label for="clientRegEmail">Email *</label>
+                        <input type="email" id="clientRegEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientRegPassword">Password *</label>
+                        <input type="password" id="clientRegPassword" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientRegFirstName">First Name *</label>
+                        <input type="text" id="clientRegFirstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientRegLastName">Last Name *</label>
+                        <input type="text" id="clientRegLastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientRegPhone">Phone</label>
+                        <input type="tel" id="clientRegPhone" name="phone">
+                    </div>
+                    <div id="clientRegisterError" class="error-message"></div>
+                    <div id="clientRegisterSuccess" class="success-message" style="display: none; padding: 0.75rem; background-color: #d1fae5; color: #065f46; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #6ee7b7;"></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
                 </form>
             </div>
         </div>
