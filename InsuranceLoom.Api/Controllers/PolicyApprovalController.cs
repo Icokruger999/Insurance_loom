@@ -258,19 +258,26 @@ public class PolicyApprovalController : ControllerBase
             await _context.SaveChangesAsync();
 
             // Send approval notification
-            if (policy.Broker != null && policy.Broker.User != null)
+            var broker = await _context.Brokers.FirstOrDefaultAsync(b => b.Id == policy.BrokerId);
+            if (broker != null)
             {
-                try
+                var brokerUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == broker.UserId);
+                var policyHolderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == policy.PolicyHolder.UserId);
+                
+                if (brokerUser != null)
                 {
-                    await _emailService.SendPolicyApprovedNotificationAsync(
-                        policy.Broker.User.Email,
-                        policy.PolicyHolder?.User?.Email ?? "",
-                        policy.PolicyNumber
-                    );
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to send approval email: {ex.Message}");
+                    try
+                    {
+                        await _emailService.SendPolicyApprovedNotificationAsync(
+                            brokerUser.Email,
+                            policyHolderUser?.Email ?? "",
+                            policy.PolicyNumber
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to send approval email: {ex.Message}");
+                    }
                 }
             }
 
