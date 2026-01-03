@@ -18,6 +18,7 @@ public class BrokerApprovalController : ControllerBase
         _emailService = emailService;
     }
 
+    [HttpGet("{brokerId}/approve")]
     [HttpPost("{brokerId}/approve")]
     public async Task<IActionResult> ApproveBroker(Guid brokerId)
     {
@@ -28,13 +29,24 @@ public class BrokerApprovalController : ControllerBase
                 .FirstOrDefaultAsync(b => b.Id == brokerId);
 
             if (broker == null)
-                return NotFound(new { message = "Broker not found" });
+            {
+                var notFoundHtml = @"<html><head><title>Broker Not Found</title></head><body style=""font-family: Arial, sans-serif; text-align: center; padding: 50px;""><h1>Broker Not Found</h1><p>The broker you're trying to approve does not exist.</p></body></html>";
+                return Content(notFoundHtml, "text/html");
+            }
 
             if (broker.IsActive)
-                return BadRequest(new { message = "Broker is already approved" });
+            {
+                var alreadyApprovedHtml = $@"<html><head><title>Already Approved</title></head><body style=""font-family: Arial, sans-serif; text-align: center; padding: 50px;""><h1>Already Approved</h1><p>Broker {broker.FirstName} {broker.LastName} ({broker.AgentNumber}) is already approved.</p><p><a href=""https://www.insuranceloom.com"">Return to Insurance Loom</a></p></body></html>";
+                return Content(alreadyApprovedHtml, "text/html");
+            }
 
             broker.IsActive = true;
             broker.UpdatedAt = DateTime.UtcNow;
+            if (broker.User != null)
+            {
+                broker.User.IsActive = true;
+                broker.User.UpdatedAt = DateTime.UtcNow;
+            }
             await _context.SaveChangesAsync();
 
             // Send approval notification email to broker
@@ -72,14 +84,44 @@ public class BrokerApprovalController : ControllerBase
                 }
             }
 
-            return Ok(new { message = "Broker approved successfully", brokerId = broker.Id });
+            // Return HTML page for browser display
+            var successHtml = $@"<html>
+<head>
+    <title>Broker Approved</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f5f5f5; }}
+        .container {{ max-width: 600px; margin: 0 auto; background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        h1 {{ color: #28a745; margin-bottom: 20px; }}
+        p {{ color: #666; line-height: 1.6; margin: 15px 0; }}
+        .info-box {{ background-color: #f8f9fa; padding: 20px; border-left: 4px solid #28a745; margin: 20px 0; text-align: left; }}
+        .btn {{ display: inline-block; background-color: #1a1a1a; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }}
+        .btn:hover {{ background-color: #333; }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <h1>✓ Broker Approved Successfully</h1>
+        <p>Broker <strong>{broker.FirstName} {broker.LastName}</strong> has been approved and can now log in.</p>
+        <div class=""info-box"">
+            <p><strong>Agent Number:</strong> {broker.AgentNumber}</p>
+            <p><strong>Email:</strong> {broker.User?.Email ?? "N/A"}</p>
+            <p><strong>Company:</strong> {broker.CompanyName ?? "N/A"}</p>
+        </div>
+        <p>An approval notification email has been sent to the broker.</p>
+        <a href=""https://www.insuranceloom.com"" class=""btn"">Return to Insurance Loom</a>
+    </div>
+</body>
+</html>";
+            return Content(successHtml, "text/html");
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "An error occurred during approval", error = ex.Message });
+            var errorHtml = $@"<html><head><title>Error</title></head><body style=""font-family: Arial, sans-serif; text-align: center; padding: 50px;""><h1 style=""color: #dc3545;"">Error</h1><p>An error occurred during approval: {ex.Message}</p><p><a href=""https://www.insuranceloom.com"">Return to Insurance Loom</a></p></body></html>";
+            return Content(errorHtml, "text/html");
         }
     }
 
+    [HttpGet("{brokerId}/reject")]
     [HttpPost("{brokerId}/reject")]
     public async Task<IActionResult> RejectBroker(Guid brokerId, [FromBody] RejectBrokerRequest? request = null)
     {
@@ -90,7 +132,10 @@ public class BrokerApprovalController : ControllerBase
                 .FirstOrDefaultAsync(b => b.Id == brokerId);
 
             if (broker == null)
-                return NotFound(new { message = "Broker not found" });
+            {
+                var notFoundHtml = @"<html><head><title>Broker Not Found</title></head><body style=""font-family: Arial, sans-serif; text-align: center; padding: 50px;""><h1>Broker Not Found</h1><p>The broker you're trying to reject does not exist.</p><p><a href=""https://www.insuranceloom.com"">Return to Insurance Loom</a></p></body></html>";
+                return Content(notFoundHtml, "text/html");
+            }
 
             // Send rejection email before deleting
             if (broker.User != null)
@@ -127,11 +172,34 @@ public class BrokerApprovalController : ControllerBase
 
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Broker rejected and account removed" });
+            // Return HTML page for browser display
+            var rejectHtml = $@"<html>
+<head>
+    <title>Broker Rejected</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f5f5f5; }}
+        .container {{ max-width: 600px; margin: 0 auto; background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        h1 {{ color: #dc3545; margin-bottom: 20px; }}
+        p {{ color: #666; line-height: 1.6; margin: 15px 0; }}
+        .btn {{ display: inline-block; background-color: #1a1a1a; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }}
+        .btn:hover {{ background-color: #333; }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <h1>Broker Rejected</h1>
+        <p>Broker <strong>{broker.FirstName} {broker.LastName}</strong> has been rejected and their account has been removed.</p>
+        <p>A rejection notification email has been sent to the broker.</p>
+        <a href=""https://www.insuranceloom.com"" class=""btn"">Return to Insurance Loom</a>
+    </div>
+</body>
+</html>";
+            return Content(rejectHtml, "text/html");
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "An error occurred during rejection", error = ex.Message });
+            var errorHtml = $@"<html><head><title>Error</title></head><body style=""font-family: Arial, sans-serif; text-align: center; padding: 50px;""><h1 style=""color: #dc3545;"">Error</h1><p>An error occurred during rejection: {ex.Message}</p><p><a href=""https://www.insuranceloom.com"">Return to Insurance Loom</a></p></body></html>";
+            return Content(errorHtml, "text/html");
         }
     }
 }
