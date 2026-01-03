@@ -18,7 +18,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize] // Require authentication but any user type can view companies
+    [AllowAnonymous] // Allow anonymous access for company list (needed for registration form)
     public async Task<ActionResult<List<CompanyDto>>> GetCompanies([FromQuery] bool activeOnly = true)
     {
         var query = _context.Companies.AsQueryable();
