@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
         {
             var response = await _authService.BrokerLoginAsync(request);
             if (response == null)
-                return Unauthorized(new { message = "Invalid agent number or password" });
+                return Unauthorized(new { message = "Invalid email or password" });
 
             return Ok(response);
         }
