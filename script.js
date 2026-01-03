@@ -58,13 +58,19 @@ function openBrokerModal() {
 }
 
 function closeBrokerModal() {
-    brokerModal.classList.remove('active');
+    const modal = document.getElementById('brokerModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
     // Reset forms
-    brokerLoginForm.reset();
-    brokerRegisterForm.reset();
-    document.getElementById('loginError').classList.remove('show');
-    document.getElementById('registerError').classList.remove('show');
-    document.getElementById('registerSuccess').classList.remove('show');
+    if (brokerLoginForm) brokerLoginForm.reset();
+    if (brokerRegisterForm) brokerRegisterForm.reset();
+    const loginError = document.getElementById('loginError');
+    const registerError = document.getElementById('registerError');
+    const registerSuccess = document.getElementById('registerSuccess');
+    if (loginError) loginError.classList.remove('show');
+    if (registerError) registerError.classList.remove('show');
+    if (registerSuccess) registerSuccess.classList.remove('show');
 }
 
 function switchTab(tabName) {
