@@ -70,14 +70,14 @@ public class AuthService : IAuthService
         // Generate unique agent number
         string agentNumber = await GenerateUniqueAgentNumberAsync();
 
-        // Create user
+        // Create user (inactive until broker is approved)
         var user = new User
         {
             Id = Guid.NewGuid(),
             Email = request.Email,
             PasswordHash = PasswordHasher.HashPassword(request.Password),
             UserType = "Broker",
-            IsActive = true,
+            IsActive = false, // Inactive until broker is approved
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
