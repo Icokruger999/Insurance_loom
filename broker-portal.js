@@ -204,15 +204,15 @@ async function loadCreateClientForm() {
                 <h3 style="margin-bottom: 2rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Personal Information</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="lastName" class="required">Last Name (Apelyido)</label>
+                        <label for="lastName" class="required">Last Name</label>
                         <input type="text" id="lastName" name="lastName" required>
                     </div>
                     <div class="form-group">
-                        <label for="firstName" class="required">First Name (Pangalan)</label>
+                        <label for="firstName" class="required">First Name</label>
                         <input type="text" id="firstName" name="firstName" required>
                     </div>
                     <div class="form-group">
-                        <label for="middleName">Middle Name (Gitnang Pangalan)</label>
+                        <label for="middleName">Middle Name</label>
                         <input type="text" id="middleName" name="middleName">
                     </div>
                     <div class="form-group">
@@ -221,15 +221,15 @@ async function loadCreateClientForm() {
                         <small>South African ID number (13 digits)</small>
                     </div>
                     <div class="form-group">
-                        <label for="dateOfBirth" class="required">Date of Birth (Petsa ng Kapanganakan)</label>
+                        <label for="dateOfBirth" class="required">Date of Birth</label>
                         <input type="date" id="dateOfBirth" name="dateOfBirth" required>
                     </div>
                     <div class="form-group">
-                        <label for="birthplace">Birthplace (Lugar ng Kapanganakan)</label>
+                        <label for="birthplace">Birthplace</label>
                         <input type="text" id="birthplace" name="birthplace">
                     </div>
                     <div class="form-group">
-                        <label for="sex" class="required">Sex (Kasarian)</label>
+                        <label for="sex" class="required">Sex</label>
                         <select id="sex" name="sex" required>
                             <option value="">-- Select --</option>
                             <option value="Male">Male</option>
@@ -237,7 +237,7 @@ async function loadCreateClientForm() {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="civilStatus" class="required">Civil Status (Katayuang Sibil)</label>
+                        <label for="civilStatus" class="required">Civil Status</label>
                         <select id="civilStatus" name="civilStatus" required>
                             <option value="">-- Select --</option>
                             <option value="Single">Single</option>
@@ -247,7 +247,7 @@ async function loadCreateClientForm() {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="occupation">Occupation (Trabaho)</label>
+                        <label for="occupation">Occupation</label>
                         <input type="text" id="occupation" name="occupation">
                     </div>
                     <div class="form-group">
@@ -260,7 +260,7 @@ async function loadCreateClientForm() {
                         <small>Include country code if international</small>
                     </div>
                     <div class="form-group full-width">
-                        <label for="address" class="required">Residence Address (Tirahan)</label>
+                        <label for="address" class="required">Residence Address</label>
                         <textarea id="address" name="address" rows="3" required></textarea>
                     </div>
                 </div>
@@ -314,7 +314,7 @@ async function loadCreateClientForm() {
                     </div>
                 </div>
                 
-                <h3 style="margin: 3rem 0 1.5rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Beneficiaries (Mga Kaanak na Tatanggap ng Benepisyo)</h3>
+                <h3 style="margin: 3rem 0 1.5rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Beneficiaries</h3>
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <div id="beneficiariesTable" style="overflow-x: auto;">
