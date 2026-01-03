@@ -53,6 +53,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Broker>(entity =>
         {
             entity.ToTable("brokers");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.HasIndex(e => e.AgentNumber).IsUnique();
             entity.HasOne(e => e.User)
                   .WithMany()
@@ -64,6 +65,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<PolicyHolder>(entity =>
         {
             entity.ToTable("policy_holders");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.HasIndex(e => e.PolicyNumber).IsUnique();
             entity.HasOne(e => e.User)
                   .WithMany()
@@ -75,6 +77,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Manager>(entity =>
         {
             entity.ToTable("managers");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.EmployeeNumber).IsUnique();
             entity.HasOne(e => e.User)
@@ -87,6 +90,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Policy>(entity =>
         {
             entity.ToTable("policies");
+            entity.Property(e => e.PolicyHolderId).HasColumnName("policy_holder_id");
+            entity.Property(e => e.BrokerId).HasColumnName("broker_id");
+            entity.Property(e => e.ServiceTypeId).HasColumnName("service_type_id");
             entity.HasIndex(e => e.PolicyNumber).IsUnique();
             entity.HasOne(e => e.PolicyHolder)
                   .WithMany()
