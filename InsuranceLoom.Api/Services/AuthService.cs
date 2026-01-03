@@ -63,6 +63,23 @@ public class AuthService : IAuthService
         _context.Brokers.Add(broker);
         await _context.SaveChangesAsync();
 
+        // Send registration confirmation email
+        try
+        {
+            await _emailService.SendBrokerRegistrationNotificationAsync(
+                user.Email,
+                agentNumber,
+                broker.FirstName,
+                broker.LastName
+            );
+        }
+        catch (Exception ex)
+        {
+            // Log email error but don't fail registration
+            // In production, use proper logging
+            Console.WriteLine($"Failed to send registration email: {ex.Message}");
+        }
+
         return new BrokerDto
         {
             Id = broker.Id,
