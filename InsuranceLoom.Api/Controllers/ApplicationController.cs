@@ -43,12 +43,8 @@ public class ApplicationController : ControllerBase
                 </div>
             ";
 
-            // Send email to all recipients
-            var tasks = request.Recipients.Select(email => 
-                _emailService.SendEmailAsync(email, subject, body, true)
-            ).ToArray();
-
-            await Task.WhenAll(tasks);
+            // Send email to all recipients using the multi-recipient method
+            await _emailService.SendEmailToMultipleRecipientsAsync(request.Recipients, subject, body, true);
 
             return Ok(new { message = $"Application PDF sent successfully to {request.Recipients.Length} recipient(s)" });
         }
