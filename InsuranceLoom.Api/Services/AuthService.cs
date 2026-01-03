@@ -54,7 +54,7 @@ public class AuthService : IAuthService
             CompanyName = request.CompanyName,
             Phone = request.Phone,
             LicenseNumber = request.LicenseNumber,
-            CommissionRate = 5.0m, // Default 5% commission rate
+            CommissionRate = 0.00m, // Default 0% commission rate (can be updated later)
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
