@@ -138,7 +138,7 @@ if (brokerLoginForm) {
         errorDiv.classList.remove('show');
 
         const formData = {
-            agentNumber: document.getElementById('loginAgentNumber').value,
+            email: document.getElementById('loginEmail').value,
             password: document.getElementById('loginPassword').value
         };
 

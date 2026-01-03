@@ -134,7 +134,7 @@ public class AuthService : IAuthService
     {
         var broker = await _context.Brokers
             .Include(b => b.User)
-            .FirstOrDefaultAsync(b => b.AgentNumber == request.AgentNumber && b.IsActive);
+            .FirstOrDefaultAsync(b => b.User != null && b.User.Email == request.Email && b.IsActive);
 
         if (broker == null || broker.User == null || !broker.User.IsActive)
             return null;
