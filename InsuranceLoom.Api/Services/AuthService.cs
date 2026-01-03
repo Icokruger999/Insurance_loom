@@ -119,14 +119,13 @@ public class AuthService : IAuthService
             Console.WriteLine($"Failed to send registration email: {ex.Message}");
         }
 
-        // Send approval request email to approver
+        // Send approval request email to manager
         try
         {
-            var approverEmail = _configuration["BrokerApproval:ApproverEmail"];
-            if (!string.IsNullOrEmpty(approverEmail))
+            if (manager != null)
             {
                 await _emailService.SendBrokerApprovalRequestAsync(
-                    approverEmail,
+                    manager.Email,
                     user.Email,
                     agentNumber,
                     broker.FirstName,
