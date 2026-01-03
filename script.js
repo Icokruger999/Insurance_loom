@@ -318,9 +318,6 @@ if (loginBtn) {
     loginBtn.addEventListener('click', handleLogin);
 }
 
-if (loginBtnMobile) {
-    loginBtnMobile.addEventListener('click', handleLogin);
-}
 
 // Login Type Selection
 if (selectBrokerBtn) {
