@@ -22,14 +22,69 @@ const brokerLoginBtnMobile = document.getElementById('brokerLoginBtnMobile');
 const policyHolderLoginBtn = document.getElementById('policyHolderLoginBtn');
 const policyHolderLoginBtnMobile = document.getElementById('policyHolderLoginBtnMobile');
 
+// API Base URL - Automatically detects environment
+const API_BASE_URL = (() => {
+    const hostname = window.location.hostname;
+    
+    // Production (AWS)
+    if (hostname === 'insuranceloom.com' || hostname === 'www.insuranceloom.com') {
+        // Use EC2 IP address (update to api.insuranceloom.com once DNS is configured)
+        return 'http://34.246.222.13/api';
+    }
+    
+    // Development (localhost)
+    return 'http://localhost:5000/api';
+})();
+
+// Broker Modal
+const brokerModal = document.getElementById('brokerModal');
+const brokerLoginBtn = document.getElementById('brokerLoginBtn');
+const brokerLoginBtnMobile = document.getElementById('brokerLoginBtnMobile');
+const modalClose = document.querySelector('.modal-close');
+const tabButtons = document.querySelectorAll('.tab-button');
+const tabContents = document.querySelectorAll('.tab-content');
+const brokerLoginForm = document.getElementById('brokerLoginForm');
+const brokerRegisterForm = document.getElementById('brokerRegisterForm');
+
+function openBrokerModal() {
+    brokerModal.classList.add('active');
+    // Reset to login tab
+    switchTab('login');
+}
+
+function closeBrokerModal() {
+    brokerModal.classList.remove('active');
+    // Reset forms
+    brokerLoginForm.reset();
+    brokerRegisterForm.reset();
+    document.getElementById('loginError').classList.remove('show');
+    document.getElementById('registerError').classList.remove('show');
+    document.getElementById('registerSuccess').classList.remove('show');
+}
+
+function switchTab(tabName) {
+    // Update tab buttons
+    tabButtons.forEach(btn => {
+        if (btn.dataset.tab === tabName) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Update tab contents
+    tabContents.forEach(content => {
+        if (content.id === `${tabName}Tab`) {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
+}
+
 function handleBrokerLogin(e) {
     e.preventDefault();
-    // TODO: Connect to C# backend API endpoint for broker login
-    // Example: window.location.href = '/broker/login';
-    // Or: fetch('/api/auth/broker/login', { method: 'POST', ... })
-    console.log('Broker login button clicked - ready for C# backend integration');
-    // For now, just show a placeholder message
-    alert('Broker login functionality will be connected to C# backend');
+    openBrokerModal();
 }
 
 function handlePolicyHolderLogin(e) {
@@ -40,6 +95,124 @@ function handlePolicyHolderLogin(e) {
     console.log('Policy holder login button clicked - ready for C# backend integration');
     // For now, just show a placeholder message
     alert('Policy holder login functionality will be connected to C# backend');
+}
+
+// Tab switching
+tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        switchTab(btn.dataset.tab);
+    });
+});
+
+// Close modal events
+if (modalClose) {
+    modalClose.addEventListener('click', closeBrokerModal);
+}
+
+if (brokerModal) {
+    brokerModal.addEventListener('click', (e) => {
+        if (e.target === brokerModal) {
+            closeBrokerModal();
+        }
+    });
+}
+
+// Broker Login Form Handler
+if (brokerLoginForm) {
+    brokerLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.classList.remove('show');
+
+        const formData = {
+            agentNumber: document.getElementById('loginAgentNumber').value,
+            password: document.getElementById('loginPassword').value
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/broker/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Store token if needed
+                if (data.token) {
+                    localStorage.setItem('brokerToken', data.token);
+                    localStorage.setItem('brokerInfo', JSON.stringify(data.broker));
+                }
+                alert(`Login successful! Welcome ${data.broker?.firstName || 'Broker'}`);
+                closeBrokerModal();
+                // You can redirect or update UI here
+            } else {
+                errorDiv.textContent = data.message || 'Login failed. Please check your credentials.';
+                errorDiv.classList.add('show');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + API_BASE_URL;
+            errorDiv.classList.add('show');
+        }
+    });
+}
+
+// Broker Registration Form Handler
+if (brokerRegisterForm) {
+    brokerRegisterForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorDiv = document.getElementById('registerError');
+        const successDiv = document.getElementById('registerSuccess');
+        errorDiv.classList.remove('show');
+        successDiv.classList.remove('show');
+
+        const formData = {
+            email: document.getElementById('regEmail').value,
+            password: document.getElementById('regPassword').value,
+            agentNumber: document.getElementById('regAgentNumber').value,
+            firstName: document.getElementById('regFirstName').value,
+            lastName: document.getElementById('regLastName').value,
+            companyName: document.getElementById('regCompanyName').value || null,
+            phone: document.getElementById('regPhone').value || null,
+            licenseNumber: document.getElementById('regLicenseNumber').value || null,
+            commissionRate: document.getElementById('regCommissionRate').value ? 
+                parseFloat(document.getElementById('regCommissionRate').value) : null
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/broker/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                successDiv.textContent = `Registration successful! Agent Number: ${data.agentNumber}. You can now login.`;
+                successDiv.classList.add('show');
+                brokerRegisterForm.reset();
+                // Switch to login tab after 2 seconds
+                setTimeout(() => {
+                    switchTab('login');
+                    successDiv.classList.remove('show');
+                }, 2000);
+            } else {
+                errorDiv.textContent = data.message || 'Registration failed. Please check your information.';
+                errorDiv.classList.add('show');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + API_BASE_URL;
+            errorDiv.classList.add('show');
+        }
+    });
 }
 
 if (brokerLoginBtn) {

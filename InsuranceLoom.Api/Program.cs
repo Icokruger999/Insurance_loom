@@ -92,7 +92,8 @@ builder.Services.AddCors(options =>
             // In production, restrict to specific origins
             policy.WithOrigins(
                     "https://insuranceloom.com", 
-                    "https://www.insuranceloom.com"
+                    "https://www.insuranceloom.com",
+                    "http://34.246.222.13"  // Allow EC2 IP for testing
                   )
                   .AllowAnyHeader()
                   .AllowAnyMethod()
