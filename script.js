@@ -174,11 +174,14 @@ if (modalClose) {
 
 if (brokerModal) {
     brokerModal.addEventListener('click', (e) => {
+        // Only close if clicking directly on the modal backdrop (not on modal-content or its children)
+        const modalContent = brokerModal.querySelector('.modal-content');
         if (e.target === brokerModal) {
             closeBrokerModal();
         }
     });
-    // Prevent clicks inside modal-content from closing the modal
+    
+    // Prevent clicks inside modal-content from bubbling to brokerModal
     const modalContent = brokerModal.querySelector('.modal-content');
     if (modalContent) {
         modalContent.addEventListener('click', (e) => {
