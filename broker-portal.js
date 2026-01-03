@@ -56,8 +56,8 @@ function initNavigation() {
     const sectionTitle = document.getElementById('sectionTitle');
     
     const sectionTitles = {
-        'new-clients': 'New Clients',
-        'existing-clients': 'Progress Existing Clients',
+        'new-clients': 'Policies Pending Approval',
+        'existing-clients': 'My Policies',
         'monthly-report': 'Monthly Report',
         'commission': 'Commission'
     };
@@ -81,6 +81,9 @@ function initNavigation() {
             if (sectionTitle && sectionTitles[targetSection]) {
                 sectionTitle.textContent = sectionTitles[targetSection];
             }
+            
+            // Load section data
+            loadSectionData(targetSection);
         });
     });
 }
@@ -97,6 +100,89 @@ function initLogout() {
     }
 }
 
+// Load section-specific data
+async function loadSectionData(sectionId) {
+    const token = localStorage.getItem('brokerToken');
+    const brokerInfo = localStorage.getItem('brokerInfo');
+    
+    if (!token || !brokerInfo) return;
+    
+    try {
+        const broker = JSON.parse(brokerInfo);
+        
+        switch (sectionId) {
+            case 'new-clients':
+                await loadPendingApprovalPolicies(broker.id);
+                break;
+            case 'existing-clients':
+                await loadAllPolicies(broker.id);
+                break;
+            case 'monthly-report':
+                await loadMonthlyReport(broker.id);
+                break;
+            case 'commission':
+                await loadCommission(broker.id);
+                break;
+        }
+    } catch (error) {
+        console.error(`Error loading ${sectionId}:`, error);
+    }
+}
+
+// Load policies pending approval
+async function loadPendingApprovalPolicies(brokerId) {
+    const policiesList = document.getElementById('pendingPoliciesList');
+    if (!policiesList) return;
+    
+    policiesList.innerHTML = '<p class="loading-text">Loading policies...</p>';
+    
+    try {
+        const token = localStorage.getItem('brokerToken');
+        // TODO: Implement API endpoint for getting broker's policies pending approval
+        // const response = await fetch(`${API_BASE_URL}/broker/${brokerId}/policies/pending-approval`, {
+        //     headers: { 'Authorization': `Bearer ${token}` }
+        // });
+        
+        // For now, show placeholder
+        policiesList.innerHTML = `
+            <div class="policy-card">
+                <p style="color: var(--text-secondary);">Policies you've sold that are waiting for manager approval will appear here.</p>
+            </div>
+        `;
+    } catch (error) {
+        policiesList.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading policies</p>';
+    }
+}
+
+// Load all policies
+async function loadAllPolicies(brokerId) {
+    const policiesList = document.getElementById('allPoliciesList');
+    if (!policiesList) return;
+    
+    policiesList.innerHTML = '<p class="loading-text">Loading policies...</p>';
+    
+    try {
+        // TODO: Implement API endpoint
+        policiesList.innerHTML = `
+            <div class="policy-card">
+                <p style="color: var(--text-secondary);">All your policies will be displayed here.</p>
+            </div>
+        `;
+    } catch (error) {
+        policiesList.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading policies</p>';
+    }
+}
+
+// Load monthly report
+async function loadMonthlyReport(brokerId) {
+    // TODO: Implement
+}
+
+// Load commission
+async function loadCommission(brokerId) {
+    // TODO: Implement
+}
+
 // Initialize portal
 document.addEventListener('DOMContentLoaded', () => {
     if (!checkAuth()) {
@@ -110,26 +196,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load initial section data
     loadSectionData('new-clients');
 });
-
-// Load section-specific data
-function loadSectionData(sectionId) {
-    // This will be implemented for each section
-    console.log(`Loading data for section: ${sectionId}`);
-    
-    // TODO: Implement API calls for each section
-    switch (sectionId) {
-        case 'new-clients':
-            // Load new client form or existing clients
-            break;
-        case 'existing-clients':
-            // Load existing clients list
-            break;
-        case 'monthly-report':
-            // Load monthly report data
-            break;
-        case 'commission':
-            // Load commission data
-            break;
-    }
-}
-
