@@ -172,6 +172,80 @@
         </div>
     </footer>
 
+    <!-- Broker Login/Registration Modal -->
+    <div id="brokerModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-tabs">
+                <button class="tab-button active" data-tab="login">Login</button>
+                <button class="tab-button" data-tab="register">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginTab" class="tab-content active">
+                <h2>Broker Login</h2>
+                <form id="brokerLoginForm">
+                    <div class="form-group">
+                        <label for="loginAgentNumber">Agent Number</label>
+                        <input type="text" id="loginAgentNumber" name="agentNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                    <div id="loginError" class="error-message"></div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="registerTab" class="tab-content">
+                <h2>Broker Registration</h2>
+                <form id="brokerRegisterForm">
+                    <div class="form-group">
+                        <label for="regEmail">Email *</label>
+                        <input type="email" id="regEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password *</label>
+                        <input type="password" id="regPassword" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regAgentNumber">Agent Number *</label>
+                        <input type="text" id="regAgentNumber" name="agentNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regFirstName">First Name *</label>
+                        <input type="text" id="regFirstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regLastName">Last Name *</label>
+                        <input type="text" id="regLastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regCompanyName">Company Name</label>
+                        <input type="text" id="regCompanyName" name="companyName">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPhone">Phone</label>
+                        <input type="tel" id="regPhone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="regLicenseNumber">License Number</label>
+                        <input type="text" id="regLicenseNumber" name="licenseNumber">
+                    </div>
+                    <div class="form-group">
+                        <label for="regCommissionRate">Commission Rate (%)</label>
+                        <input type="number" id="regCommissionRate" name="commissionRate" step="0.01">
+                    </div>
+                    <div id="registerError" class="error-message"></div>
+                    <div id="registerSuccess" class="success-message"></div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
