@@ -326,19 +326,24 @@ public class PolicyApprovalController : ControllerBase
             await _context.SaveChangesAsync();
 
             // Send rejection notification
-            if (policy.Broker != null && policy.Broker.User != null)
+            var broker = await _context.Brokers.FirstOrDefaultAsync(b => b.Id == policy.BrokerId);
+            if (broker != null)
             {
-                try
+                var brokerUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == broker.UserId);
+                if (brokerUser != null)
                 {
-                    await _emailService.SendPolicyRejectedNotificationAsync(
-                        policy.Broker.User.Email,
-                        policy.PolicyNumber,
-                        request.Reason
-                    );
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to send rejection email: {ex.Message}");
+                    try
+                    {
+                        await _emailService.SendPolicyRejectedNotificationAsync(
+                            brokerUser.Email,
+                            policy.PolicyNumber,
+                            request.Reason
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to send rejection email: {ex.Message}");
+                    }
                 }
             }
 
