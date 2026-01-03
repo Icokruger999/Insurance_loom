@@ -96,28 +96,9 @@ function handleServiceSelection(serviceId, serviceName) {
         dropdown.classList.remove('show');
     }
     
-    // Check if user is logged in as client
-    const clientToken = localStorage.getItem('clientToken');
-    
-    if (clientToken) {
-        // User is logged in, redirect to application form (TODO: create client application page)
-        localStorage.setItem('selectedServiceId', serviceId);
-        localStorage.setItem('selectedServiceName', serviceName);
-        alert('Client application page coming soon. Please contact a broker for assistance.');
-    } else {
-        // User not logged in, show client login/registration modal
-        localStorage.setItem('selectedServiceId', serviceId);
-        localStorage.setItem('selectedServiceName', serviceName);
-        if (typeof openClientModal === 'function') {
-            openClientModal();
-        } else {
-            // Fallback: show login modal
-            const loginTypeModal = document.getElementById('loginTypeModal');
-            if (loginTypeModal) {
-                loginTypeModal.classList.add('active');
-            }
-        }
-    }
+    // Redirect to application page with service information
+    const applicationUrl = `/application.html?serviceId=${encodeURIComponent(serviceId)}&serviceName=${encodeURIComponent(serviceName)}`;
+    window.location.href = applicationUrl;
 }
 
 // Initialize on page load
