@@ -123,20 +123,28 @@ public class PolicyHolderController : ControllerBase
 
                 _context.Policies.Add(policy);
 
-                // Create debit order for payment
+                // Create debit order for payment (bank details will be added later)
                 if (request.PaymentDate.HasValue && request.PremiumAmount.HasValue)
                 {
+                    // Calculate next debit date based on payment day
+                    var today = DateTime.UtcNow;
+                    var nextDebitDate = new DateTime(today.Year, today.Month, request.PaymentDate.Value);
+                    if (nextDebitDate <= today)
+                    {
+                        nextDebitDate = nextDebitDate.AddMonths(1);
+                    }
+
                     var debitOrder = new DebitOrder
                     {
                         Id = Guid.NewGuid(),
                         PolicyId = policy.Id,
                         PolicyHolderId = policyHolder.Id,
                         BankName = null, // Will be updated later
-                        AccountNumber = null, // Will be updated later
-                        AccountHolderName = $"{request.FirstName} {request.LastName}",
-                        PaymentDay = request.PaymentDate.Value,
+                        BankAccountNumber = null, // Will be updated later
                         Amount = request.PremiumAmount.Value,
-                        IsActive = true,
+                        Frequency = "Monthly",
+                        NextDebitDate = nextDebitDate,
+                        Status = "Active",
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
