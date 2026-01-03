@@ -448,11 +448,27 @@ async function loadCreateClientForm() {
                 <div class="error-message" id="formError"></div>
                 <div class="success-message" id="formSuccess"></div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="submitBtn">Create Client & Policy</button>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                        <button type="button" class="btn btn-secondary" id="downloadPdfBtn">Download PDF</button>
+                        <button type="button" class="btn btn-secondary" id="emailPdfBtn">Email PDF</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Create Client & Policy</button>
+                    </div>
                 </div>
             </form>
         `;
+        
+        // Add PDF download handler
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        if (downloadPdfBtn) {
+            downloadPdfBtn.addEventListener('click', generateAndDownloadPDF);
+        }
+        
+        // Add email PDF handler
+        const emailPdfBtn = document.getElementById('emailPdfBtn');
+        if (emailPdfBtn) {
+            emailPdfBtn.addEventListener('click', showEmailModal);
+        }
         
         // Add form submission handler
         const form = document.getElementById('newClientForm');

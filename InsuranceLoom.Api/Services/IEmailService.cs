@@ -9,5 +9,6 @@ public interface IEmailService
     Task SendPolicyApprovedNotificationAsync(string brokerEmail, string policyHolderEmail, string policyNumber);
     Task SendPolicyRejectedNotificationAsync(string brokerEmail, string policyNumber, string reason);
     Task SendChangesRequestedNotificationAsync(string brokerEmail, string policyNumber, string changesRequired);
+    Task SendEmailToMultipleRecipientsAsync(string[] recipients, string subject, string body, bool isHtml = true);
 }
 

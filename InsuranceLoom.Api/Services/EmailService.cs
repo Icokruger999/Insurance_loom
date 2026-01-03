@@ -165,5 +165,37 @@ public class EmailService : IEmailService
 
         await SendEmailAsync(brokerEmail, subject, body);
     }
+
+    public async Task SendEmailToMultipleRecipientsAsync(string[] recipients, string subject, string body, bool isHtml = true)
+    {
+        try
+        {
+            using var client = new SmtpClient(_smtpServer, _smtpPort)
+            {
+                EnableSsl = true,
+                Credentials = new NetworkCredential(_username, _password)
+            };
+
+            var tasks = recipients.Select(async email =>
+            {
+                using var message = new MailMessage
+                {
+                    From = new MailAddress(_senderEmail, _senderName),
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = isHtml
+                };
+                message.To.Add(email);
+                await client.SendMailAsync(message);
+            }).ToArray();
+
+            await Task.WhenAll(tasks);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Email send failed: {ex.Message}");
+            throw;
+        }
+    }
 }
 
