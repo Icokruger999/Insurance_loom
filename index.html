@@ -231,7 +231,17 @@
                     </div>
                     <div class="form-group">
                         <label for="regCompanyName">Company Name</label>
-                        <input type="text" id="regCompanyName" name="companyName">
+                        <input type="text" id="regCompanyName" name="companyName" list="companyList">
+                        <datalist id="companyList"></datalist>
+                        <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+                            Select from existing companies or type a new company name
+                        </small>
+                        <div style="margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="createCompanyCheckbox" style="margin-right: 0.5rem;">
+                                <span style="font-size: 0.875rem;">Create company if it doesn't exist</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="regPhone">Phone</label>

@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
     // Core Tables
     public DbSet<User> Users { get; set; }
     public DbSet<ServiceType> ServiceTypes { get; set; }
+    public DbSet<Company> Companies { get; set; }
 
     // User Type Tables
     public DbSet<Broker> Brokers { get; set; }
@@ -238,6 +239,18 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+        });
+
+        // Company Configuration
+        modelBuilder.Entity<Company>(entity =>
+        {
+            entity.ToTable("companies");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.HasIndex(e => e.Name).IsUnique();
         });
 
         // DocumentType Configuration  

@@ -39,6 +39,30 @@ const API_BASE_URL = (() => {
     return 'http://localhost:5000/api';
 })();
 
+// Load companies list on page load
+async function loadCompanies() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/company?activeOnly=true`);
+        if (response.ok) {
+            const companies = await response.json();
+            const companyList = document.getElementById('companyList');
+            if (companyList) {
+                companyList.innerHTML = '';
+                companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.name;
+                    companyList.appendChild(option);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load companies:', error);
+    }
+}
+
+// Load companies when page loads
+document.addEventListener('DOMContentLoaded', loadCompanies);
+
 // Broker Modal
 const brokerModal = document.getElementById('brokerModal');
 const modalClose = document.querySelector('.modal-close');
