@@ -1,0 +1,143 @@
+using InsuranceLoom.Api.Data;
+using InsuranceLoom.Api.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace InsuranceLoom.Api.Controllers;
+
+[ApiController]
+[Route("api/broker")]
+public class BrokerApprovalController : ControllerBase
+{
+    private readonly ApplicationDbContext _context;
+    private readonly IEmailService _emailService;
+
+    public BrokerApprovalController(ApplicationDbContext context, IEmailService emailService)
+    {
+        _context = context;
+        _emailService = emailService;
+    }
+
+    [HttpPost("{brokerId}/approve")]
+    public async Task<IActionResult> ApproveBroker(Guid brokerId)
+    {
+        try
+        {
+            var broker = await _context.Brokers
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.Id == brokerId);
+
+            if (broker == null)
+                return NotFound(new { message = "Broker not found" });
+
+            if (broker.IsActive)
+                return BadRequest(new { message = "Broker is already approved" });
+
+            broker.IsActive = true;
+            broker.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            // Send approval notification email to broker
+            if (broker.User != null)
+            {
+                try
+                {
+                    await _emailService.SendEmailAsync(
+                        broker.User.Email,
+                        "Insurance Loom - Your Broker Account Has Been Approved",
+                        $@"
+                            <div style=""font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;"">
+                                <div style=""background-color: #1a1a1a; color: #ffffff; padding: 20px; text-align: center;"">
+                                    <h1 style=""margin: 0;"">Insurance Loom</h1>
+                                </div>
+                                <div style=""background-color: #ffffff; padding: 30px;"">
+                                    <h2 style=""color: #333333;"">Account Approved!</h2>
+                                    <p style=""color: #666666; line-height: 1.6;"">Good news, {broker.FirstName}! Your broker account has been approved.</p>
+                                    <div style=""background-color: #f8f9fa; padding: 20px; border-left: 4px solid #28a745; margin: 20px 0;"">
+                                        <p style=""margin: 0; color: #333333;""><strong>Your Agent Number:</strong> <span style=""font-size: 18px; color: #1a1a1a;"">{broker.AgentNumber}</span></p>
+                                    </div>
+                                    <p style=""color: #666666; line-height: 1.6;"">You can now log in to the Insurance Loom portal using your email address and password.</p>
+                                    <div style=""text-align: center; margin: 30px 0;"">
+                                        <a href=""https://www.insuranceloom.com"" style=""display: inline-block; background-color: #1a1a1a; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px;"">Login to Your Account</a>
+                                    </div>
+                                    <p style=""color: #666666; line-height: 1.6; font-size: 14px; margin-top: 30px;"">Best regards,<br>The Insurance Loom Team</p>
+                                </div>
+                            </div>
+                        "
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send approval email: {ex.Message}");
+                }
+            }
+
+            return Ok(new { message = "Broker approved successfully", brokerId = broker.Id });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during approval", error = ex.Message });
+        }
+    }
+
+    [HttpPost("{brokerId}/reject")]
+    public async Task<IActionResult> RejectBroker(Guid brokerId, [FromBody] RejectBrokerRequest? request = null)
+    {
+        try
+        {
+            var broker = await _context.Brokers
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.Id == brokerId);
+
+            if (broker == null)
+                return NotFound(new { message = "Broker not found" });
+
+            // Send rejection email before deleting
+            if (broker.User != null)
+            {
+                try
+                {
+                    await _emailService.SendEmailAsync(
+                        broker.User.Email,
+                        "Insurance Loom - Broker Registration Status",
+                        $@"
+                            <div style=""font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;"">
+                                <div style=""background-color: #1a1a1a; color: #ffffff; padding: 20px; text-align: center;"">
+                                    <h1 style=""margin: 0;"">Insurance Loom</h1>
+                                </div>
+                                <div style=""background-color: #ffffff; padding: 30px;"">
+                                    <h2 style=""color: #333333;"">Registration Status</h2>
+                                    <p style=""color: #666666; line-height: 1.6;"">Dear {broker.FirstName},</p>
+                                    <p style=""color: #666666; line-height: 1.6;"">We regret to inform you that your broker registration has been rejected.</p>
+                                    {(request?.Reason != null ? $@"<p style=""color: #666666; line-height: 1.6;""><strong>Reason:</strong> {request.Reason}</p>" : "")}
+                                    <p style=""color: #666666; line-height: 1.6; font-size: 14px; margin-top: 30px;"">If you have any questions, please contact our support team.</p>
+                                    <p style=""color: #666666; line-height: 1.6; font-size: 14px;"">Best regards,<br>The Insurance Loom Team</p>
+                                </div>
+                            </div>
+                        "
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send rejection email: {ex.Message}");
+                }
+
+                _context.Users.Remove(broker.User);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Broker rejected and account removed" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during rejection", error = ex.Message });
+        }
+    }
+}
+
+public class RejectBrokerRequest
+{
+    public string? Reason { get; set; }
+}
+

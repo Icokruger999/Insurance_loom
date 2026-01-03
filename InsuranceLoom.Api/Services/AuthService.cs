@@ -11,12 +11,14 @@ public class AuthService : IAuthService
     private readonly ApplicationDbContext _context;
     private readonly JwtTokenGenerator _jwtGenerator;
     private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
-    public AuthService(ApplicationDbContext context, JwtTokenGenerator jwtGenerator, IEmailService emailService)
+    public AuthService(ApplicationDbContext context, JwtTokenGenerator jwtGenerator, IEmailService emailService, IConfiguration configuration)
     {
         _context = context;
         _jwtGenerator = jwtGenerator;
         _emailService = emailService;
+        _configuration = configuration;
     }
 
     public async Task<BrokerDto> RegisterBrokerAsync(CreateBrokerRequest request)
@@ -55,7 +57,7 @@ public class AuthService : IAuthService
             Phone = request.Phone,
             LicenseNumber = request.LicenseNumber,
             CommissionRate = 0.00m, // Default 0% commission rate (can be updated later)
-            IsActive = true,
+            IsActive = false, // Pending approval - will be set to true after admin approval
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -63,7 +65,7 @@ public class AuthService : IAuthService
         _context.Brokers.Add(broker);
         await _context.SaveChangesAsync();
 
-        // Send registration confirmation email
+        // Send registration confirmation email to broker (pending approval)
         try
         {
             await _emailService.SendBrokerRegistrationNotificationAsync(
@@ -75,9 +77,29 @@ public class AuthService : IAuthService
         }
         catch (Exception ex)
         {
-            // Log email error but don't fail registration
-            // In production, use proper logging
             Console.WriteLine($"Failed to send registration email: {ex.Message}");
+        }
+
+        // Send approval request email to approver
+        try
+        {
+            var approverEmail = _configuration["BrokerApproval:ApproverEmail"];
+            if (!string.IsNullOrEmpty(approverEmail))
+            {
+                await _emailService.SendBrokerApprovalRequestAsync(
+                    approverEmail,
+                    user.Email,
+                    agentNumber,
+                    broker.FirstName,
+                    broker.LastName,
+                    broker.CompanyName ?? "",
+                    broker.Id
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to send approval request email: {ex.Message}");
         }
 
         return new BrokerDto
@@ -134,13 +156,17 @@ public class AuthService : IAuthService
     {
         var broker = await _context.Brokers
             .Include(b => b.User)
-            .FirstOrDefaultAsync(b => b.User != null && b.User.Email == request.Email && b.IsActive);
+            .FirstOrDefaultAsync(b => b.User != null && b.User.Email == request.Email);
 
         if (broker == null || broker.User == null || !broker.User.IsActive)
             return null;
 
         if (!PasswordHasher.VerifyPassword(request.Password, broker.User.PasswordHash))
             return null;
+
+        // Check if broker is approved (IsActive must be true)
+        if (!broker.IsActive)
+            return null; // Broker is pending approval
 
         var token = _jwtGenerator.GenerateToken(broker.User.Id, broker.User.Email, "Broker");
         var refreshToken = _jwtGenerator.GenerateRefreshToken();

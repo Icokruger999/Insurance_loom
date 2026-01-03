@@ -16,11 +16,14 @@ navLinks.forEach(link => {
     });
 });
 
-// Login Button Handlers (ready for C# backend integration)
-const brokerLoginBtn = document.getElementById('brokerLoginBtn');
-const brokerLoginBtnMobile = document.getElementById('brokerLoginBtnMobile');
-const policyHolderLoginBtn = document.getElementById('policyHolderLoginBtn');
-const policyHolderLoginBtnMobile = document.getElementById('policyHolderLoginBtnMobile');
+// Login Button Handlers
+const loginBtn = document.getElementById('loginBtn');
+const loginBtnMobile = document.getElementById('loginBtnMobile');
+const loginTypeModal = document.getElementById('loginTypeModal');
+const selectBrokerBtn = document.getElementById('selectBrokerBtn');
+const selectClientBtn = document.getElementById('selectClientBtn');
+const closeLoginTypeModal = document.getElementById('closeLoginTypeModal');
+const clientModal = document.getElementById('clientModal');
 
 // API Base URL - Automatically detects environment
 const API_BASE_URL = (() => {
@@ -93,21 +96,44 @@ function switchTab(tabName) {
     });
 }
 
-function handleBrokerLogin(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Broker login button clicked');
-    openBrokerModal();
+function openLoginTypeModal() {
+    const modal = document.getElementById('loginTypeModal');
+    if (!modal) {
+        console.error('Login type modal not found in DOM');
+        return;
+    }
+    modal.classList.add('active');
 }
 
-function handlePolicyHolderLogin(e) {
+function closeLoginTypeModalFunc() {
+    const modal = document.getElementById('loginTypeModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function openClientModal() {
+    closeLoginTypeModalFunc();
+    const modal = document.getElementById('clientModal');
+    if (!modal) {
+        console.error('Client modal not found in DOM');
+        return;
+    }
+    modal.classList.add('active');
+}
+
+function closeClientModal() {
+    const modal = document.getElementById('clientModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function handleLogin(e) {
     e.preventDefault();
-    // TODO: Connect to C# backend API endpoint for policy holder login
-    // Example: window.location.href = '/policyholder/login';
-    // Or: fetch('/api/auth/policyholder/login', { method: 'POST', ... })
-    console.log('Policy holder login button clicked - ready for C# backend integration');
-    // For now, just show a placeholder message
-    alert('Policy holder login functionality will be connected to C# backend');
+    e.stopPropagation();
+    console.log('Login button clicked');
+    openLoginTypeModal();
 }
 
 // Tab switching
@@ -227,20 +253,54 @@ if (brokerRegisterForm) {
     });
 }
 
-if (brokerLoginBtn) {
-    brokerLoginBtn.addEventListener('click', handleBrokerLogin);
+// Single Login Button Handlers
+if (loginBtn) {
+    loginBtn.addEventListener('click', handleLogin);
 }
 
-if (brokerLoginBtnMobile) {
-    brokerLoginBtnMobile.addEventListener('click', handleBrokerLogin);
+if (loginBtnMobile) {
+    loginBtnMobile.addEventListener('click', handleLogin);
 }
 
-if (policyHolderLoginBtn) {
-    policyHolderLoginBtn.addEventListener('click', handlePolicyHolderLogin);
+// Login Type Selection
+if (selectBrokerBtn) {
+    selectBrokerBtn.addEventListener('click', () => {
+        closeLoginTypeModalFunc();
+        openBrokerModal();
+    });
 }
 
-if (policyHolderLoginBtnMobile) {
-    policyHolderLoginBtnMobile.addEventListener('click', handlePolicyHolderLogin);
+if (selectClientBtn) {
+    selectClientBtn.addEventListener('click', () => {
+        openClientModal();
+    });
+}
+
+// Close Login Type Modal
+if (closeLoginTypeModal) {
+    closeLoginTypeModal.addEventListener('click', closeLoginTypeModalFunc);
+}
+
+if (loginTypeModal) {
+    loginTypeModal.addEventListener('click', (e) => {
+        if (e.target === loginTypeModal) {
+            closeLoginTypeModalFunc();
+        }
+    });
+}
+
+// Close Client Modal
+const clientModalClose = clientModal ? clientModal.querySelector('.modal-close') : null;
+if (clientModalClose) {
+    clientModalClose.addEventListener('click', closeClientModal);
+}
+
+if (clientModal) {
+    clientModal.addEventListener('click', (e) => {
+        if (e.target === clientModal) {
+            closeClientModal();
+        }
+    });
 }
 
 // Smooth scroll for anchor links (exclude login buttons)

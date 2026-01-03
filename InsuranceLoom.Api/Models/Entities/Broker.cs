@@ -12,7 +12,7 @@ public class Broker
     public string? Phone { get; set; }
     public string? LicenseNumber { get; set; }
     public decimal? CommissionRate { get; set; }
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; } = false; // Set to false until approved by admin
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

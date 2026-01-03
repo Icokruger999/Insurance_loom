@@ -1,6 +1,8 @@
 using InsuranceLoom.Api.Models.DTOs;
 using InsuranceLoom.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using InsuranceLoom.Api.Data;
 
 namespace InsuranceLoom.Api.Controllers;
 
@@ -9,10 +11,14 @@ namespace InsuranceLoom.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly ApplicationDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, ApplicationDbContext context, IEmailService emailService)
     {
         _authService = authService;
+        _context = context;
+        _emailService = emailService;
     }
 
     [HttpPost("broker/register")]
@@ -40,7 +46,17 @@ public class AuthController : ControllerBase
         {
             var response = await _authService.BrokerLoginAsync(request);
             if (response == null)
+            {
+                // Check if broker exists but is not approved
+                var broker = await _context.Brokers
+                    .Include(b => b.User)
+                    .FirstOrDefaultAsync(b => b.User != null && b.User.Email == request.Email);
+                
+                if (broker != null && !broker.IsActive)
+                    return Unauthorized(new { message = "Your account is pending approval. Please wait for admin approval before logging in." });
+                
                 return Unauthorized(new { message = "Invalid email or password" });
+            }
 
             return Ok(response);
         }

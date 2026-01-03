@@ -68,10 +68,8 @@ public class EmailService : IEmailService
                         <p style=""margin: 0; color: #333333;""><strong>Your Agent Number:</strong> <span style=""font-size: 18px; color: #1a1a1a;"">{agentNumber}</span></p>
                         <p style=""margin: 10px 0 0 0; color: #666666; font-size: 14px;"">Please save this number - you'll need it to log in to your account.</p>
                     </div>
-                    <p style=""color: #666666; line-height: 1.6;"">You can now log in to the Insurance Loom portal using your Agent Number and password.</p>
-                    <div style=""text-align: center; margin: 30px 0;"">
-                        <a href=""https://www.insuranceloom.com"" style=""display: inline-block; background-color: #1a1a1a; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px;"">Login to Your Account</a>
-                    </div>
+                    <p style=""color: #666666; line-height: 1.6;"">Your account is currently pending approval. You will receive an email notification once your account has been approved and you can log in.</p>
+                    <p style=""color: #666666; line-height: 1.6; font-size: 14px;"">Please save your Agent Number - you'll need it for reference once your account is approved.</p>
                     <p style=""color: #666666; line-height: 1.6; font-size: 14px;"">If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
                     <p style=""color: #666666; line-height: 1.6; font-size: 14px; margin-top: 30px;"">Best regards,<br>The Insurance Loom Team</p>
                 </div>
@@ -83,6 +81,35 @@ public class EmailService : IEmailService
         ";
 
         await SendEmailAsync(brokerEmail, subject, body);
+    }
+
+    public async Task SendBrokerApprovalRequestAsync(string approverEmail, string brokerEmail, string agentNumber, string firstName, string lastName, string companyName, Guid brokerId)
+    {
+        var subject = $"New Broker Registration Requires Approval - {agentNumber}";
+        var body = $@"
+            <div style=""font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;"">
+                <div style=""background-color: #1a1a1a; color: #ffffff; padding: 20px; text-align: center;"">
+                    <h1 style=""margin: 0;"">Insurance Loom</h1>
+                </div>
+                <div style=""background-color: #ffffff; padding: 30px;"">
+                    <h2 style=""color: #333333;"">New Broker Registration - Approval Required</h2>
+                    <p style=""color: #666666; line-height: 1.6;"">A new broker has registered and requires your approval.</p>
+                    <div style=""background-color: #f8f9fa; padding: 20px; border-left: 4px solid #4a4a4a; margin: 20px 0;"">
+                        <p style=""margin: 0; color: #333333;""><strong>Agent Number:</strong> {agentNumber}</p>
+                        <p style=""margin: 5px 0; color: #333333;""><strong>Name:</strong> {firstName} {lastName}</p>
+                        <p style=""margin: 5px 0; color: #333333;""><strong>Email:</strong> {brokerEmail}</p>
+                        {(!string.IsNullOrEmpty(companyName) ? $@"<p style=""margin: 5px 0; color: #333333;""><strong>Company:</strong> {companyName}</p>" : "")}
+                    </div>
+                    <div style=""text-align: center; margin: 30px 0;"">
+                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/approve"" style=""display: inline-block; background-color: #28a745; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-right: 10px;"">Approve Broker</a>
+                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/reject"" style=""display: inline-block; background-color: #dc3545; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px;"">Reject Broker</a>
+                    </div>
+                    <p style=""color: #666666; line-height: 1.6; font-size: 14px;"">Please review the broker's information and approve or reject their registration.</p>
+                </div>
+            </div>
+        ";
+
+        await SendEmailAsync(approverEmail, subject, body);
     }
 
     public async Task SendPolicySubmittedNotificationAsync(string managerEmail, string policyNumber, string brokerName)
