@@ -178,6 +178,13 @@ if (brokerModal) {
             closeBrokerModal();
         }
     });
+    // Prevent clicks inside modal-content from closing the modal
+    const modalContent = brokerModal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
 }
 
 // Broker Login Form Handler
