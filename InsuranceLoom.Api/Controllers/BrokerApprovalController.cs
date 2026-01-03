@@ -1,4 +1,5 @@
 using InsuranceLoom.Api.Data;
+using InsuranceLoom.Api.Models.Entities;
 using InsuranceLoom.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ public class BrokerApprovalController : ControllerBase
 
     [HttpGet("{brokerId}/approve")]
     [HttpPost("{brokerId}/approve")]
-    public async Task<IActionResult> ApproveBroker(Guid brokerId)
+    public async Task<IActionResult> ApproveBroker(Guid brokerId, [FromQuery] string? managerEmail = null)
     {
         try
         {
@@ -40,6 +41,36 @@ public class BrokerApprovalController : ControllerBase
                 return Content(alreadyApprovedHtml, "text/html");
             }
 
+            // Find the manager who approved (from query parameter or by company)
+            Manager? approvingManager = null;
+            string? approvingManagerEmail = null;
+            
+            if (!string.IsNullOrWhiteSpace(managerEmail))
+            {
+                approvingManager = await _context.Managers
+                    .Include(m => m.Company)
+                    .FirstOrDefaultAsync(m => m.Email.ToLower() == managerEmail.Trim().ToLower() && m.IsActive);
+                approvingManagerEmail = managerEmail;
+            }
+            else if (!string.IsNullOrWhiteSpace(broker.CompanyName))
+            {
+                // Try to find manager by company
+                var company = await _context.Companies
+                    .FirstOrDefaultAsync(c => c.Name.ToLower() == broker.CompanyName.ToLower());
+                
+                if (company != null)
+                {
+                    approvingManager = await _context.Managers
+                        .Include(m => m.Company)
+                        .FirstOrDefaultAsync(m => m.CompanyId == company.Id && m.IsActive && m.CanManageBrokers);
+                    if (approvingManager != null)
+                    {
+                        approvingManagerEmail = approvingManager.Email;
+                    }
+                }
+            }
+
+            var previousStatus = broker.IsActive ? "Active" : "Pending";
             broker.IsActive = true;
             broker.UpdatedAt = DateTime.UtcNow;
             if (broker.User != null)
@@ -47,6 +78,22 @@ public class BrokerApprovalController : ControllerBase
                 broker.User.IsActive = true;
                 broker.User.UpdatedAt = DateTime.UtcNow;
             }
+
+            // Log approval to audit table
+            var approvalHistory = new BrokerApprovalHistory
+            {
+                Id = Guid.NewGuid(),
+                BrokerId = broker.Id,
+                Action = "Approved",
+                PerformedByManagerId = approvingManager?.Id,
+                PerformedByEmail = approvingManagerEmail ?? "Unknown",
+                PreviousStatus = previousStatus,
+                NewStatus = "Active",
+                Notes = $"Broker approved by {(approvingManager != null ? $"{approvingManager.FirstName} {approvingManager.LastName}" : approvingManagerEmail ?? "Unknown")}",
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.BrokerApprovalHistory.Add(approvalHistory);
+            
             await _context.SaveChangesAsync();
 
             // Send approval notification email to broker
@@ -123,7 +170,7 @@ public class BrokerApprovalController : ControllerBase
 
     [HttpGet("{brokerId}/reject")]
     [HttpPost("{brokerId}/reject")]
-    public async Task<IActionResult> RejectBroker(Guid brokerId, [FromBody] RejectBrokerRequest? request = null)
+    public async Task<IActionResult> RejectBroker(Guid brokerId, [FromQuery] string? managerEmail = null, [FromBody] RejectBrokerRequest? request = null)
     {
         try
         {
@@ -136,6 +183,32 @@ public class BrokerApprovalController : ControllerBase
                 var notFoundHtml = @"<html><head><title>Broker Not Found</title></head><body style=""font-family: Arial, sans-serif; text-align: center; padding: 50px;""><h1>Broker Not Found</h1><p>The broker you're trying to reject does not exist.</p><p><a href=""https://www.insuranceloom.com"">Return to Insurance Loom</a></p></body></html>";
                 return Content(notFoundHtml, "text/html");
             }
+
+            // Find the manager who rejected
+            Manager? rejectingManager = null;
+            string? rejectingManagerEmail = null;
+            
+            if (!string.IsNullOrWhiteSpace(managerEmail))
+            {
+                rejectingManager = await _context.Managers
+                    .FirstOrDefaultAsync(m => m.Email.ToLower() == managerEmail.Trim().ToLower() && m.IsActive);
+                rejectingManagerEmail = managerEmail;
+            }
+
+            // Log rejection to audit table before deleting
+            var rejectionHistory = new BrokerApprovalHistory
+            {
+                Id = Guid.NewGuid(),
+                BrokerId = broker.Id,
+                Action = "Rejected",
+                PerformedByManagerId = rejectingManager?.Id,
+                PerformedByEmail = rejectingManagerEmail ?? "Unknown",
+                PreviousStatus = broker.IsActive ? "Active" : "Pending",
+                NewStatus = "Rejected",
+                Notes = $"Broker rejected by {(rejectingManager != null ? $"{rejectingManager.FirstName} {rejectingManager.LastName}" : rejectingManagerEmail ?? "Unknown")}. Reason: {request?.Reason ?? "No reason provided"}",
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.BrokerApprovalHistory.Add(rejectionHistory);
 
             // Send rejection email before deleting
             if (broker.User != null)

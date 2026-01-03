@@ -101,8 +101,8 @@ public class EmailService : IEmailService
                         {(!string.IsNullOrEmpty(companyName) ? $@"<p style=""margin: 5px 0; color: #333333;""><strong>Company:</strong> {companyName}</p>" : "")}
                     </div>
                     <div style=""text-align: center; margin: 30px 0;"">
-                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/approve"" style=""display: inline-block; background-color: #28a745; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-right: 10px;"">Approve Broker</a>
-                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/reject"" style=""display: inline-block; background-color: #dc3545; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px;"">Reject Broker</a>
+                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/approve?managerEmail={Uri.EscapeDataString(approverEmail)}"" style=""display: inline-block; background-color: #28a745; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-right: 10px;"">Approve Broker</a>
+                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/reject?managerEmail={Uri.EscapeDataString(approverEmail)}"" style=""display: inline-block; background-color: #dc3545; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px;"">Reject Broker</a>
                     </div>
                     <p style=""color: #666666; line-height: 1.6; font-size: 14px;"">Please review the broker's information and approve or reject their registration.</p>
                 </div>

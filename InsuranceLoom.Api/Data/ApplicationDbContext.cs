@@ -30,6 +30,7 @@ public class ApplicationDbContext : DbContext
     // Approval Tables
     public DbSet<PolicyApproval> PolicyApprovals { get; set; }
     public DbSet<PolicyApprovalHistory> PolicyApprovalHistory { get; set; }
+    public DbSet<BrokerApprovalHistory> BrokerApprovalHistory { get; set; }
 
     // Other Tables
     public DbSet<Claim> Claims { get; set; }
@@ -274,6 +275,30 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.ValidityPeriodDays).HasColumnName("validity_period_days");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+        });
+
+        // Broker Approval History Configuration
+        modelBuilder.Entity<BrokerApprovalHistory>(entity =>
+        {
+            entity.ToTable("broker_approval_history");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BrokerId).HasColumnName("broker_id");
+            entity.Property(e => e.Action).HasColumnName("action").HasMaxLength(50);
+            entity.Property(e => e.PerformedByManagerId).HasColumnName("performed_by_manager_id");
+            entity.Property(e => e.PerformedByEmail).HasColumnName("performed_by_email").HasMaxLength(255);
+            entity.Property(e => e.Notes).HasColumnName("notes");
+            entity.Property(e => e.PreviousStatus).HasColumnName("previous_status").HasMaxLength(50);
+            entity.Property(e => e.NewStatus).HasColumnName("new_status").HasMaxLength(50);
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.HasOne(e => e.Broker)
+                  .WithMany()
+                  .HasForeignKey(e => e.BrokerId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.PerformedByManager)
+                  .WithMany()
+                  .HasForeignKey(e => e.PerformedByManagerId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // Additional table mappings (minimal - add column mappings if errors occur)
