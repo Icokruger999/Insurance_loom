@@ -188,76 +188,122 @@ async function loadCommission(brokerId) {
 }
 
 // Load Create Client Form
-function loadCreateClientForm() {
+async function loadCreateClientForm() {
     const formContainer = document.getElementById('createClientForm');
     if (!formContainer) return;
     
-    formContainer.innerHTML = `
-        <form id="newClientForm" class="client-form">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="firstName" class="required">First Name</label>
-                    <input type="text" id="firstName" name="firstName" required>
-                </div>
-                <div class="form-group">
-                    <label for="lastName" class="required">Last Name</label>
-                    <input type="text" id="lastName" name="lastName" required>
-                </div>
-                <div class="form-group">
-                    <label for="email" class="required">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone">
-                </div>
-                <div class="form-group">
-                    <label for="idNumber">ID Number</label>
-                    <input type="text" id="idNumber" name="idNumber">
-                </div>
-                <div class="form-group">
-                    <label for="dateOfBirth">Date of Birth</label>
-                    <input type="date" id="dateOfBirth" name="dateOfBirth">
-                </div>
-                <div class="form-group full-width">
-                    <label for="address">Address</label>
-                    <textarea id="address" name="address" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="password" class="required">Password</label>
-                    <input type="password" id="password" name="password" required>
-                    <small>Client will use this password to log in</small>
-                </div>
-                <div class="form-group">
-                    <label for="confirmPassword" class="required">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required>
-                </div>
-            </div>
-            <div class="error-message" id="formError"></div>
-            <div class="success-message" id="formSuccess"></div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                <button type="submit" class="btn btn-primary" id="submitBtn">Create Client</button>
-            </div>
-        </form>
-    `;
+    formContainer.innerHTML = '<p class="loading-text">Loading form...</p>';
     
-    // Add form submission handler
-    const form = document.getElementById('newClientForm');
-    if (form) {
-        form.addEventListener('submit', handleCreateClient);
-    }
-    
-    // Add cancel button handler
-    const cancelBtn = document.getElementById('cancelBtn');
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-            form.reset();
-            const errorDiv = document.getElementById('formError');
-            const successDiv = document.getElementById('formSuccess');
-            if (errorDiv) errorDiv.classList.remove('show');
-            if (successDiv) successDiv.classList.remove('show');
-        });
+    try {
+        // Load service types
+        const serviceTypesResponse = await fetch(`${API_BASE_URL}/servicetypes?activeOnly=true`);
+        const serviceTypes = serviceTypesResponse.ok ? await serviceTypesResponse.json() : [];
+        
+        formContainer.innerHTML = `
+            <form id="newClientForm" class="client-form">
+                <h4 style="margin-bottom: 1.5rem; color: var(--text-primary); font-weight: 600;">Client Information</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="firstName" class="required">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName" class="required">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="idNumber" class="required">ID Number</label>
+                        <input type="text" id="idNumber" name="idNumber" required maxlength="13">
+                        <small>South African ID number (13 digits)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateOfBirth" class="required">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="required">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" class="required">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                        <small>Include country code if international</small>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="address" class="required">Physical Address</label>
+                        <textarea id="address" name="address" rows="3" required></textarea>
+                    </div>
+                </div>
+                
+                <h4 style="margin: 2.5rem 0 1.5rem; color: var(--text-primary); font-weight: 600;">Insurance Product Selection</h4>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="serviceType" class="required">Select Insurance Product</label>
+                        <select id="serviceType" name="serviceType" required>
+                            <option value="">-- Select a product --</option>
+                            ${serviceTypes.map(st => `<option value="${st.id}">${st.serviceName}${st.description ? ' - ' + st.description : ''}</option>`).join('')}
+                        </select>
+                        <small>Choose the insurance product the client wants to purchase</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="coverageAmount">Coverage Amount (R)</label>
+                        <input type="number" id="coverageAmount" name="coverageAmount" min="0" step="0.01">
+                        <small>Total coverage amount</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="premiumAmount">Premium Amount (R)</label>
+                        <input type="number" id="premiumAmount" name="premiumAmount" min="0" step="0.01">
+                        <small>Monthly premium amount</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate">Policy Start Date</label>
+                        <input type="date" id="startDate" name="startDate" min="${new Date().toISOString().split('T')[0]}">
+                        <small>When should the policy become active?</small>
+                    </div>
+                </div>
+                
+                <h4 style="margin: 2.5rem 0 1.5rem; color: var(--text-primary); font-weight: 600;">Account Credentials</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="password" class="required">Password</label>
+                        <input type="password" id="password" name="password" required minlength="6">
+                        <small>Client will use this password to log in (minimum 6 characters)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword" class="required">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+                    </div>
+                </div>
+                
+                <div class="error-message" id="formError"></div>
+                <div class="success-message" id="formSuccess"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Create Client & Policy</button>
+                </div>
+            </form>
+        `;
+        
+        // Add form submission handler
+        const form = document.getElementById('newClientForm');
+        if (form) {
+            form.addEventListener('submit', handleCreateClient);
+        }
+        
+        // Add cancel button handler
+        const cancelBtn = document.getElementById('cancelBtn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                form.reset();
+                const errorDiv = document.getElementById('formError');
+                const successDiv = document.getElementById('formSuccess');
+                if (errorDiv) errorDiv.classList.remove('show');
+                if (successDiv) successDiv.classList.remove('show');
+            });
+        }
+    } catch (error) {
+        console.error('Error loading form:', error);
+        formContainer.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading form. Please refresh the page.</p>';
     }
 }
 
@@ -283,7 +329,11 @@ async function handleCreateClient(e) {
         dateOfBirth: document.getElementById('dateOfBirth').value,
         address: document.getElementById('address').value.trim(),
         password: document.getElementById('password').value,
-        confirmPassword: document.getElementById('confirmPassword').value
+        confirmPassword: document.getElementById('confirmPassword').value,
+        serviceTypeId: document.getElementById('serviceType').value || null,
+        coverageAmount: document.getElementById('coverageAmount').value ? parseFloat(document.getElementById('coverageAmount').value) : null,
+        premiumAmount: document.getElementById('premiumAmount').value ? parseFloat(document.getElementById('premiumAmount').value) : null,
+        startDate: document.getElementById('startDate').value || null
     };
     
     // Validation
@@ -313,8 +363,6 @@ async function handleCreateClient(e) {
         const token = localStorage.getItem('brokerToken');
         const brokerInfo = JSON.parse(localStorage.getItem('brokerInfo'));
         
-        // TODO: Replace with actual API endpoint when available
-        // For now, show success message
         const response = await fetch(`${API_BASE_URL}/policyholder/register`, {
             method: 'POST',
             headers: {
@@ -330,7 +378,10 @@ async function handleCreateClient(e) {
                 dateOfBirth: formData.dateOfBirth || null,
                 address: formData.address || null,
                 password: formData.password,
-                brokerId: brokerInfo?.id
+                serviceTypeId: formData.serviceTypeId || null,
+                coverageAmount: formData.coverageAmount,
+                premiumAmount: formData.premiumAmount,
+                startDate: formData.startDate || null
             })
         });
         
@@ -338,10 +389,22 @@ async function handleCreateClient(e) {
         
         if (response.ok) {
             if (successDiv) {
-                successDiv.textContent = `Client created successfully! Policy Number: ${data.policyNumber || 'N/A'}`;
+                let successMsg = `Client created successfully!`;
+                if (data.policyNumber) {
+                    successMsg += `\nPolicy Holder Number: ${data.policyNumber}`;
+                }
+                if (data.policyNumberGenerated) {
+                    successMsg += `\nPolicy Number: ${data.policyNumberGenerated}`;
+                }
+                successDiv.textContent = successMsg;
                 successDiv.classList.add('show');
             }
             document.getElementById('newClientForm').reset();
+            
+            // Scroll to success message
+            if (successDiv) {
+                successDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         } else {
             if (errorDiv) {
                 errorDiv.textContent = data.message || 'Failed to create client. Please try again.';
@@ -364,8 +427,15 @@ async function handleCreateClient(e) {
 
 // Initialize portal
 document.addEventListener('DOMContentLoaded', () => {
+    // Check auth first before rendering anything
     if (!checkAuth()) {
         return;
+    }
+    
+    // Show portal once authenticated
+    const container = document.querySelector('.portal-container');
+    if (container) {
+        container.classList.add('loaded');
     }
     
     loadBrokerInfo();

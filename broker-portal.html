@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Broker Portal - Insurance Loom</title>
     <link rel="stylesheet" href="broker-portal.css">
+    <style>
+        /* Prevent flash of unstyled content */
+        .portal-container {
+            opacity: 0;
+            transition: opacity 0.2s ease-in;
+        }
+        .portal-container.loaded {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
     <div class="portal-container">

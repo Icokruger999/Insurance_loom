@@ -2,7 +2,7 @@
 
 **The `BrokerApproval` section is NO LONGER NEEDED** - we now use the manager email from the broker registration form, not a global config value.
 
-Here's the complete file (use your actual credentials from EC2):
+Here's the complete file with all correct values:
 
 ```json
 {
@@ -14,10 +14,10 @@ Here's the complete file (use your actual credentials from EC2):
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection": "Host=insuranceloom-db.clm264kc2ifj.af-south-1.rds.amazonaws.com;Port=5432;Database=insuranceloom;Username=postgres;Password=YOUR_DB_PASSWORD;Pooling=true;Minimum Pool Size=5;Maximum Pool Size=100;SSL Mode=Prefer;"
+    "DefaultConnection": "Host=insuranceloom-db.clm264kc2ifj.af-south-1.rds.amazonaws.com;Port=5432;Database=insuranceloom;Username=postgres;Password=1bHiVZ0odtB?&+S$;Pooling=true;Minimum Pool Size=5;Maximum Pool Size=100;SSL Mode=Prefer;"
   },
   "JwtSettings": {
-    "SecretKey": "YOUR_JWT_SECRET_KEY",
+    "SecretKey": "InsuranceLoom-Production-JWT-Secret-Key-2024-Min-32-Chars-Long-Secure-Random-Key-For-Authentication",
     "Issuer": "InsuranceLoom",
     "Audience": "InsuranceLoomUsers",
     "ExpirationMinutes": 30,
@@ -26,8 +26,8 @@ Here's the complete file (use your actual credentials from EC2):
   "AWS": {
     "Region": "af-south-1",
     "S3Bucket": "insurance-loom-documents",
-    "AccessKey": "YOUR_AWS_ACCESS_KEY",
-    "SecretKey": "YOUR_AWS_SECRET_KEY"
+    "AccessKey": "AKIASFECYFH6UE4NTOMH",
+    "SecretKey": "QQYuoLHOnWSPgDXAvxnaxBH0t7Ql3p5cU0h84qPa"
   },
   "EmailSettings": {
     "SmtpServer": "mail.privateemail.com",
