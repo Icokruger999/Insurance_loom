@@ -18,7 +18,7 @@ This guide will help you deploy the updated Insurance Loom API to your EC2 insta
 
 2. **Navigate to the repository directory:**
    ```bash
-   cd ~/Insurance_loom
+   cd /home/ec2-user/Insurance_loom
    ```
 
 3. **Make the deployment script executable (if not already):**
@@ -50,7 +50,7 @@ If you prefer to run the commands manually:
 
 2. **Navigate to the repository:**
    ```bash
-   cd ~/Insurance_loom
+   cd /home/ec2-user/Insurance_loom
    ```
 
 3. **Pull the latest code from GitHub:**
@@ -60,7 +60,7 @@ If you prefer to run the commands manually:
 
 4. **Navigate to the API project directory:**
    ```bash
-   cd InsuranceLoom.Api
+   cd /home/ec2-user/Insurance_loom/InsuranceLoom.Api
    ```
 
 5. **Stop the API service:**
@@ -162,6 +162,14 @@ sudo journalctl -u insuranceloom-api.service -f
 If you want to run everything in one command:
 
 ```bash
-cd ~/Insurance_loom && git pull origin main && cd InsuranceLoom.Api && sudo systemctl stop insuranceloom-api.service && dotnet publish -c Release -o ./publish && sudo cp -r ./publish/* /var/www/api/ && sudo chown -R ec2-user:ec2-user /var/www/api && sudo systemctl start insuranceloom-api.service && sudo systemctl status insuranceloom-api.service --no-pager
+cd /home/ec2-user/Insurance_loom && git pull origin main && cd InsuranceLoom.Api && sudo systemctl stop insuranceloom-api.service && dotnet publish -c Release -o ./publish && sudo cp -r ./publish/* /var/www/api/ && sudo chown -R ec2-user:ec2-user /var/www/api && sudo systemctl start insuranceloom-api.service && sudo systemctl status insuranceloom-api.service --no-pager
 ```
+
+## Your Specific Paths
+
+- **Repository Directory:** `/home/ec2-user/Insurance_loom`
+- **API Project Directory:** `/home/ec2-user/Insurance_loom/InsuranceLoom.Api`
+- **Deployment Directory:** `/var/www/api`
+- **Service Name:** `insuranceloom-api.service`
+- **API URL:** `https://api.insuranceloom.com`
 
