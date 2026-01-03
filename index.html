@@ -230,11 +230,18 @@
                         <input type="text" id="regLastName" name="lastName" required>
                     </div>
                     <div class="form-group">
-                        <label for="regCompanyName">Company Name</label>
+                        <label for="regCompanyName">Company Name *</label>
                         <input type="text" id="regCompanyName" name="companyName" list="companyList" required>
                         <datalist id="companyList"></datalist>
                         <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
                             Select from existing companies only
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="regManagerEmail">Manager Email *</label>
+                        <input type="email" id="regManagerEmail" name="managerEmail" required>
+                        <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+                            Enter your manager's email address for approval
                         </small>
                     </div>
                     <div class="form-group">

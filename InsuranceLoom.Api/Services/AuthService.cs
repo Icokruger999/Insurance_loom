@@ -29,15 +29,42 @@ public class AuthService : IAuthService
             throw new ArgumentException("Email already exists");
 
         // Validate company name if provided - must exist in database
+        Company? company = null;
         if (!string.IsNullOrWhiteSpace(request.CompanyName))
         {
-            var companyExists = await _context.Companies
-                .AnyAsync(c => c.Name.ToLower() == request.CompanyName.Trim().ToLower() && c.IsActive);
+            company = await _context.Companies
+                .FirstOrDefaultAsync(c => c.Name.ToLower() == request.CompanyName.Trim().ToLower() && c.IsActive);
             
-            if (!companyExists)
+            if (company == null)
             {
                 throw new ArgumentException($"Company '{request.CompanyName}' does not exist. Please select an existing company.");
             }
+        }
+
+        // Validate manager email - must exist and be associated with the broker's company
+        if (string.IsNullOrWhiteSpace(request.ManagerEmail))
+        {
+            throw new ArgumentException("Manager email is required.");
+        }
+
+        Manager? manager = null;
+        if (company != null)
+        {
+            manager = await _context.Managers
+                .Include(m => m.Company)
+                .FirstOrDefaultAsync(m => m.Email.ToLower() == request.ManagerEmail.Trim().ToLower() 
+                    && m.IsActive 
+                    && m.CompanyId == company.Id);
+        }
+        else
+        {
+            manager = await _context.Managers
+                .FirstOrDefaultAsync(m => m.Email.ToLower() == request.ManagerEmail.Trim().ToLower() && m.IsActive);
+        }
+
+        if (manager == null)
+        {
+            throw new ArgumentException($"Manager with email '{request.ManagerEmail}' not found or not associated with the selected company.");
         }
 
         // Generate unique agent number

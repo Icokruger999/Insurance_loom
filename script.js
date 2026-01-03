@@ -240,6 +240,7 @@ if (brokerRegisterForm) {
             firstName: document.getElementById('regFirstName').value,
             lastName: document.getElementById('regLastName').value,
             companyName: document.getElementById('regCompanyName').value.trim() || null,
+            managerEmail: document.getElementById('regManagerEmail').value.trim(),
             phone: document.getElementById('regPhone').value || null,
             licenseNumber: document.getElementById('regLicenseNumber').value || null
             // CommissionRate uses default value, can be changed later
