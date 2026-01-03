@@ -340,6 +340,15 @@ section {
     color: var(--text-primary);
 }
 
+/* Features Section */
+.features {
+    position: relative;
+}
+
+.features.puzzle-pattern::before {
+    opacity: 0.25;
+}
+
 /* Feature Cards */
 .features-grid {
     display: grid;
