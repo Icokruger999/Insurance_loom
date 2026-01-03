@@ -166,15 +166,148 @@ async function loadAllPolicies(brokerId) {
     policiesList.innerHTML = '<p class="loading-text">Loading policies...</p>';
     
     try {
-        // TODO: Implement API endpoint
-        policiesList.innerHTML = `
-            <div class="policy-card">
-                <p style="color: var(--text-secondary);">All your policies will be displayed here.</p>
-            </div>
-        `;
+        const token = localStorage.getItem('brokerToken');
+        const response = await fetch(`${API_BASE_URL}/policy/broker/${brokerId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to load policies');
+        }
+        
+        const policies = await response.json();
+        
+        if (policies.length === 0) {
+            policiesList.innerHTML = `
+                <div class="policy-card">
+                    <p style="color: var(--text-secondary);">No policies found. Create a new application to get started.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        policiesList.innerHTML = policies.map(policy => {
+            const statusClass = getStatusClass(policy.status);
+            return `
+                <div class="policy-card" style="margin-bottom: 1rem; padding: 1.5rem; background-color: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary);">${policy.policyNumber}</h4>
+                            <p style="margin: 0; color: var(--text-secondary);">${policy.policyHolderName}</p>
+                            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">${policy.serviceType}</p>
+                        </div>
+                        <span class="status-badge ${statusClass}" style="padding: 0.375rem 0.75rem; border-radius: 4px; font-size: 0.875rem; font-weight: 500;">
+                            ${policy.status}
+                        </span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <p style="margin: 0; font-size: 0.875rem; color: var(--text-muted);">Coverage Amount</p>
+                            <p style="margin: 0.25rem 0 0 0; color: var(--text-primary); font-weight: 500;">R ${policy.coverageAmount?.toFixed(2) || '0.00'}</p>
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-size: 0.875rem; color: var(--text-muted);">Premium Amount</p>
+                            <p style="margin: 0.25rem 0 0 0; color: var(--text-primary); font-weight: 500;">R ${policy.premiumAmount?.toFixed(2) || '0.00'}</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        ${policy.status === 'Draft' || policy.status === 'ChangesRequired' ? `
+                            <button class="btn btn-primary" onclick="submitForApproval('${policy.id}')" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                Submit for Approval
+                            </button>
+                        ` : ''}
+                        ${policy.status === 'PendingSubmission' || policy.status === 'UnderReview' ? `
+                            <span style="padding: 0.5rem 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                                Awaiting Manager Review
+                            </span>
+                        ` : ''}
+                        ${policy.status === 'Approved' ? `
+                            <span style="padding: 0.5rem 1rem; font-size: 0.875rem; color: var(--success-color); font-weight: 500;">
+                                ✓ Approved
+                            </span>
+                        ` : ''}
+                        ${policy.status === 'Rejected' ? `
+                            <button class="btn btn-secondary" onclick="viewRejectionReason('${policy.id}')" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                View Reason
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Add status badge styles if not already present
+        if (!document.getElementById('statusStyles')) {
+            const style = document.createElement('style');
+            style.id = 'statusStyles';
+            style.textContent = `
+                .status-badge { display: inline-block; }
+                .status-badge.Draft { background-color: #6c757d; color: white; }
+                .status-badge.PendingSubmission, .status-badge.UnderReview { background-color: #ffc107; color: #000; }
+                .status-badge.Approved, .status-badge.Active { background-color: #28a745; color: white; }
+                .status-badge.Rejected, .status-badge.Cancelled { background-color: #dc3545; color: white; }
+                .status-badge.ChangesRequired { background-color: #fd7e14; color: white; }
+            `;
+            document.head.appendChild(style);
+        }
     } catch (error) {
+        console.error('Error loading policies:', error);
         policiesList.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading policies</p>';
     }
+}
+
+// Get status CSS class
+function getStatusClass(status) {
+    const statusMap = {
+        'Draft': 'Draft',
+        'PendingSubmission': 'PendingSubmission',
+        'UnderReview': 'UnderReview',
+        'Approved': 'Approved',
+        'Active': 'Active',
+        'Rejected': 'Rejected',
+        'Cancelled': 'Cancelled',
+        'ChangesRequired': 'ChangesRequired'
+    };
+    return statusMap[status] || 'Draft';
+}
+
+// Submit policy for approval
+async function submitForApproval(policyId) {
+    if (!confirm('Are you sure you want to submit this policy for approval?')) {
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('brokerToken');
+        const response = await fetch(`${API_BASE_URL}/policy-approval/${policyId}/submit`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert('Policy submitted for approval successfully!');
+            // Reload policies
+            const brokerInfo = JSON.parse(localStorage.getItem('brokerInfo'));
+            if (brokerInfo) {
+                await loadAllPolicies(brokerInfo.id);
+            }
+        } else {
+            alert(data.message || 'Failed to submit policy for approval');
+        }
+    } catch (error) {
+        console.error('Error submitting policy:', error);
+        alert('Error submitting policy for approval. Please try again.');
+    }
+}
+
+// View rejection reason (placeholder)
+function viewRejectionReason(policyId) {
+    alert('Rejection reason functionality coming soon.');
 }
 
 // Load monthly report

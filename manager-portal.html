@@ -18,20 +18,19 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <button class="nav-btn active" data-section="agents">
-                    <span class="nav-icon">👥</span>
+                <button class="nav-btn active" data-section="pending-applications">
+                    <span class="nav-text">Pending Applications</span>
+                </button>
+                <button class="nav-btn" data-section="approved-applications">
+                    <span class="nav-text">Approved Applications</span>
+                </button>
+                <button class="nav-btn" data-section="rejected-applications">
+                    <span class="nav-text">Rejected Applications</span>
+                </button>
+                <button class="nav-btn" data-section="agents">
                     <span class="nav-text">Agents by Region</span>
                 </button>
-                <button class="nav-btn" data-section="pending-policies">
-                    <span class="nav-icon">⏳</span>
-                    <span class="nav-text">Pending Policies</span>
-                </button>
-                <button class="nav-btn" data-section="approvals">
-                    <span class="nav-icon">✅</span>
-                    <span class="nav-text">Approval History</span>
-                </button>
                 <button class="nav-btn" data-section="reports">
-                    <span class="nav-icon">📊</span>
                     <span class="nav-text">Reports</span>
                 </button>
             </nav>
@@ -43,12 +42,46 @@
         <!-- Main Content Area -->
         <main class="main-content">
             <div class="content-header">
-                <h2 id="sectionTitle">Agents by Region</h2>
+                <h2 id="sectionTitle">Pending Applications</h2>
             </div>
 
-            <!-- Agents by Region Section -->
-            <section id="agents" class="content-section active">
+            <!-- Pending Applications Section -->
+            <section id="pending-applications" class="content-section active">
                 <div class="section-content">
+                    <h3>Pending Applications</h3>
+                    <p>Review and approve applications submitted by brokers.</p>
+                    <div id="pendingApplicationsList" class="applications-list">
+                        <p class="loading-text">Loading pending applications...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Approved Applications Section -->
+            <section id="approved-applications" class="content-section">
+                <div class="section-content">
+                    <h3>Approved Applications</h3>
+                    <p>View all approved applications.</p>
+                    <div id="approvedApplicationsList" class="applications-list">
+                        <p class="loading-text">Loading approved applications...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rejected Applications Section -->
+            <section id="rejected-applications" class="content-section">
+                <div class="section-content">
+                    <h3>Rejected Applications</h3>
+                    <p>View all rejected applications.</p>
+                    <div id="rejectedApplicationsList" class="applications-list">
+                        <p class="loading-text">Loading rejected applications...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agents by Region Section -->
+            <section id="agents" class="content-section">
+                <div class="section-content">
+                    <h3>Agents by Region</h3>
                     <div class="filter-bar">
                         <select id="regionFilter" class="filter-select">
                             <option value="">All Regions</option>
@@ -60,28 +93,6 @@
                     </div>
                     <div id="agentsList" class="agents-list">
                         <p class="loading-text">Loading agents...</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Pending Policies Section -->
-            <section id="pending-policies" class="content-section">
-                <div class="section-content">
-                    <h3>Policies Requiring Approval</h3>
-                    <p>Review and approve policies submitted by brokers.</p>
-                    <div id="pendingPoliciesList" class="policies-list">
-                        <p class="loading-text">Loading pending policies...</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Approval History Section -->
-            <section id="approvals" class="content-section">
-                <div class="section-content">
-                    <h3>Approval History</h3>
-                    <p>View your approval and rejection history.</p>
-                    <div id="approvalHistoryList" class="approval-list">
-                        <p class="loading-text">Loading approval history...</p>
                     </div>
                 </div>
             </section>

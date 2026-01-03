@@ -56,9 +56,10 @@ function initNavigation() {
     const sectionTitle = document.getElementById('sectionTitle');
     
     const sectionTitles = {
+        'pending-applications': 'Pending Applications',
+        'approved-applications': 'Approved Applications',
+        'rejected-applications': 'Rejected Applications',
         'agents': 'Agents by Region',
-        'pending-policies': 'Pending Policies',
-        'approvals': 'Approval History',
         'reports': 'Reports & Analytics'
     };
     
