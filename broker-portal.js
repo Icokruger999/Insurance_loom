@@ -63,12 +63,6 @@ function initNavigation() {
         'commission': 'Commission'
     };
     
-    // Update welcome section title when switching sections
-    const welcomeTitle = document.querySelector('.welcome-section h1');
-    if (welcomeTitle && sectionTitles[targetSection]) {
-        // Keep welcome message, just update section title
-    }
-    
     navButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const targetSection = btn.dataset.section;
