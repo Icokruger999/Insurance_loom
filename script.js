@@ -156,6 +156,25 @@ function closeClientModal() {
     }
 }
 
+function openManagerModal() {
+    const modal = document.getElementById('managerModal');
+    if (!modal) {
+        console.error('Manager modal not found in DOM');
+        return;
+    }
+    modal.classList.add('active');
+}
+
+function closeManagerModal() {
+    const modal = document.getElementById('managerModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+    if (managerLoginForm) managerLoginForm.reset();
+    const managerError = document.getElementById('managerLoginError');
+    if (managerError) managerError.classList.remove('show');
+}
+
 function handleLogin(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -308,6 +327,13 @@ if (selectBrokerBtn) {
     });
 }
 
+if (selectManagerBtn) {
+    selectManagerBtn.addEventListener('click', () => {
+        closeLoginTypeModalFunc();
+        openManagerModal();
+    });
+}
+
 if (selectClientBtn) {
     selectClientBtn.addEventListener('click', () => {
         openClientModal();
@@ -337,6 +363,71 @@ if (clientModal) {
     clientModal.addEventListener('click', (e) => {
         if (e.target === clientModal) {
             closeClientModal();
+        }
+    });
+}
+
+// Manager Modal
+const closeManagerModalBtn = managerModal ? managerModal.querySelector('.modal-close') : null;
+if (closeManagerModalBtn) {
+    closeManagerModalBtn.addEventListener('click', closeManagerModal);
+}
+
+if (managerModal) {
+    managerModal.addEventListener('click', (e) => {
+        if (e.target === managerModal) {
+            closeManagerModal();
+        }
+    });
+    // Prevent clicks inside modal-content from closing the modal
+    const modalContent = managerModal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+}
+
+// Manager Login Form Handler
+if (managerLoginForm) {
+    managerLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorDiv = document.getElementById('managerLoginError');
+        errorDiv.classList.remove('show');
+
+        const formData = {
+            email: document.getElementById('managerEmail').value,
+            password: document.getElementById('managerPassword').value
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/manager/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Store token if needed
+                if (data.token) {
+                    localStorage.setItem('managerToken', data.token);
+                    localStorage.setItem('managerInfo', JSON.stringify(data.manager));
+                }
+                closeManagerModal();
+                // Redirect to manager portal
+                window.location.href = '/manager-portal.html';
+            } else {
+                errorDiv.textContent = data.message || 'Login failed. Please check your credentials.';
+                errorDiv.classList.add('show');
+            }
+        } catch (error) {
+            console.error('Manager login error:', error);
+            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + API_BASE_URL;
+            errorDiv.classList.add('show');
         }
     });
 }
