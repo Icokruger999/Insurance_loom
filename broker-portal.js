@@ -547,6 +547,284 @@ async function loadCreateClientForm() {
     }
 }
 
+// Collect Form Data (reusable function)
+function collectFormData() {
+    // Collect beneficiaries
+    const beneficiaries = [];
+    const beneficiaryRows = document.querySelectorAll('[id^="beneficiary-row-"]');
+    beneficiaryRows.forEach(row => {
+        const index = row.id.split('-')[2];
+        const fullName = document.querySelector(`[name="beneficiary-fullName-${index}"]`)?.value.trim();
+        if (fullName) {
+            beneficiaries.push({
+                fullName: fullName,
+                dateOfBirth: document.querySelector(`[name="beneficiary-dob-${index}"]`)?.value || null,
+                age: document.querySelector(`[name="beneficiary-age-${index}"]`)?.value ? parseInt(document.querySelector(`[name="beneficiary-age-${index}"]`).value) : null,
+                mobile: document.querySelector(`[name="beneficiary-mobile-${index}"]`)?.value.trim() || null,
+                email: document.querySelector(`[name="beneficiary-email-${index}"]`)?.value.trim() || null,
+                relationship: document.querySelector(`[name="beneficiary-relationship-${index}"]`)?.value.trim() || null,
+                type: document.querySelector(`[name="beneficiary-type-${index}"]`)?.value || null
+            });
+        }
+    });
+    
+    return {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        middleName: document.getElementById('middleName')?.value.trim() || null,
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        idNumber: document.getElementById('idNumber').value.trim(),
+        dateOfBirth: document.getElementById('dateOfBirth').value,
+        birthplace: document.getElementById('birthplace')?.value.trim() || null,
+        sex: document.getElementById('sex').value,
+        civilStatus: document.getElementById('civilStatus').value,
+        occupation: document.getElementById('occupation')?.value.trim() || null,
+        address: document.getElementById('address').value.trim(),
+        serviceType: document.getElementById('serviceType').selectedOptions[0]?.text || '',
+        coverageAmount: document.getElementById('coverageAmount').value ? parseFloat(document.getElementById('coverageAmount').value) : null,
+        premiumAmount: document.getElementById('premiumAmount').value ? parseFloat(document.getElementById('premiumAmount').value) : null,
+        activationDate: document.getElementById('activationDate').value || null,
+        monthlyIncome: document.getElementById('monthlyIncome').value ? parseFloat(document.getElementById('monthlyIncome').value) : null,
+        monthlyExpenses: document.getElementById('monthlyExpenses').value ? parseFloat(document.getElementById('monthlyExpenses').value) : null,
+        paymentDate: document.getElementById('paymentDate').value ? parseInt(document.getElementById('paymentDate').value) : null,
+        beneficiaries: beneficiaries,
+        employmentStartDate: document.getElementById('employmentStartDate')?.value || null,
+        employmentEndDate: document.getElementById('employmentEndDate')?.value || null,
+        agencyName: document.getElementById('agencyName')?.value.trim() || null,
+        agencyContactNo: document.getElementById('agencyContactNo')?.value.trim() || null,
+        agencyAddress: document.getElementById('agencyAddress')?.value.trim() || null,
+        agencyEmail: document.getElementById('agencyEmail')?.value.trim() || null,
+        agencySignatory: document.getElementById('agencySignatory')?.value.trim() || null
+    };
+}
+
+// Generate PDF HTML Content
+function generatePDFContent(formData) {
+    const beneficiariesHtml = formData.beneficiaries.length > 0 
+        ? `<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead>
+                <tr style="background-color: #f5f5f5;">
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Full Name</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Date of Birth</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Age</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Mobile</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Email</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Relationship</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${formData.beneficiaries.map(b => `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${b.fullName || ''}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${b.dateOfBirth || ''}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${b.age || ''}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${b.mobile || ''}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${b.email || ''}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${b.relationship || ''}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${b.type || ''}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>`
+        : '<p>No beneficiaries added.</p>';
+    
+    return `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
+            <h1 style="text-align: center; margin-bottom: 30px;">Insurance Application Form</h1>
+            
+            <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;">Personal Information</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px; font-weight: bold; width: 40%;">Last Name:</td><td style="padding: 8px;">${formData.lastName || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">First Name:</td><td style="padding: 8px;">${formData.firstName || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Middle Name:</td><td style="padding: 8px;">${formData.middleName || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">ID Number:</td><td style="padding: 8px;">${formData.idNumber || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Date of Birth:</td><td style="padding: 8px;">${formData.dateOfBirth || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Birthplace:</td><td style="padding: 8px;">${formData.birthplace || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Sex:</td><td style="padding: 8px;">${formData.sex || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Civil Status:</td><td style="padding: 8px;">${formData.civilStatus || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Occupation:</td><td style="padding: 8px;">${formData.occupation || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Email:</td><td style="padding: 8px;">${formData.email || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Phone:</td><td style="padding: 8px;">${formData.phone || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Address:</td><td style="padding: 8px;">${formData.address || ''}</td></tr>
+            </table>
+            
+            <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;">Insurance Product Selection</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px; font-weight: bold; width: 40%;">Insurance Product:</td><td style="padding: 8px;">${formData.serviceType || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Coverage Amount:</td><td style="padding: 8px;">${formData.coverageAmount ? 'R' + formData.coverageAmount.toFixed(2) : ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Premium Amount:</td><td style="padding: 8px;">${formData.premiumAmount ? 'R' + formData.premiumAmount.toFixed(2) : ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Activation Date:</td><td style="padding: 8px;">${formData.activationDate || ''}</td></tr>
+            </table>
+            
+            <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;">Financial Information</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px; font-weight: bold; width: 40%;">Monthly Income:</td><td style="padding: 8px;">${formData.monthlyIncome ? 'R' + formData.monthlyIncome.toFixed(2) : ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Monthly Expenses:</td><td style="padding: 8px;">${formData.monthlyExpenses ? 'R' + formData.monthlyExpenses.toFixed(2) : ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Payment Date:</td><td style="padding: 8px;">${formData.paymentDate ? formData.paymentDate + (formData.paymentDate === 1 ? 'st' : formData.paymentDate === 2 ? 'nd' : formData.paymentDate === 3 ? 'rd' : 'th') : ''}</td></tr>
+            </table>
+            
+            <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;">Beneficiaries</h2>
+            ${beneficiariesHtml}
+            
+            ${formData.agencyName ? `
+            <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;">Agency/Payor Information</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px; font-weight: bold; width: 40%;">Employment Start Date:</td><td style="padding: 8px;">${formData.employmentStartDate || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Employment End Date:</td><td style="padding: 8px;">${formData.employmentEndDate || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Agency Name:</td><td style="padding: 8px;">${formData.agencyName || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Agency Contact:</td><td style="padding: 8px;">${formData.agencyContactNo || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Agency Address:</td><td style="padding: 8px;">${formData.agencyAddress || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Agency Email:</td><td style="padding: 8px;">${formData.agencyEmail || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Authorized Signatory:</td><td style="padding: 8px;">${formData.agencySignatory || ''}</td></tr>
+            </table>
+            ` : ''}
+            
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #333;">
+                <p style="font-size: 12px; color: #666;">Generated on: ${new Date().toLocaleString()}</p>
+            </div>
+        </div>
+    `;
+}
+
+// Generate and Download PDF
+async function generateAndDownloadPDF() {
+    try {
+        const form = document.getElementById('newClientForm');
+        if (!form) {
+            alert('Form not found');
+            return;
+        }
+        
+        // Create a printable version of the form
+        const formData = collectFormData();
+        const pdfContent = generatePDFContent(formData);
+        
+        // Create a temporary div for PDF generation
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = pdfContent;
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.width = '210mm'; // A4 width
+        tempDiv.style.padding = '20mm';
+        document.body.appendChild(tempDiv);
+        
+        // Generate PDF
+        const opt = {
+            margin: 10,
+            filename: `Insurance_Application_${formData.lastName}_${formData.firstName}_${new Date().toISOString().split('T')[0]}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        await html2pdf().set(opt).from(tempDiv).save();
+        
+        // Remove temporary div
+        document.body.removeChild(tempDiv);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
+}
+
+// Show Email Modal
+function showEmailModal() {
+    const emailAddresses = prompt('Enter email addresses (comma-separated):\nExample: email1@example.com, email2@example.com');
+    if (emailAddresses && emailAddresses.trim()) {
+        emailApplicationPDF(emailAddresses.split(',').map(e => e.trim()).filter(e => e));
+    }
+}
+
+// Email Application PDF
+async function emailApplicationPDF(recipients) {
+    try {
+        const form = document.getElementById('newClientForm');
+        if (!form) {
+            alert('Form not found');
+            return;
+        }
+        
+        const submitBtn = document.getElementById('emailPdfBtn');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        
+        // Collect form data
+        const formDataRaw = collectFormData();
+        
+        // Send to backend for PDF generation and email
+        const token = localStorage.getItem('brokerToken');
+        const response = await fetch(`${API_BASE_URL}/application/email-pdf`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                formData: {
+                    firstName: formDataRaw.firstName,
+                    lastName: formDataRaw.lastName,
+                    middleName: formDataRaw.middleName,
+                    email: formDataRaw.email,
+                    phone: formDataRaw.phone,
+                    idNumber: formDataRaw.idNumber,
+                    dateOfBirth: formDataRaw.dateOfBirth,
+                    birthplace: formDataRaw.birthplace,
+                    sex: formDataRaw.sex,
+                    civilStatus: formDataRaw.civilStatus,
+                    occupation: formDataRaw.occupation,
+                    address: formDataRaw.address,
+                    serviceType: formDataRaw.serviceType,
+                    coverageAmount: formDataRaw.coverageAmount,
+                    premiumAmount: formDataRaw.premiumAmount,
+                    activationDate: formDataRaw.activationDate,
+                    monthlyIncome: formDataRaw.monthlyIncome,
+                    monthlyExpenses: formDataRaw.monthlyExpenses,
+                    paymentDate: formDataRaw.paymentDate,
+                    beneficiaries: formDataRaw.beneficiaries.map(b => ({
+                        fullName: b.fullName,
+                        dateOfBirth: b.dateOfBirth,
+                        age: b.age,
+                        mobile: b.mobile,
+                        email: b.email,
+                        relationship: b.relationship,
+                        type: b.type
+                    })),
+                    employmentStartDate: formDataRaw.employmentStartDate,
+                    employmentEndDate: formDataRaw.employmentEndDate,
+                    agencyName: formDataRaw.agencyName,
+                    agencyContactNo: formDataRaw.agencyContactNo,
+                    agencyAddress: formDataRaw.agencyAddress,
+                    agencyEmail: formDataRaw.agencyEmail,
+                    agencySignatory: formDataRaw.agencySignatory
+                },
+                recipients: recipients
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert(`Application PDF sent successfully to ${recipients.length} recipient(s)!`);
+        } else {
+            alert(data.message || 'Error sending email. Please try again.');
+        }
+        
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        alert('Error sending email. Please try again.');
+        const submitBtn = document.getElementById('emailPdfBtn');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Email PDF';
+        }
+    }
+}
+
 // Handle Create Client Form Submission
 async function handleCreateClient(e) {
     e.preventDefault();
