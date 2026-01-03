@@ -23,16 +23,24 @@ The companies table has been created successfully. Now deploy the code changes.
    ```
 
 4. **Verify Deployment:**
-   - Check service status: `sudo systemctl status insuranceloom-api.service`
-   - Check logs: `sudo journalctl -u insuranceloom-api.service -n 50 --no-pager`
+   ```bash
+   sudo systemctl status insuranceloom-api.service
+   ```
 
-5. **Test Company List Endpoint:**
+5. **Check Logs (if needed):**
+   ```bash
+   sudo journalctl -u insuranceloom-api.service -n 50 --no-pager
+   ```
+
+6. **Test Company List Endpoint:**
    ```bash
    curl https://api.insuranceloom.com/api/company
    ```
    Should return JSON with "Astutetech Data" and "Pogo Group"
 
-6. **Test Broker Registration:**
+7. **Test Broker Registration:**
+   - Go to https://www.insuranceloom.com
+   - Click Login > Broker > Register
    - Try registering with an existing company (should work)
    - Try registering with a non-existent company without checkbox (should fail)
    - Try registering with a non-existent company with checkbox checked (should create company)
@@ -44,4 +52,3 @@ After deployment, verify:
 - ✅ API endpoints respond correctly
 - ✅ Broker registration validates companies
 - ✅ Company creation works during registration
-
