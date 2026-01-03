@@ -47,7 +47,7 @@ public class ClientAuthController : ControllerBase
             {
                 Id = Guid.NewGuid(),
                 Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                PasswordHash = PasswordHasher.HashPassword(request.Password),
                 UserType = "PolicyHolder",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -108,7 +108,7 @@ public class ClientAuthController : ControllerBase
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.Email && u.UserType == "PolicyHolder");
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            if (user == null || !PasswordHasher.VerifyPassword(request.Password, user.PasswordHash))
             {
                 return Unauthorized(new { message = "Invalid email or password" });
             }
