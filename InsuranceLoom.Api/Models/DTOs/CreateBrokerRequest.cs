@@ -8,6 +8,7 @@ public class CreateBrokerRequest
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string? CompanyName { get; set; }
+    public string ManagerEmail { get; set; } = string.Empty; // Manager email for approval
     public string? Phone { get; set; }
     public string? LicenseNumber { get; set; }
     // CommissionRate uses default value, can be changed later
