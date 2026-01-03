@@ -63,6 +63,12 @@ function initNavigation() {
         'commission': 'Commission'
     };
     
+    // Update welcome section title when switching sections
+    const welcomeTitle = document.querySelector('.welcome-section h1');
+    if (welcomeTitle && sectionTitles[targetSection]) {
+        // Keep welcome message, just update section title
+    }
+    
     navButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const targetSection = btn.dataset.section;
@@ -201,7 +207,7 @@ async function loadCreateClientForm() {
         
         formContainer.innerHTML = `
             <form id="newClientForm" class="client-form">
-                <h4 style="margin-bottom: 1.5rem; color: var(--text-primary); font-weight: 600;">Client Information</h4>
+                <h3 style="margin-bottom: 2rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Client Information</h3>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="firstName" class="required">First Name</label>
@@ -235,7 +241,7 @@ async function loadCreateClientForm() {
                     </div>
                 </div>
                 
-                <h4 style="margin: 2.5rem 0 1.5rem; color: var(--text-primary); font-weight: 600;">Insurance Product Selection</h4>
+                <h3 style="margin: 3rem 0 1.5rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Insurance Product Selection</h3>
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label for="serviceType" class="required">Select Insurance Product</label>
@@ -256,22 +262,50 @@ async function loadCreateClientForm() {
                         <small>Monthly premium amount</small>
                     </div>
                     <div class="form-group">
-                        <label for="startDate">Policy Start Date</label>
-                        <input type="date" id="startDate" name="startDate" min="${new Date().toISOString().split('T')[0]}">
+                        <label for="activationDate" class="required">Policy Activation Date</label>
+                        <input type="date" id="activationDate" name="activationDate" required min="${new Date().toISOString().split('T')[0]}">
                         <small>When should the policy become active?</small>
                     </div>
                 </div>
                 
-                <h4 style="margin: 2.5rem 0 1.5rem; color: var(--text-primary); font-weight: 600;">Account Credentials</h4>
+                <h3 style="margin: 3rem 0 1.5rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Financial Information</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="password" class="required">Password</label>
-                        <input type="password" id="password" name="password" required minlength="6">
-                        <small>Client will use this password to log in (minimum 6 characters)</small>
+                        <label for="monthlyIncome" class="required">Monthly Income (R)</label>
+                        <input type="number" id="monthlyIncome" name="monthlyIncome" required min="0" step="0.01">
+                        <small>Client's monthly income</small>
                     </div>
                     <div class="form-group">
-                        <label for="confirmPassword" class="required">Confirm Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+                        <label for="monthlyExpenses" class="required">Monthly Expenses (R)</label>
+                        <input type="number" id="monthlyExpenses" name="monthlyExpenses" required min="0" step="0.01">
+                        <small>Client's monthly expenses</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentDate" class="required">Preferred Payment Date</label>
+                        <select id="paymentDate" name="paymentDate" required>
+                            <option value="">-- Select day --</option>
+                            ${Array.from({length: 28}, (_, i) => i + 1).map(day => `<option value="${day}">${day}${day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'}</option>`).join('')}
+                        </select>
+                        <small>Day of month for premium payment</small>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 3rem 0 1.5rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Required Documents</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="idDocument" class="required">ID Document</label>
+                        <input type="file" id="idDocument" name="idDocument" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small>Upload a copy of ID document (PDF, JPG, PNG - Max 5MB)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="proofOfAddress" class="required">Proof of Address</label>
+                        <input type="file" id="proofOfAddress" name="proofOfAddress" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small>Upload proof of address (PDF, JPG, PNG - Max 5MB)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="bankStatement">Bank Statement (Optional)</label>
+                        <input type="file" id="bankStatement" name="bankStatement" accept=".pdf,.jpg,.jpeg,.png">
+                        <small>Upload recent bank statement if available</small>
                     </div>
                 </div>
                 
@@ -328,26 +362,47 @@ async function handleCreateClient(e) {
         idNumber: document.getElementById('idNumber').value.trim(),
         dateOfBirth: document.getElementById('dateOfBirth').value,
         address: document.getElementById('address').value.trim(),
-        password: document.getElementById('password').value,
-        confirmPassword: document.getElementById('confirmPassword').value,
         serviceTypeId: document.getElementById('serviceType').value || null,
         coverageAmount: document.getElementById('coverageAmount').value ? parseFloat(document.getElementById('coverageAmount').value) : null,
         premiumAmount: document.getElementById('premiumAmount').value ? parseFloat(document.getElementById('premiumAmount').value) : null,
-        startDate: document.getElementById('startDate').value || null
+        activationDate: document.getElementById('activationDate').value || null,
+        monthlyIncome: document.getElementById('monthlyIncome').value ? parseFloat(document.getElementById('monthlyIncome').value) : null,
+        monthlyExpenses: document.getElementById('monthlyExpenses').value ? parseFloat(document.getElementById('monthlyExpenses').value) : null,
+        paymentDate: document.getElementById('paymentDate').value ? parseInt(document.getElementById('paymentDate').value) : null,
+        idDocument: document.getElementById('idDocument').files[0],
+        proofOfAddress: document.getElementById('proofOfAddress').files[0],
+        bankStatement: document.getElementById('bankStatement').files[0] || null
     };
     
     // Validation
-    if (formData.password !== formData.confirmPassword) {
+    if (!formData.serviceTypeId) {
         if (errorDiv) {
-            errorDiv.textContent = 'Passwords do not match';
+            errorDiv.textContent = 'Please select an insurance product';
             errorDiv.classList.add('show');
         }
         return;
     }
     
-    if (formData.password.length < 6) {
+    if (!formData.idDocument || !formData.proofOfAddress) {
         if (errorDiv) {
-            errorDiv.textContent = 'Password must be at least 6 characters';
+            errorDiv.textContent = 'Please upload required documents (ID and Proof of Address)';
+            errorDiv.classList.add('show');
+        }
+        return;
+    }
+    
+    // Validate file sizes (5MB max)
+    const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (formData.idDocument.size > maxFileSize) {
+        if (errorDiv) {
+            errorDiv.textContent = 'ID Document file size exceeds 5MB limit';
+            errorDiv.classList.add('show');
+        }
+        return;
+    }
+    if (formData.proofOfAddress.size > maxFileSize) {
+        if (errorDiv) {
+            errorDiv.textContent = 'Proof of Address file size exceeds 5MB limit';
             errorDiv.classList.add('show');
         }
         return;
@@ -363,26 +418,32 @@ async function handleCreateClient(e) {
         const token = localStorage.getItem('brokerToken');
         const brokerInfo = JSON.parse(localStorage.getItem('brokerInfo'));
         
+        // Create FormData for file uploads
+        const formDataToSend = new FormData();
+        formDataToSend.append('firstName', formData.firstName);
+        formDataToSend.append('lastName', formData.lastName);
+        formDataToSend.append('email', formData.email);
+        formDataToSend.append('phone', formData.phone || '');
+        formDataToSend.append('idNumber', formData.idNumber || '');
+        formDataToSend.append('dateOfBirth', formData.dateOfBirth || '');
+        formDataToSend.append('address', formData.address || '');
+        formDataToSend.append('serviceTypeId', formData.serviceTypeId || '');
+        if (formData.coverageAmount) formDataToSend.append('coverageAmount', formData.coverageAmount.toString());
+        if (formData.premiumAmount) formDataToSend.append('premiumAmount', formData.premiumAmount.toString());
+        formDataToSend.append('activationDate', formData.activationDate || '');
+        if (formData.monthlyIncome) formDataToSend.append('monthlyIncome', formData.monthlyIncome.toString());
+        if (formData.monthlyExpenses) formDataToSend.append('monthlyExpenses', formData.monthlyExpenses.toString());
+        if (formData.paymentDate) formDataToSend.append('paymentDate', formData.paymentDate.toString());
+        formDataToSend.append('idDocument', formData.idDocument);
+        formDataToSend.append('proofOfAddress', formData.proofOfAddress);
+        if (formData.bankStatement) formDataToSend.append('bankStatement', formData.bankStatement);
+        
         const response = await fetch(`${API_BASE_URL}/policyholder/register`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                email: formData.email,
-                phone: formData.phone || null,
-                idNumber: formData.idNumber || null,
-                dateOfBirth: formData.dateOfBirth || null,
-                address: formData.address || null,
-                password: formData.password,
-                serviceTypeId: formData.serviceTypeId || null,
-                coverageAmount: formData.coverageAmount,
-                premiumAmount: formData.premiumAmount,
-                startDate: formData.startDate || null
-            })
+            body: formDataToSend
         });
         
         const data = await response.json();

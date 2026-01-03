@@ -118,6 +118,19 @@ builder.Services.AddSingleton<JwtTokenGenerator>();
 
 var app = builder.Build();
 
+// Run migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        await MigrationRunner.RunMigrationsAsync(app.Services);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Migration error on startup: {ex.Message}");
+    }
+}
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
