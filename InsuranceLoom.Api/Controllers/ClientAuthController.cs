@@ -1,5 +1,7 @@
 using InsuranceLoom.Api.Data;
+using InsuranceLoom.Api.Helpers;
 using InsuranceLoom.Api.Models.DTOs;
+using InsuranceLoom.Api.Models.Entities;
 using InsuranceLoom.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
