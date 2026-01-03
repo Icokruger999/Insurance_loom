@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broker Portal - Insurance Loom</title>
+    <link rel="stylesheet" href="broker-portal.css">
+</head>
+<body>
+    <div class="portal-container">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Broker Portal</h1>
+                <div class="broker-info" id="brokerInfo">
+                    <p class="broker-name" id="brokerName">Loading...</p>
+                    <p class="broker-email" id="brokerEmail"></p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-section="new-clients">
+                    <span class="nav-icon">➕</span>
+                    <span class="nav-text">New Clients</span>
+                </button>
+                <button class="nav-btn" data-section="existing-clients">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Progress Existing Clients</span>
+                </button>
+                <button class="nav-btn" data-section="monthly-report">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Monthly Report</span>
+                </button>
+                <button class="nav-btn" data-section="commission">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text">Commission</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2 id="sectionTitle">New Clients</h2>
+            </div>
+
+            <!-- New Clients Section -->
+            <section id="new-clients" class="content-section active">
+                <div class="section-content">
+                    <h3>Add New Client</h3>
+                    <p>This section will allow you to register new clients and create policies.</p>
+                    <!-- New client form will go here -->
+                </div>
+            </section>
+
+            <!-- Existing Clients Section -->
+            <section id="existing-clients" class="content-section">
+                <div class="section-content">
+                    <h3>Existing Clients Progress</h3>
+                    <p>View and manage your existing clients and their policy statuses.</p>
+                    <!-- Client list and progress tracking will go here -->
+                </div>
+            </section>
+
+            <!-- Monthly Report Section -->
+            <section id="monthly-report" class="content-section">
+                <div class="section-content">
+                    <h3>Monthly Report</h3>
+                    <p>View your monthly performance metrics and statistics.</p>
+                    <!-- Monthly report charts and data will go here -->
+                </div>
+            </section>
+
+            <!-- Commission Section -->
+            <section id="commission" class="content-section">
+                <div class="section-content">
+                    <h3>Commission</h3>
+                    <p>View your commission earnings and payment history.</p>
+                    <!-- Commission details will go here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="broker-portal.js"></script>
+</body>
+</html>
+

@@ -219,9 +219,9 @@ if (brokerLoginForm) {
                     localStorage.setItem('brokerToken', data.token);
                     localStorage.setItem('brokerInfo', JSON.stringify(data.broker));
                 }
-                alert(`Login successful! Welcome ${data.broker?.firstName || 'Broker'}`);
                 closeBrokerModal();
-                // You can redirect or update UI here
+                // Redirect to broker portal
+                window.location.href = '/broker-portal.html';
             } else {
                 errorDiv.textContent = data.message || 'Login failed. Please check your credentials.';
                 errorDiv.classList.add('show');
