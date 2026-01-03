@@ -122,18 +122,20 @@ public class ApplicationController : ControllerBase
             <h3 style=""border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;"">Beneficiaries</h3>
             {beneficiariesHtml}
             
-            {(string.IsNullOrEmpty(formData.AgencyName) ? "" : $@"
-            <h3 style=""border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;"">Agency/Payor Information</h3>
+            {(!string.IsNullOrEmpty(formData.EmploymentType) || !string.IsNullOrEmpty(formData.IncomeTaxNumber) || !string.IsNullOrEmpty(formData.AgencyName) ? $@"
+            <h3 style=""border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;"">Employer Information / Agency/Payor Information</h3>
             <table style=""width: 100%; border-collapse: collapse;"">
-                <tr><td style=""padding: 8px; font-weight: bold; width: 40%;"">Employment Start Date:</td><td style=""padding: 8px;"">{formData.EmploymentStartDate ?? ""}</td></tr>
+                {(!string.IsNullOrEmpty(formData.EmploymentType) ? $@"<tr><td style=""padding: 8px; font-weight: bold; width: 40%;"">Employment Type:</td><td style=""padding: 8px;"">{formData.EmploymentType ?? ""}</td></tr>" : "")}
+                {(!string.IsNullOrEmpty(formData.IncomeTaxNumber) ? $@"<tr><td style=""padding: 8px; font-weight: bold;"">Income Tax Number:</td><td style=""padding: 8px;"">{formData.IncomeTaxNumber ?? ""}</td></tr>" : "")}
+                <tr><td style=""padding: 8px; font-weight: bold;"">Employment Start Date:</td><td style=""padding: 8px;"">{formData.EmploymentStartDate ?? ""}</td></tr>
                 <tr><td style=""padding: 8px; font-weight: bold;"">Employment End Date:</td><td style=""padding: 8px;"">{formData.EmploymentEndDate ?? ""}</td></tr>
-                <tr><td style=""padding: 8px; font-weight: bold;"">Agency Name:</td><td style=""padding: 8px;"">{formData.AgencyName ?? ""}</td></tr>
+                <tr><td style=""padding: 8px; font-weight: bold;"">Agency / Employer Name:</td><td style=""padding: 8px;"">{formData.AgencyName ?? ""}</td></tr>
                 <tr><td style=""padding: 8px; font-weight: bold;"">Agency Contact:</td><td style=""padding: 8px;"">{formData.AgencyContactNo ?? ""}</td></tr>
-                <tr><td style=""padding: 8px; font-weight: bold;"">Agency Address:</td><td style=""padding: 8px;"">{formData.AgencyAddress ?? ""}</td></tr>
-                <tr><td style=""padding: 8px; font-weight: bold;"">Agency Email:</td><td style=""padding: 8px;"">{formData.AgencyEmail ?? ""}</td></tr>
+                <tr><td style=""padding: 8px; font-weight: bold;"">Agency / Employer Address:</td><td style=""padding: 8px;"">{formData.AgencyAddress ?? ""}</td></tr>
+                <tr><td style=""padding: 8px; font-weight: bold;"">Agency / Employer Email:</td><td style=""padding: 8px;"">{formData.AgencyEmail ?? ""}</td></tr>
                 <tr><td style=""padding: 8px; font-weight: bold;"">Authorized Signatory:</td><td style=""padding: 8px;"">{formData.AgencySignatory ?? ""}</td></tr>
             </table>
-            ")}
+            " : "")}
         ";
     }
 }
@@ -166,6 +168,8 @@ public class ApplicationFormData
     public decimal? MonthlyExpenses { get; set; }
     public int? PaymentDate { get; set; }
     public BeneficiaryData[]? Beneficiaries { get; set; }
+    public string? EmploymentType { get; set; }
+    public string? IncomeTaxNumber { get; set; }
     public string? EmploymentStartDate { get; set; }
     public string? EmploymentEndDate { get; set; }
     public string? AgencyName { get; set; }

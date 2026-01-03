@@ -394,8 +394,20 @@ async function loadCreateClientForm() {
                     </div>
                 </div>
                 
-                <h3 style="margin: 3rem 0 1.5rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Agency/Payor Information</h3>
+                <h3 style="margin: 3rem 0 1.5rem; color: var(--text-primary); font-weight: 600; font-size: 1.5rem;">Employer Information / Agency/Payor Information</h3>
                 <div class="form-grid">
+                    <div class="form-group">
+                        <label for="employmentType" class="required">Employment Type</label>
+                        <select id="employmentType" name="employmentType" required>
+                            <option value="">-- Select --</option>
+                            <option value="Employee">Employee</option>
+                            <option value="Self Employed">Self Employed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="incomeTaxNumber" class="required">Income Tax Number</label>
+                        <input type="text" id="incomeTaxNumber" name="incomeTaxNumber" required>
+                    </div>
                     <div class="form-group">
                         <label for="employmentStartDate">Term of Employment - From / Departure Date</label>
                         <input type="date" id="employmentStartDate" name="employmentStartDate">
@@ -405,7 +417,7 @@ async function loadCreateClientForm() {
                         <input type="date" id="employmentEndDate" name="employmentEndDate">
                     </div>
                     <div class="form-group">
-                        <label for="agencyName">Name of Agency</label>
+                        <label for="agencyName">Name of Agency / Employer</label>
                         <input type="text" id="agencyName" name="agencyName">
                     </div>
                     <div class="form-group">
@@ -413,11 +425,11 @@ async function loadCreateClientForm() {
                         <input type="tel" id="agencyContactNo" name="agencyContactNo">
                     </div>
                     <div class="form-group full-width">
-                        <label for="agencyAddress">Address of Agency</label>
+                        <label for="agencyAddress">Address of Agency / Employer</label>
                         <textarea id="agencyAddress" name="agencyAddress" rows="2"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="agencyEmail">E-mail Address of Agency</label>
+                        <label for="agencyEmail">E-mail Address of Agency / Employer</label>
                         <input type="email" id="agencyEmail" name="agencyEmail">
                     </div>
                     <div class="form-group">
@@ -589,6 +601,8 @@ function collectFormData() {
         monthlyExpenses: document.getElementById('monthlyExpenses').value ? parseFloat(document.getElementById('monthlyExpenses').value) : null,
         paymentDate: document.getElementById('paymentDate').value ? parseInt(document.getElementById('paymentDate').value) : null,
         beneficiaries: beneficiaries,
+        employmentType: document.getElementById('employmentType')?.value || null,
+        incomeTaxNumber: document.getElementById('incomeTaxNumber')?.value.trim() || null,
         employmentStartDate: document.getElementById('employmentStartDate')?.value || null,
         employmentEndDate: document.getElementById('employmentEndDate')?.value || null,
         agencyName: document.getElementById('agencyName')?.value.trim() || null,
@@ -668,15 +682,17 @@ function generatePDFContent(formData) {
             <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;">Beneficiaries</h2>
             ${beneficiariesHtml}
             
-            ${formData.agencyName ? `
-            <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;">Agency/Payor Information</h2>
+            ${(formData.employmentType || formData.incomeTaxNumber || formData.agencyName) ? `
+            <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;">Employer Information / Agency/Payor Information</h2>
             <table style="width: 100%; border-collapse: collapse;">
-                <tr><td style="padding: 8px; font-weight: bold; width: 40%;">Employment Start Date:</td><td style="padding: 8px;">${formData.employmentStartDate || ''}</td></tr>
+                ${formData.employmentType ? `<tr><td style="padding: 8px; font-weight: bold; width: 40%;">Employment Type:</td><td style="padding: 8px;">${formData.employmentType || ''}</td></tr>` : ''}
+                ${formData.incomeTaxNumber ? `<tr><td style="padding: 8px; font-weight: bold;">Income Tax Number:</td><td style="padding: 8px;">${formData.incomeTaxNumber || ''}</td></tr>` : ''}
+                <tr><td style="padding: 8px; font-weight: bold;">Employment Start Date:</td><td style="padding: 8px;">${formData.employmentStartDate || ''}</td></tr>
                 <tr><td style="padding: 8px; font-weight: bold;">Employment End Date:</td><td style="padding: 8px;">${formData.employmentEndDate || ''}</td></tr>
-                <tr><td style="padding: 8px; font-weight: bold;">Agency Name:</td><td style="padding: 8px;">${formData.agencyName || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Agency / Employer Name:</td><td style="padding: 8px;">${formData.agencyName || ''}</td></tr>
                 <tr><td style="padding: 8px; font-weight: bold;">Agency Contact:</td><td style="padding: 8px;">${formData.agencyContactNo || ''}</td></tr>
-                <tr><td style="padding: 8px; font-weight: bold;">Agency Address:</td><td style="padding: 8px;">${formData.agencyAddress || ''}</td></tr>
-                <tr><td style="padding: 8px; font-weight: bold;">Agency Email:</td><td style="padding: 8px;">${formData.agencyEmail || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Agency / Employer Address:</td><td style="padding: 8px;">${formData.agencyAddress || ''}</td></tr>
+                <tr><td style="padding: 8px; font-weight: bold;">Agency / Employer Email:</td><td style="padding: 8px;">${formData.agencyEmail || ''}</td></tr>
                 <tr><td style="padding: 8px; font-weight: bold;">Authorized Signatory:</td><td style="padding: 8px;">${formData.agencySignatory || ''}</td></tr>
             </table>
             ` : ''}
@@ -792,6 +808,8 @@ async function emailApplicationPDF(recipients) {
                         relationship: b.relationship,
                         type: b.type
                     })),
+                    employmentType: formDataRaw.employmentType,
+                    incomeTaxNumber: formDataRaw.incomeTaxNumber,
                     employmentStartDate: formDataRaw.employmentStartDate,
                     employmentEndDate: formDataRaw.employmentEndDate,
                     agencyName: formDataRaw.agencyName,
@@ -881,6 +899,8 @@ async function handleCreateClient(e) {
         declarationsAgree: document.getElementById('declarationsAgree').checked,
         dataPrivacyConsent: document.getElementById('dataPrivacyConsent').checked,
         marketingConsent: document.getElementById('marketingConsent')?.checked || false,
+        employmentType: document.getElementById('employmentType')?.value || null,
+        incomeTaxNumber: document.getElementById('incomeTaxNumber')?.value.trim() || null,
         employmentStartDate: document.getElementById('employmentStartDate')?.value || null,
         employmentEndDate: document.getElementById('employmentEndDate')?.value || null,
         agencyName: document.getElementById('agencyName')?.value.trim() || null,
@@ -962,6 +982,8 @@ async function handleCreateClient(e) {
         formDataToSend.append('declarationsAgree', formData.declarationsAgree.toString());
         formDataToSend.append('dataPrivacyConsent', formData.dataPrivacyConsent.toString());
         formDataToSend.append('marketingConsent', formData.marketingConsent.toString());
+        if (formData.employmentType) formDataToSend.append('employmentType', formData.employmentType);
+        if (formData.incomeTaxNumber) formDataToSend.append('incomeTaxNumber', formData.incomeTaxNumber);
         if (formData.employmentStartDate) formDataToSend.append('employmentStartDate', formData.employmentStartDate);
         if (formData.employmentEndDate) formDataToSend.append('employmentEndDate', formData.employmentEndDate);
         if (formData.agencyName) formDataToSend.append('agencyName', formData.agencyName);
