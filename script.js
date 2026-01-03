@@ -45,6 +45,11 @@ const brokerLoginForm = document.getElementById('brokerLoginForm');
 const brokerRegisterForm = document.getElementById('brokerRegisterForm');
 
 function openBrokerModal() {
+    if (!brokerModal) {
+        console.error('Broker modal not found');
+        return;
+    }
+    console.log('Opening broker modal');
     brokerModal.classList.add('active');
     // Reset to login tab
     switchTab('login');
@@ -82,6 +87,8 @@ function switchTab(tabName) {
 
 function handleBrokerLogin(e) {
     e.preventDefault();
+    e.stopPropagation();
+    console.log('Broker login button clicked');
     openBrokerModal();
 }
 
@@ -229,8 +236,8 @@ if (policyHolderLoginBtnMobile) {
     policyHolderLoginBtnMobile.addEventListener('click', handlePolicyHolderLogin);
 }
 
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+// Smooth scroll for anchor links (exclude login buttons)
+document.querySelectorAll('a[href^="#"]:not(.btn-login)').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
