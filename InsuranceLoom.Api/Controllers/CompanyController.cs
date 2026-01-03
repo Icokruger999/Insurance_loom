@@ -44,7 +44,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Broker,Manager")] // Brokers and Managers can create companies
+    [Authorize(Roles = "Manager")] // Only Managers can create companies
     public async Task<ActionResult<CompanyDto>> CreateCompany([FromBody] CreateCompanyRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Name))

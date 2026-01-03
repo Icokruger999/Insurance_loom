@@ -28,7 +28,7 @@ public class AuthService : IAuthService
         if (existingUser != null)
             throw new ArgumentException("Email already exists");
 
-        // Validate company name if provided
+        // Validate company name if provided - must exist in database
         if (!string.IsNullOrWhiteSpace(request.CompanyName))
         {
             var companyExists = await _context.Companies
@@ -36,24 +36,7 @@ public class AuthService : IAuthService
             
             if (!companyExists)
             {
-                // If company doesn't exist and createCompany flag is set, create it
-                if (request.CreateCompanyIfNotExists)
-                {
-                    var newCompany = new Company
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = request.CompanyName.Trim(),
-                        IsActive = true,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    _context.Companies.Add(newCompany);
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    throw new ArgumentException($"Company '{request.CompanyName}' does not exist. Please select an existing company or create a new one.");
-                }
+                throw new ArgumentException($"Company '{request.CompanyName}' does not exist. Please select an existing company.");
             }
         }
 

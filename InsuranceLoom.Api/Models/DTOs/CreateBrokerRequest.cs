@@ -8,7 +8,6 @@ public class CreateBrokerRequest
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string? CompanyName { get; set; }
-    public bool CreateCompanyIfNotExists { get; set; } = false; // If true, create company if it doesn't exist
     public string? Phone { get; set; }
     public string? LicenseNumber { get; set; }
     // CommissionRate uses default value, can be changed later
