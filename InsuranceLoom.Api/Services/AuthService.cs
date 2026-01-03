@@ -10,11 +10,13 @@ public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
     private readonly JwtTokenGenerator _jwtGenerator;
+    private readonly IEmailService _emailService;
 
-    public AuthService(ApplicationDbContext context, JwtTokenGenerator jwtGenerator)
+    public AuthService(ApplicationDbContext context, JwtTokenGenerator jwtGenerator, IEmailService emailService)
     {
         _context = context;
         _jwtGenerator = jwtGenerator;
+        _emailService = emailService;
     }
 
     public async Task<BrokerDto> RegisterBrokerAsync(CreateBrokerRequest request)
