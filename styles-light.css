@@ -45,7 +45,7 @@ body {
     position: relative;
 }
 
-/* Puzzle piece pattern background - SVG pattern */
+/* Puzzle piece pattern background - cascading from top-left corner */
 .puzzle-pattern {
     position: relative;
     overflow: hidden;
@@ -56,15 +56,18 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 400px;
+    height: 600px;
     background-image: 
-        url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='puzzle' x='0' y='0' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0,0 L20,0 L20,10 Q20,20 10,20 L10,30 L0,30 Z' fill='%23e6f2ed' opacity='0.3'/%3E%3Cpath d='M20,0 L40,0 L40,20 L30,20 Q20,20 20,10 Z' fill='%23d4e4dc' opacity='0.25'/%3E%3Cpath d='M40,0 L60,0 L60,30 L50,30 L50,20 Q50,20 40,20 Z' fill='%23c8dfd1' opacity='0.2'/%3E%3Cpath d='M0,30 L10,30 L10,40 Q10,50 20,50 L20,60 L0,60 Z' fill='%23b8d4c4' opacity='0.25'/%3E%3Cpath d='M20,50 L40,50 L40,60 L20,60 Z' fill='%23e6f2ed' opacity='0.3'/%3E%3Cpath d='M40,30 L50,30 L50,40 Q50,50 40,50 L40,60 L60,60 L60,30 Z' fill='%23d4e4dc' opacity='0.25'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23puzzle)'/%3E%3C/svg%3E");
-    background-size: 120px 120px;
-    background-repeat: repeat;
+        url("data:image/svg+xml,%3Csvg width='400' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='puzzle' x='0' y='0' width='80' height='80' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0,0 L26,0 L26,13 Q26,26 13,26 L13,40 L0,40 Z' fill='%23ffffff' opacity='0.6'/%3E%3Cpath d='M26,0 L53,0 L53,26 L39,26 Q26,26 26,13 Z' fill='%23ffffff' opacity='0.7'/%3E%3Cpath d='M53,0 L80,0 L80,40 L66,40 L66,26 Q66,26 53,26 Z' fill='%23ffffff' opacity='0.65'/%3E%3Cpath d='M0,40 L13,40 L13,53 Q13,66 26,66 L26,80 L0,80 Z' fill='%23ffffff' opacity='0.7'/%3E%3Cpath d='M26,66 L53,66 L53,80 L26,80 Z' fill='%23ffffff' opacity='0.6'/%3E%3Cpath d='M53,40 L66,40 L66,53 Q66,66 53,66 L53,80 L80,80 L80,40 Z' fill='%23ffffff' opacity='0.65'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='400' height='600' fill='url(%23puzzle)'/%3E%3C/svg%3E");
+    background-size: 400px 600px;
+    background-repeat: no-repeat;
+    background-position: top left;
     opacity: 0.4;
     pointer-events: none;
     z-index: 0;
+    transform: rotate(-5deg);
+    transform-origin: top left;
 }
 
 .puzzle-pattern > * {
@@ -300,6 +303,9 @@ body {
 
 .hero.puzzle-pattern::before {
     opacity: 0.35;
+    width: 500px;
+    height: 700px;
+    background-size: 500px 700px;
 }
 
 .hero-title {
@@ -346,7 +352,10 @@ section {
 }
 
 .features.puzzle-pattern::before {
-    opacity: 0.25;
+    opacity: 0.3;
+    width: 450px;
+    height: 650px;
+    background-size: 450px 650px;
 }
 
 /* Feature Cards */
@@ -396,6 +405,9 @@ section {
 
 .partners.puzzle-pattern::before {
     opacity: 0.3;
+    width: 400px;
+    height: 600px;
+    background-size: 400px 600px;
 }
 
 .partners-grid {
