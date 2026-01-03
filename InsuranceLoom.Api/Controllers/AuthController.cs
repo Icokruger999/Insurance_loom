@@ -52,8 +52,14 @@ public class AuthController : ControllerBase
                     .Include(b => b.User)
                     .FirstOrDefaultAsync(b => b.User != null && b.User.Email == request.Email);
                 
-                if (broker != null && !broker.IsActive)
-                    return Unauthorized(new { message = "Your account is pending approval. Please wait for admin approval before logging in." });
+                if (broker == null)
+                    return Unauthorized(new { message = "No account found with this email address. Please register first." });
+                
+                if (broker.User != null && !broker.User.IsActive)
+                    return Unauthorized(new { message = "Your account has been deactivated. Please contact support." });
+                
+                if (!broker.IsActive)
+                    return Unauthorized(new { message = "Your account is pending approval. Please wait for manager approval before logging in. You will receive an email when approved." });
                 
                 return Unauthorized(new { message = "Invalid email or password" });
             }
