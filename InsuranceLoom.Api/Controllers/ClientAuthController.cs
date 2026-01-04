@@ -151,6 +151,88 @@ public class ClientAuthController : ControllerBase
         }
     }
 
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        try
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email && u.UserType == "PolicyHolder");
+
+            if (user == null)
+            {
+                return Ok(new { message = "If an account exists with this email, a password reset link has been sent." });
+            }
+
+            var policyHolder = await _context.PolicyHolders
+                .FirstOrDefaultAsync(ph => ph.UserId == user.Id);
+
+            var tempPassword = Guid.NewGuid().ToString("N")[..12];
+            user.PasswordHash = PasswordHasher.HashPassword(tempPassword);
+            await _context.SaveChangesAsync();
+
+            var emailBody = $@"
+                <h2>Password Reset Request</h2>
+                <p>Hello {policyHolder?.FirstName ?? "User"},</p>
+                <p>You have requested to reset your password for your Insurance Loom account.</p>
+                <p><strong>Your temporary password is: {tempPassword}</strong></p>
+                <p>Please log in with this temporary password and change it immediately after logging in.</p>
+                <p>If you did not request this password reset, please contact support immediately.</p>
+                <p>Best regards,<br>Insurance Loom Team</p>
+            ";
+
+            await _emailService.SendEmailAsync(
+                user.Email,
+                "Password Reset - Insurance Loom",
+                emailBody
+            );
+
+            return Ok(new { message = "Password reset email has been sent. Please check your inbox." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while processing your request", error = ex.Message });
+        }
+    }
+
+    [HttpPost("change-password")]
+    [Authorize(Roles = "PolicyHolder")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user token" });
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId && u.UserType == "PolicyHolder");
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            if (!PasswordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+            {
+                return Unauthorized(new { message = "Current password is incorrect" });
+            }
+
+            user.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Password changed successfully" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while changing password", error = ex.Message });
+        }
+    }
+
     private string GenerateJwtToken(User user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");

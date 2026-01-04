@@ -1,9 +1,11 @@
 using InsuranceLoom.Api.Models.DTOs;
 using InsuranceLoom.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using InsuranceLoom.Api.Data;
 using InsuranceLoom.Api.Helpers;
+using System.Security.Claims;
 
 namespace InsuranceLoom.Api.Controllers;
 
@@ -153,6 +155,127 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "An error occurred while processing your request", error = ex.Message });
+        }
+    }
+
+    [HttpPost("broker/forgot-password")]
+    public async Task<ActionResult> BrokerForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        try
+        {
+            var broker = await _context.Brokers
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.User != null && b.User.Email == request.Email);
+
+            if (broker == null || broker.User == null)
+            {
+                return Ok(new { message = "If an account exists with this email, a password reset link has been sent." });
+            }
+
+            var tempPassword = Guid.NewGuid().ToString("N")[..12];
+            var passwordHasher = new PasswordHasher();
+            broker.User.PasswordHash = passwordHasher.HashPassword(tempPassword);
+            await _context.SaveChangesAsync();
+
+            var emailBody = $@"
+                <h2>Password Reset Request</h2>
+                <p>Hello {broker.User.FirstName} {broker.User.LastName},</p>
+                <p>You have requested to reset your password for your Insurance Loom Broker account.</p>
+                <p><strong>Your temporary password is: {tempPassword}</strong></p>
+                <p>Please log in with this temporary password and change it immediately after logging in.</p>
+                <p>If you did not request this password reset, please contact support immediately.</p>
+                <p>Best regards,<br>Insurance Loom Team</p>
+            ";
+
+            await _emailService.SendEmailAsync(
+                broker.User.Email,
+                "Password Reset - Insurance Loom",
+                emailBody
+            );
+
+            return Ok(new { message = "Password reset email has been sent. Please check your inbox." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while processing your request", error = ex.Message });
+        }
+    }
+
+    [HttpPost("manager/change-password")]
+    [Authorize(Roles = "Manager,Admin")]
+    public async Task<ActionResult> ManagerChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user token" });
+            }
+
+            var manager = await _context.Managers
+                .Include(m => m.User)
+                .FirstOrDefaultAsync(m => m.User != null && m.User.Id == userId);
+
+            if (manager == null || manager.User == null)
+            {
+                return NotFound(new { message = "Manager not found" });
+            }
+
+            var passwordHasher = new PasswordHasher();
+            if (!passwordHasher.VerifyPassword(request.CurrentPassword, manager.User.PasswordHash))
+            {
+                return Unauthorized(new { message = "Current password is incorrect" });
+            }
+
+            manager.User.PasswordHash = passwordHasher.HashPassword(request.NewPassword);
+            manager.User.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Password changed successfully" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while changing password", error = ex.Message });
+        }
+    }
+
+    [HttpPost("broker/change-password")]
+    [Authorize(Roles = "Broker")]
+    public async Task<ActionResult> BrokerChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user token" });
+            }
+
+            var broker = await _context.Brokers
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.User != null && b.User.Id == userId);
+
+            if (broker == null || broker.User == null)
+            {
+                return NotFound(new { message = "Broker not found" });
+            }
+
+            var passwordHasher = new PasswordHasher();
+            if (!passwordHasher.VerifyPassword(request.CurrentPassword, broker.User.PasswordHash))
+            {
+                return Unauthorized(new { message = "Current password is incorrect" });
+            }
+
+            broker.User.PasswordHash = passwordHasher.HashPassword(request.NewPassword);
+            broker.User.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Password changed successfully" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while changing password", error = ex.Message });
         }
     }
 }
