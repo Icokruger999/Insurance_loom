@@ -108,6 +108,9 @@ async function loadSectionData(sectionId) {
     
     try {
         switch (sectionId) {
+            case 'dashboard':
+                await loadDashboard();
+                break;
             case 'pending-applications':
                 await loadPendingApplications();
                 break;

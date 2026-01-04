@@ -11,14 +11,18 @@
         <!-- Left Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h1>Manager Portal</h1>
+                <h1>Insurance Loom</h1>
+                <h2 style="font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 0.25rem;">Manager Portal</h2>
                 <div class="manager-info" id="managerInfo">
                     <p class="manager-name" id="managerName">Loading...</p>
                     <p class="manager-email" id="managerEmail"></p>
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <button class="nav-btn active" data-section="pending-applications">
+                <button class="nav-btn active" data-section="dashboard">
+                    <span class="nav-text">Dashboard</span>
+                </button>
+                <button class="nav-btn" data-section="pending-applications">
                     <span class="nav-text">Pending Applications</span>
                 </button>
                 <button class="nav-btn" data-section="approved-applications">
@@ -42,11 +46,20 @@
         <!-- Main Content Area -->
         <main class="main-content">
             <div class="content-header">
-                <h2 id="sectionTitle">Pending Applications</h2>
+                <h2 id="sectionTitle">Dashboard</h2>
             </div>
 
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="section-content">
+                    <div id="dashboardContent">
+                        <p class="loading-text">Loading dashboard...</p>
+                    </div>
+                </div>
+            </section>
+
             <!-- Pending Applications Section -->
-            <section id="pending-applications" class="content-section active">
+            <section id="pending-applications" class="content-section">
                 <div class="section-content">
                     <h3>Pending Applications</h3>
                     <p>Review and approve applications submitted by brokers.</p>
