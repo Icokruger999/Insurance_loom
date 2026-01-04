@@ -121,6 +121,9 @@ async function loadSectionData(sectionId) {
             case 'rejected-applications':
                 await loadRejectedApplications();
                 break;
+            case 'broker-activity':
+                await loadBrokerActivity();
+                break;
             case 'agents':
                 await loadAgents();
                 break;
@@ -265,9 +268,6 @@ async function loadDashboard() {
                 <div class="table-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0; color: var(--text-primary); font-size: 1.25rem;">All Policies</h3>
-                        <button onclick="loadAllPoliciesTable()" id="refreshPoliciesBtn" style="padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
-                            <span>🔄</span> Refresh
-                        </button>
                     </div>
                     <div id="policiesFilters" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
                         <div>
@@ -699,12 +699,17 @@ async function loadAllPoliciesTable() {
         const startDate = document.getElementById('filterStartDate')?.value || '';
         const endDate = document.getElementById('filterEndDate')?.value || '';
         
-        let url = `${API_BASE_URL}/policy-approval/all?`;
-        if (region) url += `region=${encodeURIComponent(region)}&`;
-        if (broker) url += `brokerId=${broker}&`;
-        if (status) url += `status=${encodeURIComponent(status)}&`;
-        if (startDate) url += `startDate=${startDate}&`;
-        if (endDate) url += `endDate=${endDate}&`;
+        let url = `${API_BASE_URL}/policy-approval/all`;
+        const params = new URLSearchParams();
+        if (region) params.append('region', region);
+        if (broker) params.append('brokerId', broker);
+        if (status) params.append('status', status);
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
         
         const response = await fetch(url, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -855,6 +860,261 @@ function viewPolicyDetails(policyId) {
     // Navigate to pending applications and highlight the policy
     navigateToSection('pending-applications');
     // TODO: Implement policy detail view
+}
+
+// Load Broker Activity Dashboard
+async function loadBrokerActivity() {
+    const content = document.getElementById('brokerActivityContent');
+    if (!content) return;
+    
+    content.innerHTML = '<p class="loading-text">Loading broker activity...</p>';
+    
+    try {
+        const token = localStorage.getItem('managerToken');
+        
+        // Fetch broker statistics
+        const statsResponse = await fetch(`${API_BASE_URL}/policy-approval/brokers/activity/stats`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        // Fetch latest policies sold by brokers
+        const policiesResponse = await fetch(`${API_BASE_URL}/policy-approval/brokers/activity/latest-policies`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        // Fetch broker performance data
+        const performanceResponse = await fetch(`${API_BASE_URL}/policy-approval/brokers/activity/performance`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const stats = statsResponse.ok ? await statsResponse.json() : { active: 0, expired: 0, pending: 0 };
+        const latestPolicies = policiesResponse.ok ? await policiesResponse.json() : [];
+        const performance = performanceResponse.ok ? await performanceResponse.json() : [];
+        
+        // Calculate percentages for donut charts
+        const totalPolicies = stats.active + stats.expired + stats.pending;
+        const activePercent = totalPolicies > 0 ? (stats.active / totalPolicies) * 100 : 0;
+        const expiredPercent = totalPolicies > 0 ? (stats.expired / totalPolicies) * 100 : 0;
+        const pendingPercent = totalPolicies > 0 ? (stats.pending / totalPolicies) * 100 : 0;
+        
+        // Calculate last 7 days stats
+        const last7Days = performance.filter(p => {
+            const date = new Date(p.date);
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            return date >= sevenDaysAgo;
+        });
+        const last7DaysPending = last7Days.reduce((sum, p) => sum + (p.pending || 0), 0);
+        
+        content.innerHTML = `
+            <div style="background: #f0f8f4; padding: 1.5rem; border-radius: 8px; min-height: 100vh;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0; color: var(--text-primary);">Broker Activity Dashboard</h2>
+                    <button onclick="refreshBrokerActivity()" id="refreshBrokerActivityBtn" style="padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;">
+                        <span id="refreshBrokerIcon">🔄</span> Refresh
+                    </button>
+                </div>
+                
+                <!-- Main Stats Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Status Section -->
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Status</h3>
+                        <div style="display: flex; align-items: center; gap: 2rem;">
+                            <div style="flex: 1;">
+                                <div style="margin-bottom: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <div style="width: 12px; height: 12px; background: var(--primary-color); border-radius: 2px;"></div>
+                                        <span style="font-size: 0.875rem; color: var(--text-secondary);">Active ${stats.active}</span>
+                                    </div>
+                                    <div style="width: 100%; height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden;">
+                                        <div style="width: ${activePercent}%; height: 100%; background: var(--primary-color); transition: width 0.3s;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <div style="width: 12px; height: 12px; background: #1a4d2e; border-radius: 2px;"></div>
+                                        <span style="font-size: 0.875rem; color: var(--text-secondary);">Expired ${stats.expired}</span>
+                                    </div>
+                                    <div style="width: 100%; height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden;">
+                                        <div style="width: ${expiredPercent}%; height: 100%; background: #1a4d2e; transition: width 0.3s;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="position: relative; width: 150px; height: 150px;">
+                                <svg viewBox="0 0 100 100" style="transform: rotate(-90deg); width: 100%; height: 100%;">
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--bg-secondary)" stroke-width="8"></circle>
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--primary-color)" stroke-width="8" 
+                                        stroke-dasharray="${2 * Math.PI * 40}" 
+                                        stroke-dashoffset="${2 * Math.PI * 40 * (1 - activePercent / 100)}"
+                                        style="transition: stroke-dashoffset 0.3s;"></circle>
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="#1a4d2e" stroke-width="8" 
+                                        stroke-dasharray="${2 * Math.PI * 40}" 
+                                        stroke-dashoffset="${2 * Math.PI * 40 * (1 - (activePercent + expiredPercent) / 100)}"
+                                        style="transition: stroke-dashoffset 0.3s;"></circle>
+                                </svg>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">${totalPolicies}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Total</div>
+                                </div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                                    <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Last 7 Days</div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div style="width: 12px; height: 12px; background: var(--success-color); border-radius: 2px;"></div>
+                                        <span style="font-size: 0.875rem; color: var(--text-secondary);">Pending ${last7DaysPending}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pending Activities Section -->
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Pending Activities</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <!-- Policy Review -->
+                            <div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                                    <div>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                            <div style="width: 8px; height: 8px; background: #000; border-radius: 50%;"></div>
+                                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Reviewed ${stats.reviewed || 0}</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%;"></div>
+                                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Pending ${stats.pendingReview || 0}</span>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; width: 80px; height: 80px;">
+                                        <svg viewBox="0 0 100 100" style="transform: rotate(-90deg); width: 100%; height: 100%;">
+                                            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--bg-secondary)" stroke-width="6"></circle>
+                                            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--primary-color)" stroke-width="6" 
+                                                stroke-dasharray="${2 * Math.PI * 35}" 
+                                                stroke-dashoffset="${2 * Math.PI * 35 * (1 - ((stats.pendingReview || 0) / ((stats.reviewed || 0) + (stats.pendingReview || 0) || 1)))}"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div style="font-size: 0.875rem; color: var(--text-primary); font-weight: 500; text-align: center;">Policy Review</div>
+                            </div>
+                            
+                            <!-- Policy Renewals -->
+                            <div>
+                                <div style="margin-bottom: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Last 7 Days</div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <div style="width: 8px; height: 8px; background: #000; border-radius: 50%;"></div>
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Reviewed ${stats.renewalsReviewed || 0}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div style="width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%;"></div>
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Pending ${stats.renewalsPending || 0}</span>
+                                    </div>
+                                </div>
+                                <div style="position: relative; width: 80px; height: 80px; margin: 0 auto;">
+                                    <svg viewBox="0 0 100 100" style="transform: rotate(-90deg); width: 100%; height: 100%;">
+                                        <circle cx="50" cy="50" r="35" fill="none" stroke="var(--bg-secondary)" stroke-width="6"></circle>
+                                        <circle cx="50" cy="50" r="35" fill="none" stroke="var(--primary-color)" stroke-width="6" 
+                                            stroke-dasharray="${2 * Math.PI * 35}" 
+                                            stroke-dashoffset="${2 * Math.PI * 35 * (1 - ((stats.renewalsPending || 0) / ((stats.renewalsReviewed || 0) + (stats.renewalsPending || 0) || 1)))}"></circle>
+                                    </svg>
+                                </div>
+                                <div style="font-size: 0.875rem; color: var(--text-primary); font-weight: 500; text-align: center; margin-top: 0.5rem;">Policy Renewals</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Latest Policies Sold Section -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                    <!-- Latest Policies Sold by Brokers -->
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Latest Policies Sold</h3>
+                        <div style="max-height: 500px; overflow-y: auto;">
+                            ${latestPolicies.length > 0 ? latestPolicies.map(policy => `
+                                <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--border-color); transition: background 0.2s;" 
+                                    onmouseover="this.style.background='var(--bg-secondary)';" 
+                                    onmouseout="this.style.background='';">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem;">
+                                        ${policy.brokerName ? policy.brokerName.charAt(0).toUpperCase() : 'B'}
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">${policy.brokerName || 'Unknown Broker'}</div>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${policy.brokerPhone || 'N/A'}</div>
+                                        <div style="font-size: 0.875rem; color: var(--text-muted);">
+                                            ${policy.serviceType || 'N/A'} (${policy.startDate ? new Date(policy.startDate).toLocaleDateString() : 'N/A'} to ${policy.endDate ? new Date(policy.endDate).toLocaleDateString() : 'N/A'})
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span style="padding: 0.375rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; 
+                                            background: ${getStatusColor(policy.status)}; 
+                                            color: ${getStatusTextColor(policy.status)};">
+                                            ${policy.status || 'Draft'}
+                                        </span>
+                                    </div>
+                                </div>
+                            `).join('') : '<p style="color: var(--text-secondary); padding: 2rem; text-align: center;">No policies found.</p>'}
+                        </div>
+                    </div>
+                    
+                    <!-- Broker Performance Summary -->
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Top Performers</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            ${performance.slice(0, 5).map((broker, index) => `
+                                <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: 4px;">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.75rem;">
+                                        ${index + 1}
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; color: var(--text-primary); font-size: 0.875rem;">${broker.brokerName || 'Unknown'}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">${broker.policiesCount || 0} policies</div>
+                                    </div>
+                                    <div style="font-weight: 600; color: var(--primary-color);">R ${(broker.totalPremium || 0).toFixed(2)}</div>
+                                </div>
+                            `).join('')}
+                            ${performance.length === 0 ? '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;">No performance data available.</p>' : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading broker activity:', error);
+        content.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading broker activity</p>';
+    }
+}
+
+// Refresh Broker Activity
+async function refreshBrokerActivity() {
+    const btn = document.getElementById('refreshBrokerActivityBtn');
+    const icon = document.getElementById('refreshBrokerIcon');
+    if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        if (icon) icon.style.animation = 'spin 1s linear infinite';
+    }
+    
+    try {
+        await loadBrokerActivity();
+        if (btn) {
+            btn.style.background = 'var(--success-color)';
+            setTimeout(() => {
+                btn.style.background = 'var(--primary-color)';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                if (icon) icon.style.animation = '';
+            }, 1000);
+        }
+    } catch (error) {
+        console.error('Error refreshing broker activity:', error);
+        if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            if (icon) icon.style.animation = '';
+        }
+    }
 }
 
 // Load reports

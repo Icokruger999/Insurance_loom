@@ -613,6 +613,117 @@ public class PolicyApprovalController : ControllerBase
             return StatusCode(500, new { message = "Error rejecting policy", error = ex.Message });
         }
     }
+
+    [HttpGet("brokers/activity/stats")]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> GetBrokerActivityStats()
+    {
+        try
+        {
+            var policies = await _context.Policies
+                .Include(p => p.Broker)
+                .ToListAsync();
+
+            var active = policies.Count(p => p.Status == "Active" || p.Status == "Approved");
+            var expired = policies.Count(p => p.Status == "Rejected" || (p.EndDate.HasValue && p.EndDate.Value < DateTime.UtcNow));
+            var pending = policies.Count(p => p.Status == "Pending" || p.Status == "PendingSubmission" || p.Status == "UnderReview");
+
+            var approvals = await _context.PolicyApprovals
+                .Where(a => a.Status == "Approved" || a.Status == "Pending")
+                .ToListAsync();
+
+            var reviewed = approvals.Count(a => a.Status == "Approved");
+            var pendingReview = approvals.Count(a => a.Status == "Pending" || a.Status == "UnderReview");
+
+            // Last 7 days renewals (policies created in last 7 days)
+            var sevenDaysAgo = DateTime.UtcNow.AddDays(-7);
+            var recentPolicies = policies.Where(p => p.CreatedAt >= sevenDaysAgo).ToList();
+            var renewalsReviewed = recentPolicies.Count(p => p.Status == "Approved" || p.Status == "Active");
+            var renewalsPending = recentPolicies.Count(p => p.Status == "Pending" || p.Status == "PendingSubmission");
+
+            return Ok(new
+            {
+                active,
+                expired,
+                pending,
+                reviewed,
+                pendingReview,
+                renewalsReviewed,
+                renewalsPending
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error fetching broker activity stats", error = ex.Message });
+        }
+    }
+
+    [HttpGet("brokers/activity/latest-policies")]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> GetLatestPoliciesSold()
+    {
+        try
+        {
+            var policies = await _context.Policies
+                .Include(p => p.Broker)
+                .Include(p => p.ServiceType)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(10)
+                .Select(p => new
+                {
+                    policyId = p.Id,
+                    policyNumber = p.PolicyNumber,
+                    brokerName = p.Broker != null ? $"{p.Broker.FirstName} {p.Broker.LastName}" : "Unknown",
+                    brokerPhone = p.Broker != null ? p.Broker.Phone : null,
+                    serviceType = p.ServiceType != null ? p.ServiceType.ServiceName : "N/A",
+                    status = p.Status,
+                    startDate = p.StartDate,
+                    endDate = p.EndDate,
+                    coverageAmount = p.CoverageAmount,
+                    premiumAmount = p.PremiumAmount,
+                    createdAt = p.CreatedAt
+                })
+                .ToListAsync();
+
+            return Ok(policies);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error fetching latest policies", error = ex.Message });
+        }
+    }
+
+    [HttpGet("brokers/activity/performance")]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> GetBrokerPerformance()
+    {
+        try
+        {
+            var brokerPerformance = await _context.Policies
+                .Include(p => p.Broker)
+                .Where(p => p.Broker != null)
+                .GroupBy(p => new { p.BrokerId, BrokerName = $"{p.Broker!.FirstName} {p.Broker.LastName}" })
+                .Select(g => new
+                {
+                    brokerId = g.Key.BrokerId,
+                    brokerName = g.Key.BrokerName,
+                    policiesCount = g.Count(),
+                    totalPremium = g.Sum(p => p.PremiumAmount ?? 0),
+                    totalCoverage = g.Sum(p => p.CoverageAmount ?? 0),
+                    activePolicies = g.Count(p => p.Status == "Active" || p.Status == "Approved"),
+                    date = g.Max(p => p.CreatedAt)
+                })
+                .OrderByDescending(b => b.totalPremium)
+                .Take(10)
+                .ToListAsync();
+
+            return Ok(brokerPerformance);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error fetching broker performance", error = ex.Message });
+        }
+    }
 }
 
 public class ApprovalRequest
