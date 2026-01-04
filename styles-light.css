@@ -357,12 +357,13 @@ body {
     text-align: center;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.70) 0%, rgba(248, 249, 250, 0.75) 100%),
                 url('images/below-header.jpg');
-    background-size: contain;
+    background-size: 100% auto;
     background-position: center center;
     background-repeat: no-repeat;
     background-blend-mode: overlay;
     position: relative;
     min-height: 600px;
+    width: 100%;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: high-quality;
     -ms-interpolation-mode: bicubic;
