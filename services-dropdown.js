@@ -1,17 +1,5 @@
 // Services Dropdown Functionality
-
-// API Base URL - Automatically detects environment
-const API_BASE_URL = (() => {
-    const hostname = window.location.hostname;
-    
-    // Production (AWS)
-    if (hostname === 'insuranceloom.com' || hostname === 'www.insuranceloom.com') {
-        return 'https://api.insuranceloom.com/api';
-    }
-    
-    // Development (localhost)
-    return 'http://localhost:5000/api';
-})();
+// Note: API_BASE_URL is declared in script.js
 
 // Load services for dropdown
 async function loadServicesForDropdown() {
