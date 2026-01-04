@@ -142,19 +142,63 @@ async function loadPendingApprovalPolicies(brokerId) {
     
     try {
         const token = localStorage.getItem('brokerToken');
-        // TODO: Implement API endpoint for getting broker's policies pending approval
-        // const response = await fetch(`${API_BASE_URL}/broker/${brokerId}/policies/pending-approval`, {
-        //     headers: { 'Authorization': `Bearer ${token}` }
-        // });
+        const response = await fetch(`${API_BASE_URL}/policy-approval/broker/pending`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         
-        // For now, show placeholder
-        policiesList.innerHTML = `
-            <div class="policy-card">
-                <p style="color: var(--text-secondary);">Policies you've sold that are waiting for manager approval will appear here.</p>
-            </div>
-        `;
+        if (!response.ok) {
+            throw new Error('Failed to load pending approvals');
+        }
+        
+        const applications = await response.json();
+        
+        if (applications.length === 0) {
+            policiesList.innerHTML = `
+                <div class="policy-card">
+                    <p style="color: var(--text-secondary);">No policies pending approval.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        policiesList.innerHTML = applications.map(app => {
+            const statusClass = getStatusClass(app.status);
+            const submittedDate = new Date(app.submittedDate).toLocaleDateString();
+            return `
+                <div class="policy-card" style="margin-bottom: 1rem; padding: 1.5rem; background-color: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary);">${app.policyNumber}</h4>
+                            <p style="margin: 0; color: var(--text-secondary);">${app.policyHolderName}</p>
+                            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">${app.serviceType}</p>
+                            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Manager: ${app.managerName || app.managerEmail || 'Not assigned'}</p>
+                            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Submitted: ${submittedDate}</p>
+                        </div>
+                        <span class="status-badge ${statusClass}" style="padding: 0.375rem 0.75rem; border-radius: 4px; font-size: 0.875rem; font-weight: 500;">
+                            ${app.status}
+                        </span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <p style="margin: 0; font-size: 0.875rem; color: var(--text-muted);">Coverage Amount</p>
+                            <p style="margin: 0.25rem 0 0 0; color: var(--text-primary); font-weight: 500;">R ${app.coverageAmount?.toFixed(2) || '0.00'}</p>
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-size: 0.875rem; color: var(--text-muted);">Premium Amount</p>
+                            <p style="margin: 0.25rem 0 0 0; color: var(--text-primary); font-weight: 500;">R ${app.premiumAmount?.toFixed(2) || '0.00'}</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <span style="padding: 0.5rem 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            Awaiting Manager Review
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join('');
     } catch (error) {
-        policiesList.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading policies</p>';
+        console.error('Error loading pending approvals:', error);
+        policiesList.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading pending approvals</p>';
     }
 }
 
@@ -273,7 +317,15 @@ function getStatusClass(status) {
 
 // Submit policy for approval
 async function submitForApproval(policyId) {
-    if (!confirm('Are you sure you want to submit this policy for approval?')) {
+    // Prompt for manager email
+    const managerEmail = prompt('Please enter the manager email address for approval:');
+    
+    if (!managerEmail || !managerEmail.trim()) {
+        alert('Manager email is required to submit for approval.');
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to submit this policy for approval to ${managerEmail}?`)) {
         return;
     }
     
@@ -284,7 +336,11 @@ async function submitForApproval(policyId) {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({
+                managerEmail: managerEmail.trim(),
+                notes: ''
+            })
         });
         
         const data = await response.json();
@@ -295,6 +351,7 @@ async function submitForApproval(policyId) {
             const brokerInfo = JSON.parse(localStorage.getItem('brokerInfo'));
             if (brokerInfo) {
                 await loadAllPolicies(brokerInfo.id);
+                await loadPendingApprovalPolicies(brokerInfo.id);
             }
         } else {
             alert(data.message || 'Failed to submit policy for approval');
