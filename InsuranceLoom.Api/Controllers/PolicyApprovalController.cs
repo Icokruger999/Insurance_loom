@@ -405,10 +405,11 @@ public class PolicyApprovalController : ControllerBase
             // Filter by region (based on policy holder's province/city)
             if (!string.IsNullOrWhiteSpace(region))
             {
+                var regionLower = region.ToLower();
                 query = query.Where(p => 
-                    (p.PolicyHolder != null && 
-                     (p.PolicyHolder.Province != null && p.PolicyHolder.Province.Contains(region, StringComparison.OrdinalIgnoreCase) ||
-                      p.PolicyHolder.City != null && p.PolicyHolder.City.Contains(region, StringComparison.OrdinalIgnoreCase))));
+                    p.PolicyHolder != null && 
+                    (p.PolicyHolder.Province != null && p.PolicyHolder.Province.ToLower().Contains(regionLower) ||
+                     p.PolicyHolder.City != null && p.PolicyHolder.City.ToLower().Contains(regionLower)));
             }
 
             // Filter by broker
