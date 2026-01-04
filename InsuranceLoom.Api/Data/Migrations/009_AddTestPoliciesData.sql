@@ -33,8 +33,8 @@ BEGIN
     SELECT id INTO v_manager_id FROM managers LIMIT 1;
     
     -- Get service types
-    SELECT id INTO v_service_type1_id FROM service_types WHERE name LIKE '%Funeral%' OR name LIKE '%Life%' LIMIT 1;
-    SELECT id INTO v_service_type2_id FROM service_types WHERE name LIKE '%Property%' OR name LIKE '%Home%' LIMIT 1;
+    SELECT id INTO v_service_type1_id FROM service_types WHERE service_name LIKE '%Funeral%' OR service_name LIKE '%Life%' LIMIT 1;
+    SELECT id INTO v_service_type2_id FROM service_types WHERE service_name LIKE '%Property%' OR service_name LIKE '%Home%' LIMIT 1;
     IF v_service_type1_id IS NULL THEN
         SELECT id INTO v_service_type1_id FROM service_types LIMIT 1;
     END IF;
