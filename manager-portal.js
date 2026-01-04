@@ -132,6 +132,163 @@ async function loadSectionData(sectionId) {
     }
 }
 
+// Load Dashboard
+async function loadDashboard() {
+    const dashboardContent = document.getElementById('dashboardContent');
+    if (!dashboardContent) return;
+    
+    dashboardContent.innerHTML = '<p class="loading-text">Loading dashboard...</p>';
+    
+    try {
+        const token = localStorage.getItem('managerToken');
+        
+        // Fetch pending applications for statistics
+        const pendingResponse = await fetch(`${API_BASE_URL}/policy-approval/pending`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const approvedResponse = await fetch(`${API_BASE_URL}/policy-approval/approved`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const rejectedResponse = await fetch(`${API_BASE_URL}/policy-approval/rejected`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const pendingApps = pendingResponse.ok ? await pendingResponse.json() : [];
+        const approvedApps = approvedResponse.ok ? await approvedResponse.json() : [];
+        const rejectedApps = rejectedResponse.ok ? await rejectedResponse.json() : [];
+        
+        const totalPolicies = pendingApps.length + approvedApps.length + rejectedApps.length;
+        const activePolicies = approvedApps.length;
+        const pendingPolicies = pendingApps.length;
+        const rejectedPolicies = rejectedApps.length;
+        
+        // South African regions
+        const regions = [
+            'Cape Town', 'Johannesburg', 'Pretoria', 'Durban', 
+            'Port Elizabeth', 'Bloemfontein', 'Free State', 'Limpopo',
+            'Mpumalanga', 'North West', 'Northern Cape', 'Eastern Cape',
+            'Western Cape', 'KwaZulu-Natal', 'Gauteng'
+        ];
+        
+        // For now, we'll use mock data for regions - this should come from API later
+        const regionData = regions.map(region => ({
+            name: region,
+            policies: Math.floor(Math.random() * 50) + 10, // Mock data
+            premium: Math.floor(Math.random() * 100000) + 50000
+        }));
+        
+        dashboardContent.innerHTML = `
+            <div class="dashboard-container">
+                <!-- Key Performance Indicators -->
+                <div class="dashboard-kpis" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Policies</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-color);">${totalPolicies}</div>
+                    </div>
+                    <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Active Policies</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);">${activePolicies}</div>
+                    </div>
+                    <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Pending Approval</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--warning-color);">${pendingPolicies}</div>
+                    </div>
+                    <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Rejected</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--danger-color);">${rejectedPolicies}</div>
+                    </div>
+                </div>
+                
+                <!-- Charts Row -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Business Overview by Region -->
+                    <div class="chart-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Business Overview by Region</h3>
+                        <div style="height: 300px; display: flex; align-items: flex-end; gap: 0.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem;">
+                            ${regionData.slice(0, 8).map(region => {
+                                const maxPolicies = Math.max(...regionData.map(r => r.policies));
+                                const height = (region.policies / maxPolicies) * 100;
+                                return `
+                                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                                        <div style="width: 100%; background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-hover) 100%); height: ${height}%; min-height: 20px; border-radius: 4px 4px 0 0; margin-bottom: 0.5rem;"></div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; transform: rotate(-45deg); transform-origin: center; white-space: nowrap;">${region.name}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Policy Volume Comparison -->
+                    <div class="chart-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Policy Volume</h3>
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 250px;">
+                            <div style="width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(
+                                var(--primary-color) 0% ${(activePolicies / totalPolicies) * 100}%,
+                                var(--warning-color) ${(activePolicies / totalPolicies) * 100}% ${((activePolicies + pendingPolicies) / totalPolicies) * 100}%,
+                                var(--danger-color) ${((activePolicies + pendingPolicies) / totalPolicies) * 100}% 100%
+                            ); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                                <div style="background: white; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">${totalPolicies}</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 12px; height: 12px; background: var(--primary-color); border-radius: 2px;"></div>
+                                    <span style="font-size: 0.875rem; color: var(--text-secondary);">Active: ${activePolicies} (${totalPolicies > 0 ? Math.round((activePolicies / totalPolicies) * 100) : 0}%)</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 12px; height: 12px; background: var(--warning-color); border-radius: 2px;"></div>
+                                    <span style="font-size: 0.875rem; color: var(--text-secondary);">Pending: ${pendingPolicies} (${totalPolicies > 0 ? Math.round((pendingPolicies / totalPolicies) * 100) : 0}%)</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="width: 12px; height: 12px; background: var(--danger-color); border-radius: 2px;"></div>
+                                    <span style="font-size: 0.875rem; color: var(--text-secondary);">Rejected: ${rejectedPolicies} (${totalPolicies > 0 ? Math.round((rejectedPolicies / totalPolicies) * 100) : 0}%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Applications Table -->
+                <div class="table-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Pending Applications (${pendingApps.length})</h3>
+                    ${pendingApps.length > 0 ? `
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--border-color);">
+                                    <th style="text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Policy Number</th>
+                                    <th style="text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Policy Holder</th>
+                                    <th style="text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Broker</th>
+                                    <th style="text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Service Type</th>
+                                    <th style="text-align: right; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Premium</th>
+                                    <th style="text-align: center; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${pendingApps.slice(0, 10).map(app => `
+                                    <tr style="border-bottom: 1px solid var(--border-color);">
+                                        <td style="padding: 0.75rem; color: var(--text-primary);">${app.policyNumber}</td>
+                                        <td style="padding: 0.75rem; color: var(--text-primary);">${app.policyHolderName}</td>
+                                        <td style="padding: 0.75rem; color: var(--text-primary);">${app.brokerName}</td>
+                                        <td style="padding: 0.75rem; color: var(--text-secondary);">${app.serviceType}</td>
+                                        <td style="padding: 0.75rem; text-align: right; color: var(--text-primary); font-weight: 500;">R ${app.premiumAmount?.toFixed(2) || '0.00'}</td>
+                                        <td style="padding: 0.75rem; text-align: center;">
+                                            <button onclick="viewApplication('${app.policyId}')" style="padding: 0.375rem 0.75rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Review</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    ` : '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No pending applications</p>'}
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+        dashboardContent.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading dashboard</p>';
+    }
+}
+
 // Load agents by region
 async function loadAgents() {
     const agentsList = document.getElementById('agentsList');
