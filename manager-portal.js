@@ -180,23 +180,34 @@ async function loadDashboard() {
         
         dashboardContent.innerHTML = `
             <div class="dashboard-container" style="background: #f0f8f4; padding: 1.5rem; border-radius: 8px; min-height: 100vh;">
+                <!-- Dashboard Header with Refresh Button -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0; color: var(--text-primary);">Dashboard Overview</h2>
+                    <button onclick="refreshDashboard()" id="refreshDashboardBtn" style="padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;">
+                        <span id="refreshIcon">🔄</span> Refresh
+                    </button>
+                </div>
                 <!-- Key Performance Indicators -->
                 <div class="dashboard-kpis" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                    <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="kpi-card" onclick="navigateToSection('pending-applications')" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'; this.style.borderColor='var(--primary-color)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
                         <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Policies</div>
                         <div style="font-size: 2rem; font-weight: 700; color: var(--primary-color);">${totalPolicies}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Click to view details →</div>
                     </div>
-                    <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="kpi-card" onclick="navigateToSection('approved-applications')" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'; this.style.borderColor='var(--success-color)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
                         <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Active Policies</div>
                         <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);">${activePolicies}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Click to view details →</div>
                     </div>
-                    <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="kpi-card" onclick="navigateToSection('pending-applications')" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'; this.style.borderColor='var(--warning-color)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
                         <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Pending Approval</div>
                         <div style="font-size: 2rem; font-weight: 700; color: var(--warning-color);">${pendingPolicies}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Click to review →</div>
                     </div>
-                    <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="kpi-card" onclick="navigateToSection('rejected-applications')" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'; this.style.borderColor='var(--danger-color)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
                         <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Rejected</div>
                         <div style="font-size: 2rem; font-weight: 700; color: var(--danger-color);">${rejectedPolicies}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Click to view details →</div>
                     </div>
                 </div>
                 
@@ -254,7 +265,9 @@ async function loadDashboard() {
                 <div class="table-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0; color: var(--text-primary); font-size: 1.25rem;">All Policies</h3>
-                        <button onclick="loadAllPoliciesTable()" style="padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Refresh</button>
+                        <button onclick="loadAllPoliciesTable()" id="refreshPoliciesBtn" style="padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
+                            <span>🔄</span> Refresh
+                        </button>
                     </div>
                     <div id="policiesFilters" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
                         <div>
@@ -308,6 +321,11 @@ async function loadDashboard() {
                 </div>
             </div>
         `;
+        
+        // Load policies table after rendering
+        setTimeout(() => {
+            loadAllPoliciesTable();
+        }, 100);
     } catch (error) {
         console.error('Error loading dashboard:', error);
         dashboardContent.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading dashboard</p>';
@@ -616,6 +634,227 @@ async function rejectApplication(policyId, reason) {
 // View Application Details (placeholder)
 function viewApplicationDetails(policyId) {
     alert('Application details view coming soon.');
+}
+
+// Refresh Dashboard
+async function refreshDashboard() {
+    const btn = document.getElementById('refreshDashboardBtn');
+    const icon = document.getElementById('refreshIcon');
+    if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        if (icon) icon.style.animation = 'spin 1s linear infinite';
+    }
+    
+    try {
+        await loadDashboard();
+        // Show success feedback
+        if (btn) {
+            btn.style.background = 'var(--success-color)';
+            setTimeout(() => {
+                btn.style.background = 'var(--primary-color)';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                if (icon) icon.style.animation = '';
+            }, 1000);
+        }
+    } catch (error) {
+        console.error('Error refreshing dashboard:', error);
+        if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            if (icon) icon.style.animation = '';
+        }
+    }
+}
+
+// Navigate to section
+function navigateToSection(sectionId) {
+    const navBtn = document.querySelector(`[data-section="${sectionId}"]`);
+    if (navBtn) {
+        navBtn.click();
+    }
+}
+
+// Load All Policies Table
+let allPoliciesData = [];
+
+async function loadAllPoliciesTable() {
+    const tableContainer = document.getElementById('allPoliciesTable');
+    if (!tableContainer) return;
+    
+    const btn = document.getElementById('refreshPoliciesBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span style="animation: spin 1s linear infinite;">🔄</span> Loading...';
+    }
+    
+    tableContainer.innerHTML = '<p class="loading-text">Loading policies...</p>';
+    
+    try {
+        const token = localStorage.getItem('managerToken');
+        const region = document.getElementById('filterRegion')?.value || '';
+        const broker = document.getElementById('filterBroker')?.value || '';
+        const status = document.getElementById('filterStatus')?.value || '';
+        const startDate = document.getElementById('filterStartDate')?.value || '';
+        const endDate = document.getElementById('filterEndDate')?.value || '';
+        
+        let url = `${API_BASE_URL}/policy-approval/all?`;
+        if (region) url += `region=${encodeURIComponent(region)}&`;
+        if (broker) url += `brokerId=${broker}&`;
+        if (status) url += `status=${encodeURIComponent(status)}&`;
+        if (startDate) url += `startDate=${startDate}&`;
+        if (endDate) url += `endDate=${endDate}&`;
+        
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to load policies');
+        }
+        
+        allPoliciesData = await response.json();
+        renderPoliciesTable(allPoliciesData);
+        
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<span>🔄</span> Refresh';
+        }
+    } catch (error) {
+        console.error('Error loading policies:', error);
+        tableContainer.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading policies</p>';
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<span>🔄</span> Refresh';
+        }
+    }
+}
+
+// Filter Policies
+function filterPolicies() {
+    if (allPoliciesData.length === 0) {
+        loadAllPoliciesTable();
+        return;
+    }
+    
+    const region = document.getElementById('filterRegion')?.value || '';
+    const broker = document.getElementById('filterBroker')?.value || '';
+    const status = document.getElementById('filterStatus')?.value || '';
+    const startDate = document.getElementById('filterStartDate')?.value || '';
+    const endDate = document.getElementById('filterEndDate')?.value || '';
+    
+    let filtered = [...allPoliciesData];
+    
+    if (region) {
+        filtered = filtered.filter(p => 
+            (p.policyHolderProvince && p.policyHolderProvince.toLowerCase().includes(region.toLowerCase())) ||
+            (p.policyHolderCity && p.policyHolderCity.toLowerCase().includes(region.toLowerCase()))
+        );
+    }
+    
+    if (broker) {
+        filtered = filtered.filter(p => p.brokerId === broker);
+    }
+    
+    if (status) {
+        filtered = filtered.filter(p => p.status === status);
+    }
+    
+    if (startDate) {
+        const start = new Date(startDate);
+        filtered = filtered.filter(p => new Date(p.createdAt) >= start);
+    }
+    
+    if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        filtered = filtered.filter(p => new Date(p.createdAt) <= end);
+    }
+    
+    renderPoliciesTable(filtered);
+}
+
+// Render Policies Table
+function renderPoliciesTable(policies) {
+    const tableContainer = document.getElementById('allPoliciesTable');
+    if (!tableContainer) return;
+    
+    if (policies.length === 0) {
+        tableContainer.innerHTML = '<p style="color: var(--text-secondary); padding: 2rem; text-align: center;">No policies found matching the filters.</p>';
+        return;
+    }
+    
+    tableContainer.innerHTML = `
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);">
+                        <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Policy #</th>
+                        <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Policy Holder</th>
+                        <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Broker</th>
+                        <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Service Type</th>
+                        <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Status</th>
+                        <th style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--text-primary);">Coverage</th>
+                        <th style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--text-primary);">Premium</th>
+                        <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${policies.map(policy => `
+                        <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;" 
+                            onmouseover="this.style.background='var(--bg-secondary)';" 
+                            onmouseout="this.style.background='';"
+                            onclick="viewPolicyDetails('${policy.id}')" 
+                            style="cursor: pointer;">
+                            <td style="padding: 0.75rem; color: var(--text-primary); font-weight: 500;">${policy.policyNumber}</td>
+                            <td style="padding: 0.75rem; color: var(--text-primary);">${policy.policyHolderName}</td>
+                            <td style="padding: 0.75rem; color: var(--text-primary);">${policy.brokerName}</td>
+                            <td style="padding: 0.75rem; color: var(--text-secondary);">${policy.serviceType}</td>
+                            <td style="padding: 0.75rem;">
+                                <span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; 
+                                    background: ${getStatusColor(policy.status)}; 
+                                    color: ${getStatusTextColor(policy.status)};">
+                                    ${policy.status}
+                                </span>
+                            </td>
+                            <td style="padding: 0.75rem; text-align: right; color: var(--text-primary);">R ${(policy.coverageAmount || 0).toFixed(2)}</td>
+                            <td style="padding: 0.75rem; text-align: right; color: var(--text-primary);">R ${(policy.premiumAmount || 0).toFixed(2)}</td>
+                            <td style="padding: 0.75rem; color: var(--text-muted); font-size: 0.875rem;">${new Date(policy.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// Get Status Color
+function getStatusColor(status) {
+    const colors = {
+        'Draft': '#6c757d',
+        'PendingSubmission': '#ffc107',
+        'Submitted': '#17a2b8',
+        'UnderReview': '#17a2b8',
+        'Approved': '#28a745',
+        'Active': '#28a745',
+        'Rejected': '#dc3545',
+        'Cancelled': '#6c757d',
+        'ChangesRequired': '#fd7e14'
+    };
+    return colors[status] || '#6c757d';
+}
+
+// Get Status Text Color
+function getStatusTextColor(status) {
+    return ['PendingSubmission', 'ChangesRequired'].includes(status) ? '#000' : '#fff';
+}
+
+// View Policy Details
+function viewPolicyDetails(policyId) {
+    // Navigate to pending applications and highlight the policy
+    navigateToSection('pending-applications');
+    // TODO: Implement policy detail view
 }
 
 // Load reports

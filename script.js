@@ -866,10 +866,11 @@ if (managerLoginForm) {
             const data = await response.json();
 
             if (response.ok) {
-                // Store token if needed
-                if (data.token) {
-                    localStorage.setItem('managerToken', data.token);
-                    localStorage.setItem('managerInfo', JSON.stringify(data.manager));
+                // Store token if needed (handle both camelCase and PascalCase)
+                const token = data.token || data.Token;
+                if (token) {
+                    localStorage.setItem('managerToken', token);
+                    localStorage.setItem('managerInfo', JSON.stringify(data.manager || data.Manager));
                 }
                 closeManagerModal();
                 
