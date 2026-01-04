@@ -933,12 +933,12 @@ section {
         width: 100%;
         background-color: var(--bg-elevated);
         flex-direction: column;
-        padding: 1rem 0;
+        padding: 0;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         border-top: 1px solid var(--border-color);
         gap: 0;
         transform: none;
-        position: static;
+        z-index: 1000;
     }
     
     .nav-menu.active {
@@ -950,10 +950,18 @@ section {
         border-bottom: 1px solid var(--border-color);
     }
     
+    .nav-menu li:last-child {
+        border-bottom: none;
+    }
+    
     .nav-menu a {
         display: block;
         padding: 1rem 1.5rem;
         width: 100%;
+    }
+    
+    .nav-menu a::after {
+        display: none;
     }
     
     .nav-toggle {
@@ -964,10 +972,7 @@ section {
         border: none;
         cursor: pointer;
         padding: 0.5rem;
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
+        z-index: 1001;
     }
     
     .nav-toggle span {
