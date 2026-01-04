@@ -444,7 +444,7 @@ if (managerForgotPasswordLink) {
         e.preventDefault();
         closeManagerModal();
         if (managerForgotPasswordModal) {
-            managerForgotPasswordModal.style.display = 'block';
+            managerForgotPasswordModal.classList.add('active');
         }
     });
 }
@@ -452,7 +452,7 @@ if (managerForgotPasswordLink) {
 if (closeManagerForgotPasswordModal) {
     closeManagerForgotPasswordModal.addEventListener('click', () => {
         if (managerForgotPasswordModal) {
-            managerForgotPasswordModal.style.display = 'none';
+            managerForgotPasswordModal.classList.remove('active');
         }
     });
 }
@@ -461,10 +461,10 @@ if (backToManagerLoginLink) {
     backToManagerLoginLink.addEventListener('click', (e) => {
         e.preventDefault();
         if (managerForgotPasswordModal) {
-            managerForgotPasswordModal.style.display = 'none';
+            managerForgotPasswordModal.classList.remove('active');
         }
         if (managerModal) {
-            managerModal.style.display = 'block';
+            managerModal.classList.add('active');
         }
     });
 }
