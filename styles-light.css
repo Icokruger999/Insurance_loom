@@ -141,7 +141,7 @@ body {
     gap: 0.75rem;
     margin-left: auto;
     padding-right: 0;
-    margin-right: -40px;
+    margin-right: -60px;
 }
 
 
@@ -254,6 +254,7 @@ body {
 .services-dropdown {
     position: relative;
     display: inline-block;
+    margin-left: 3rem;
 }
 
 .services-dropdown-btn {
