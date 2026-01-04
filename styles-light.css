@@ -140,6 +140,11 @@ body {
     align-items: center;
     gap: 0.75rem;
     margin-left: auto;
+    padding-right: 0;
+}
+
+.services-dropdown {
+    margin-left: auto;
 }
 
 .btn {
