@@ -295,6 +295,9 @@ public class CreatePolicyHolderRequest
     public string? IdNumber { get; set; }
     public DateTime? DateOfBirth { get; set; }
     public string? Address { get; set; }
+    public string? StreetName { get; set; } // New: Street name
+    public string? Suburb { get; set; } // New: Suburb
+    public string? Region { get; set; } // New: Region/Province
     public Guid? ServiceTypeId { get; set; }
     public decimal? CoverageAmount { get; set; }
     public decimal? PremiumAmount { get; set; }

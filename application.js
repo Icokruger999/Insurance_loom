@@ -128,7 +128,9 @@ function populateReviewSummary() {
         dateOfBirth: document.getElementById('dateOfBirth').value,
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
-        address: document.getElementById('address').value,
+        streetName: document.getElementById('streetName').value,
+        suburb: document.getElementById('suburb').value,
+        region: document.getElementById('region').value,
         monthlyIncome: document.getElementById('monthlyIncome').value,
         preferredPaymentDate: document.getElementById('preferredPaymentDate').value
     };
@@ -142,7 +144,9 @@ function populateReviewSummary() {
             <div><strong>Date of Birth:</strong> ${formData.dateOfBirth}</div>
             <div><strong>Email:</strong> ${formData.email}</div>
             <div><strong>Phone:</strong> ${formData.phone}</div>
-            <div><strong>Address:</strong> ${formData.address}</div>
+            <div><strong>Street:</strong> ${formData.streetName}</div>
+            <div><strong>Suburb:</strong> ${formData.suburb}</div>
+            <div><strong>Region:</strong> ${formData.region}</div>
             ${formData.monthlyIncome ? `<div><strong>Monthly Income:</strong> R${parseFloat(formData.monthlyIncome).toLocaleString()}</div>` : ''}
             ${formData.preferredPaymentDate ? `<div><strong>Preferred Payment Date:</strong> ${formData.preferredPaymentDate} of each month</div>` : ''}
         </div>
@@ -158,33 +162,14 @@ async function submitApplication() {
         return;
     }
     
-    // Check if user is logged in
-    const clientToken = localStorage.getItem('clientToken');
-    
-    if (!clientToken) {
-        // User not logged in, show message about creating account
-        if (confirm('You need to create an account to submit your application. Would you like to create an account now? (You can log in if you already have one)')) {
-            // Store form data temporarily
-            const formData = collectFormData();
-            sessionStorage.setItem('pendingApplication', JSON.stringify(formData));
-            sessionStorage.setItem('selectedServiceId', selectedServiceId);
-            sessionStorage.setItem('selectedServiceName', selectedServiceName);
-            
-            // Redirect to home page to show login modal
-            window.location.href = '/?action=client-register';
-        }
-        return;
-    }
-    
-    // User is logged in, submit application
+    // Submit application anonymously (no account required)
     try {
         const formData = collectFormData();
         
         const response = await fetch(`${API_BASE_URL}/client/application`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${clientToken}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 ...formData,
@@ -195,9 +180,13 @@ async function submitApplication() {
         const data = await response.json();
         
         if (response.ok) {
-            // Success - redirect to success page or show success message
-            alert('Application submitted successfully! You will receive a confirmation email shortly.');
-            window.location.href = '/';
+            // Success - show success message and redirect
+            showSuccessMessage('Application submitted successfully! A broker will review your application and contact you shortly.');
+            
+            // Redirect to home page after 3 seconds
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 3000);
         } else {
             showError(data.message || 'Failed to submit application. Please try again.');
         }
@@ -215,7 +204,9 @@ function collectFormData() {
         dateOfBirth: document.getElementById('dateOfBirth').value,
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
-        address: document.getElementById('address').value,
+        streetName: document.getElementById('streetName').value,
+        suburb: document.getElementById('suburb').value,
+        region: document.getElementById('region').value,
         monthlyIncome: document.getElementById('monthlyIncome').value ? parseFloat(document.getElementById('monthlyIncome').value) : null,
         paymentDate: document.getElementById('preferredPaymentDate').value ? parseInt(document.getElementById('preferredPaymentDate').value) : null
     };
@@ -225,6 +216,21 @@ function showError(message) {
     const errorDiv = document.getElementById('applicationError');
     errorDiv.textContent = message;
     errorDiv.classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showSuccessMessage(message) {
+    // Create or update success message element
+    let successDiv = document.getElementById('applicationSuccess');
+    if (!successDiv) {
+        successDiv = document.createElement('div');
+        successDiv.id = 'applicationSuccess';
+        successDiv.className = 'success-message';
+        successDiv.style.cssText = 'display: block; color: #065f46; font-size: 0.875rem; margin-top: 0.5rem; padding: 0.75rem; background-color: #d1fae5; border-radius: 6px; border: 1px solid #6ee7b7; margin-bottom: 1rem;';
+        const errorDiv = document.getElementById('applicationError');
+        errorDiv.parentNode.insertBefore(successDiv, errorDiv);
+    }
+    successDiv.textContent = message;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
