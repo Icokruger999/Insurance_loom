@@ -450,8 +450,7 @@ public class PolicyApprovalController : ControllerBase
                     status = p.Status,
                     startDate = p.StartDate,
                     createdAt = p.CreatedAt,
-                    updatedAt = p.UpdatedAt,
-                    hasDocuments = false
+                    updatedAt = p.UpdatedAt
                 })
                 .ToListAsync();
 
@@ -468,6 +467,13 @@ public class PolicyApprovalController : ControllerBase
                     ApprovalStatus = g.OrderByDescending(pa => pa.SubmittedDate).Select(pa => pa.Status).FirstOrDefault(),
                     DocumentsVerified = g.OrderByDescending(pa => pa.SubmittedDate).Select(pa => pa.DocumentsVerified).FirstOrDefault()
                 })
+                .ToListAsync();
+
+            // Get document counts separately
+            var documentCounts = await _context.Documents
+                .Where(d => policyIds.Contains(d.PolicyId))
+                .GroupBy(d => d.PolicyId)
+                .Select(g => new { PolicyId = g.Key, HasDocuments = g.Any() })
                 .ToListAsync();
 
             // Merge approval data
@@ -488,7 +494,7 @@ public class PolicyApprovalController : ControllerBase
                 p.createdAt,
                 p.updatedAt,
                 approvalStatus = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.ApprovalStatus,
-                p.hasDocuments,
+                hasDocuments = documentCounts.Any(d => d.PolicyId == p.id && d.HasDocuments),
                 documentsVerified = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.DocumentsVerified ?? false
             }).ToList();
 
