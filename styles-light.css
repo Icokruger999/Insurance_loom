@@ -449,6 +449,10 @@ body {
     text-align: center;
 }
 
+.hero-subtitle-section .hero-buttons {
+    margin-top: 2rem;
+}
+
 .hero-subtitle {
     font-size: 1.5rem;
     font-weight: 400;
@@ -922,39 +926,51 @@ section {
         display: none;
     }
     
+    .navbar .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .nav-brand {
+        width: 100%;
+    }
+    
     .nav-actions {
+        width: 100%;
         gap: 0.5rem;
-        margin-right: -10px;
+        margin-right: 0;
+        margin-left: 0;
+        justify-content: flex-start;
         flex-wrap: wrap;
-        justify-content: flex-end;
     }
     
     .btn-login {
-        padding: 0.5rem 1rem;
-        font-size: 0.75rem;
-        min-width: 65px;
+        padding: 0.4rem 0.875rem;
+        font-size: 0.7rem;
+        min-width: 60px;
     }
     
     .btn-whatsapp-header {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
-        min-height: 36px;
-        padding: 0.4rem;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        padding: 0.35rem;
     }
     
     .btn-whatsapp-header svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
     }
     
     .services-dropdown {
-        margin-left: 0.5rem;
+        margin-left: 0;
     }
     
     .services-dropdown-btn {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.7rem;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.65rem;
         white-space: nowrap;
     }
     
@@ -978,19 +994,6 @@ section {
         padding: 0 10px;
     }
     
-    .hero-buttons {
-        flex-direction: column;
-        gap: 0.75rem;
-        padding: 0 10px;
-    }
-    
-    .hero-buttons .btn {
-        width: 100%;
-        max-width: 280px;
-        padding: 0.875rem 1.5rem;
-        font-size: 0.875rem;
-    }
-    
     .hero-subtitle-section {
         padding: 2rem 0 1.5rem;
     }
@@ -999,6 +1002,20 @@ section {
         font-size: 1.125rem;
         padding: 0 15px;
         line-height: 1.6;
+    }
+    
+    .hero-subtitle-section .hero-buttons {
+        margin-top: 1.5rem;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 0 15px;
+    }
+    
+    .hero-subtitle-section .hero-buttons .btn {
+        width: 100%;
+        max-width: 260px;
+        padding: 0.7rem 1.25rem;
+        font-size: 0.8rem;
     }
     
     section {
