@@ -6,11 +6,20 @@ function initMobileMenu() {
     const toggle = document.querySelector('.nav-toggle');
     const menu = document.querySelector('.nav-menu');
     
+    console.log('Initializing mobile menu:', { toggle, menu });
+    
     if (toggle && menu) {
-        toggle.addEventListener('click', function(e) {
+        // Remove any existing event listeners by cloning
+        const newToggle = toggle.cloneNode(true);
+        toggle.parentNode.replaceChild(newToggle, toggle);
+        
+        // Add click event to the new toggle
+        newToggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            console.log('Hamburger clicked, current state:', menu.classList.contains('active'));
             menu.classList.toggle('active');
+            console.log('After toggle, state:', menu.classList.contains('active'));
         });
         
         // Close mobile menu when clicking on a link
@@ -20,6 +29,10 @@ function initMobileMenu() {
                 menu.classList.remove('active');
             });
         });
+        
+        console.log('Mobile menu initialized successfully');
+    } else {
+        console.error('Mobile menu elements not found:', { toggle, menu });
     }
 }
 
