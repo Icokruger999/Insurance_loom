@@ -128,15 +128,14 @@ public class AuthController : ControllerBase
             var tempPassword = Guid.NewGuid().ToString("N")[..12]; // 12 character temporary password
             
             // Hash the temporary password
-            var passwordHasher = new Helpers.PasswordHasher();
-            manager.User.PasswordHash = passwordHasher.HashPassword(tempPassword);
+            manager.User.PasswordHash = PasswordHasher.HashPassword(tempPassword);
 
             await _context.SaveChangesAsync();
 
             // Send email with temporary password
             var emailBody = $@"
                 <h2>Password Reset Request</h2>
-                <p>Hello {manager.User.FirstName} {manager.User.LastName},</p>
+                <p>Hello {manager.FirstName} {manager.LastName},</p>
                 <p>You have requested to reset your password for your Insurance Loom Manager account.</p>
                 <p><strong>Your temporary password is: {tempPassword}</strong></p>
                 <p>Please log in with this temporary password and change it immediately after logging in.</p>
@@ -173,13 +172,12 @@ public class AuthController : ControllerBase
             }
 
             var tempPassword = Guid.NewGuid().ToString("N")[..12];
-            var passwordHasher = new PasswordHasher();
-            broker.User.PasswordHash = passwordHasher.HashPassword(tempPassword);
+            broker.User.PasswordHash = PasswordHasher.HashPassword(tempPassword);
             await _context.SaveChangesAsync();
 
             var emailBody = $@"
                 <h2>Password Reset Request</h2>
-                <p>Hello {broker.User.FirstName} {broker.User.LastName},</p>
+                <p>Hello {broker.FirstName} {broker.LastName},</p>
                 <p>You have requested to reset your password for your Insurance Loom Broker account.</p>
                 <p><strong>Your temporary password is: {tempPassword}</strong></p>
                 <p>Please log in with this temporary password and change it immediately after logging in.</p>
@@ -222,13 +220,12 @@ public class AuthController : ControllerBase
                 return NotFound(new { message = "Manager not found" });
             }
 
-            var passwordHasher = new PasswordHasher();
-            if (!passwordHasher.VerifyPassword(request.CurrentPassword, manager.User.PasswordHash))
+            if (!PasswordHasher.VerifyPassword(request.CurrentPassword, manager.User.PasswordHash))
             {
                 return Unauthorized(new { message = "Current password is incorrect" });
             }
 
-            manager.User.PasswordHash = passwordHasher.HashPassword(request.NewPassword);
+            manager.User.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
             manager.User.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -261,13 +258,12 @@ public class AuthController : ControllerBase
                 return NotFound(new { message = "Broker not found" });
             }
 
-            var passwordHasher = new PasswordHasher();
-            if (!passwordHasher.VerifyPassword(request.CurrentPassword, broker.User.PasswordHash))
+            if (!PasswordHasher.VerifyPassword(request.CurrentPassword, broker.User.PasswordHash))
             {
                 return Unauthorized(new { message = "Current password is incorrect" });
             }
 
-            broker.User.PasswordHash = passwordHasher.HashPassword(request.NewPassword);
+            broker.User.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
             broker.User.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 

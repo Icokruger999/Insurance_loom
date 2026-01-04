@@ -147,11 +147,12 @@ public class ClientApplicationController : ControllerBase
             _context.PolicyApprovalHistory.Add(new PolicyApprovalHistory
             {
                 Id = Guid.NewGuid(),
-                PolicyApprovalId = policyApproval.Id,
+                ApprovalId = policyApproval.Id,
+                PolicyId = policy.Id,
                 Action = "Submitted",
                 PreviousStatus = "Draft",
                 NewStatus = "PendingSubmission",
-                PerformedByUserType = "Anonymous",
+                PerformedByType = "Anonymous",
                 Notes = "Online application submitted",
                 CreatedAt = DateTime.UtcNow
             });
