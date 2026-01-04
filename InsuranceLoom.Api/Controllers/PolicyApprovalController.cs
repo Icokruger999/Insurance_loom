@@ -874,9 +874,13 @@ public class PolicyApprovalController : ControllerBase
             var policyIds = policies.Select(p => p.id).ToList();
 
             // Get approval data with rejection reasons
-            var approvals = await _context.PolicyApprovals
+            // Load approvals first, then group in memory to avoid SQL translation issues
+            var allApprovals = await _context.PolicyApprovals
                 .Where(pa => policyIds.Contains(pa.PolicyId))
                 .OrderByDescending(pa => pa.SubmittedDate)
+                .ToListAsync();
+            
+            var approvals = allApprovals
                 .GroupBy(pa => pa.PolicyId)
                 .Select(g => new
                 {
@@ -889,7 +893,7 @@ public class PolicyApprovalController : ControllerBase
                     ReviewNotes = g.First().ReviewNotes,
                     ChangesRequired = g.First().ChangesRequired
                 })
-                .ToListAsync();
+                .ToList();
 
             // Merge approval data
             var result = policies.Select(p => new
