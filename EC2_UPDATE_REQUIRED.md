@@ -1,70 +1,93 @@
-# EC2 Update Required
+# EC2 Update Required - Database Query Endpoints
 
-## Summary
-Yes, you need to update EC2. The following changes require deployment:
+## Issue
+The dashboard shows 404 errors because the EC2 API hasn't been updated with the new endpoints that query the database.
 
-### Database Schema Changes:
-1. **New `dependents` table** - For people covered under policies (children, spouse, etc.)
-2. **Updated `beneficiaries` table** - Added `is_primary` column
-3. **Updated `policy_holders` table** - Already has all new fields (migration 006)
+## Endpoints That Need to Be Deployed
 
-### Code Changes:
-1. New `Dependent` entity
-2. Updated `Beneficiary` entity (added `IsPrimary` field)
-3. Updated `ApplicationDbContext` with new configurations
-4. New SQL migration: `008_AddDependentsTableAndUpdateBeneficiaries.sql`
+All these endpoints **query the database directly** using Entity Framework:
 
-## Deployment Steps
+### 1. Agent Activity Stats
+- **Route:** `GET /api/policy-approval/agents/activity/stats`
+- **Queries:** 
+  - `policies` table (counts by status)
+  - `policy_approvals` table (review counts)
+- **Returns:** Active, expired, pending counts, review stats
 
-### Option 1: Using Deployment Script (Recommended)
+### 2. Latest Policies
+- **Route:** `GET /api/policy-approval/agents/activity/latest-policies`
+- **Queries:** 
+  - `policies` table (with joins to `brokers` and `service_types`)
+- **Returns:** Latest 10 policies with broker and service type info
+
+### 3. Agent Performance
+- **Route:** `GET /api/policy-approval/agents/activity/performance`
+- **Queries:** 
+  - `policies` table (grouped by broker)
+- **Returns:** Top 10 agents by premium, with policy counts
+
+### 4. Region Statistics
+- **Route:** `GET /api/policy-approval/regions/statistics`
+- **Queries:** 
+  - `policies` table (joined with `policy_holders`)
+  - Groups by `province` and `city` from `policy_holders`
+- **Returns:** Policy counts and premiums by region
+
+## All Endpoints Query Database Tables
+
+✅ **Policies Table** - Main policy data
+✅ **Policy_Approvals Table** - Approval status and review data
+✅ **Brokers Table** - Agent information
+✅ **Policy_Holders Table** - Address and region data
+✅ **Service_Types Table** - Service type information
+
+## Update EC2 Now
+
+Run on your EC2 instance:
 
 ```bash
 cd /home/ec2-user/Insurance_loom
-./deploy-ec2.sh
+git pull origin main
+chmod +x update-ec2-api.sh
+./update-ec2-api.sh
 ```
 
-### Option 2: Manual Deployment
+Or manually:
 
 ```bash
 cd /home/ec2-user/Insurance_loom
 git pull origin main
 cd InsuranceLoom.Api
-sudo systemctl stop insuranceloom-api.service
 dotnet publish -c Release -o ./publish
+sudo systemctl stop insuranceloom-api.service
 sudo cp -r ./publish/* /var/www/api/
 sudo chown -R ec2-user:ec2-user /var/www/api
 sudo systemctl start insuranceloom-api.service
 sudo systemctl status insuranceloom-api.service
 ```
 
-## Automatic Migration Execution
+## Verify Database Has Data
 
-When the API starts, it will **automatically** run the new SQL migration:
-- `008_AddDependentsTableAndUpdateBeneficiaries.sql`
-
-This migration will:
-- Create the `dependents` table
-- Add `is_primary` column to `beneficiaries` table
-
-**No manual SQL execution required** - the MigrationRunner handles this automatically.
-
-## Verification
-
-After deployment, check the logs to confirm migrations ran:
+After updating, if dashboard still shows no data, check if database has policies:
 
 ```bash
-sudo journalctl -u insuranceloom-api.service -n 100 --no-pager | grep -i migration
+# On EC2, connect to database
+psql -U postgres -d insuranceloom
+
+# Check if policies exist
+SELECT COUNT(*) FROM policies;
+
+# Check if brokers exist
+SELECT COUNT(*) FROM brokers;
+
+# If no data, run test data migrations
+\i InsuranceLoom.Api/Data/Migrations/010_AddTestBrokers.sql
+\i InsuranceLoom.Api/Data/Migrations/011_AddMoreTestPoliciesForBrokerActivity.sql
 ```
 
-You should see:
-```
-Executed migration: 008_AddDependentsTableAndUpdateBeneficiaries.sql
-```
+## Expected Behavior After Update
 
-## Important Notes
-
-- The migrations use `IF NOT EXISTS` clauses, so they're safe to run multiple times
-- If a migration fails, check the logs for details
-- The API will continue to run even if migrations fail (errors are logged)
-- All database changes are backward compatible (new tables/columns only)
-
+1. ✅ 404 errors should disappear
+2. ✅ Dashboard should show data from database
+3. ✅ All statistics should reflect actual database records
+4. ✅ Region statistics should show data grouped by province/city
