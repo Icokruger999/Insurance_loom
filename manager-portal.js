@@ -179,7 +179,55 @@ async function loadDashboard() {
         }));
         
         dashboardContent.innerHTML = `
-            <div class="dashboard-container">
+            <div class="dashboard-container" style="background: #f0f8f4; padding: 1.5rem; border-radius: 8px; min-height: 100vh;">
+                <!-- Filters Section -->
+                <div id="dashboardFilters" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Region</label>
+                        <select id="dashboardFilterRegion" onchange="applyDashboardFilters()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                            <option value="">All Regions</option>
+                            <option value="Cape Town">Cape Town</option>
+                            <option value="Johannesburg">Johannesburg</option>
+                            <option value="Pretoria">Pretoria</option>
+                            <option value="Durban">Durban</option>
+                            <option value="Bloemfontein">Bloemfontein</option>
+                            <option value="Free State">Free State</option>
+                            <option value="Western Cape">Western Cape</option>
+                            <option value="Gauteng">Gauteng</option>
+                            <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Broker</label>
+                        <select id="dashboardFilterBroker" onchange="applyDashboardFilters()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                            <option value="">All Brokers</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Status</label>
+                        <select id="dashboardFilterStatus" onchange="applyDashboardFilters()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                            <option value="">All Statuses</option>
+                            <option value="Draft">Draft</option>
+                            <option value="PendingSubmission">Pending Submission</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="UnderReview">Under Review</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Active">Active</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="ChangesRequired">Changes Required</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">From Date</label>
+                        <input type="date" id="dashboardFilterStartDate" onchange="applyDashboardFilters()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">To Date</label>
+                        <input type="date" id="dashboardFilterEndDate" onchange="applyDashboardFilters()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                    </div>
+                </div>
+                
                 <!-- Key Performance Indicators -->
                 <div class="dashboard-kpis" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                     <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">

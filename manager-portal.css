@@ -80,6 +80,44 @@ body > * {
     z-index: 1;
 }
 
+/* iPad and tablet responsive styles */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        padding: 1rem !important;
+    }
+    
+    #dashboardFilters {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .dashboard-kpis {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .chart-card {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #dashboardFilters {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .dashboard-kpis {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .table-card table {
+        font-size: 0.75rem !important;
+    }
+    
+    .table-card th,
+    .table-card td {
+        padding: 0.5rem !important;
+    }
+}
+
 .portal-container {
     display: flex;
     height: 100vh;
