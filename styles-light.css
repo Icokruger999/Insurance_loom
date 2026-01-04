@@ -590,13 +590,19 @@ section {
 .about {
     position: relative;
     padding: 6rem 0;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.70) 0%, rgba(255, 255, 255, 0.75) 100%),
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.30) 100%),
                 url('images/near-footer.jpg');
-    background-size: cover;
-    background-position: center;
+    background-size: 100% auto;
+    background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-blend-mode: overlay;
+    background-blend-mode: darken;
+    position: relative;
+    width: 100%;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: high-quality;
+    -ms-interpolation-mode: bicubic;
 }
 
 .about > .container {
