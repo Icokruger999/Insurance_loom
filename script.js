@@ -268,7 +268,7 @@ if (brokerLoginForm) {
         };
 
         try {
-            const response = await fetch(`/auth/broker/login`, {
+            const response = await fetch(`${window.API_BASE_URL}/auth/broker/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -293,7 +293,7 @@ if (brokerLoginForm) {
             }
         } catch (error) {
             console.error('Login error:', error);
-            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + API_BASE_URL;
+            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + window.API_BASE_URL;
             errorDiv.classList.add('show');
         }
     });
@@ -322,7 +322,7 @@ if (brokerRegisterForm) {
         };
 
         try {
-            const response = await fetch(`/auth/broker/register`, {
+            const response = await fetch(`${window.API_BASE_URL}/auth/broker/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -347,7 +347,7 @@ if (brokerRegisterForm) {
             }
         } catch (error) {
             console.error('Registration error:', error);
-            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + API_BASE_URL;
+            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + window.API_BASE_URL;
             errorDiv.classList.add('show');
         }
     });
@@ -446,7 +446,7 @@ if (managerLoginForm) {
         };
 
         try {
-            const response = await fetch(`/auth/manager/login`, {
+            const response = await fetch(`${window.API_BASE_URL}/auth/manager/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -471,7 +471,7 @@ if (managerLoginForm) {
             }
         } catch (error) {
             console.error('Manager login error:', error);
-            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + API_BASE_URL;
+            errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + window.API_BASE_URL;
             errorDiv.classList.add('show');
         }
     });
