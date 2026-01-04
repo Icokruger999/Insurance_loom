@@ -915,26 +915,27 @@ section {
     }
     
     .navbar .container {
-        flex-direction: row;
-        align-items: center;
-        gap: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
         flex-wrap: nowrap;
         position: relative;
     }
     
     .nav-brand {
-        flex: 1;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     
     .nav-brand h1 {
         font-size: 1.35rem;
+        margin: 0;
     }
     
     .nav-menu {
         display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
         width: 100%;
         background-color: var(--bg-elevated);
         flex-direction: column;
@@ -944,7 +945,7 @@ section {
         gap: 0;
         transform: none;
         z-index: 1000;
-        margin-top: 0.5rem;
+        position: relative;
     }
     
     .nav-menu.active {
@@ -979,10 +980,7 @@ section {
         cursor: pointer;
         padding: 0.5rem;
         z-index: 1001;
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
+        position: relative;
     }
     
     .nav-toggle span {
@@ -995,11 +993,11 @@ section {
     
     .nav-actions {
         gap: 0.5rem;
-        margin-right: 50px;
+        margin-right: 0;
         margin-left: 0;
         justify-content: center;
-        flex-wrap: nowrap;
-        width: auto;
+        flex-wrap: wrap;
+        width: 100%;
     }
     
     .btn-login {
