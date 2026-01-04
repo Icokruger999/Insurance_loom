@@ -433,8 +433,6 @@ public class PolicyApprovalController : ControllerBase
                 query = query.Where(p => p.CreatedAt <= endDate.Value.AddDays(1)); // Include the entire end date
             }
 
-            var policyIds = await query.Select(p => p.Id).ToListAsync();
-            
             var policies = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Select(p => new
@@ -456,6 +454,9 @@ public class PolicyApprovalController : ControllerBase
                     hasDocuments = _context.Documents.Any(d => d.PolicyId == p.Id)
                 })
                 .ToListAsync();
+
+            // Get policy IDs for approval lookup
+            var policyIds = policies.Select(p => p.id).ToList();
 
             // Get approval statuses separately
             var approvals = await _context.PolicyApprovals
