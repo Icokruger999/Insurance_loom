@@ -324,10 +324,7 @@ if (brokerRegisterForm) {
     });
 }
 
-// Single Login Button Handlers
-if (loginBtn) {
-    loginBtn.addEventListener('click', handleLogin);
-}
+// Login button handler is attached in DOMContentLoaded event - no duplicate needed
 
 
 // Login Type Selection
