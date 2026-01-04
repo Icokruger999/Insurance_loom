@@ -844,7 +844,12 @@ public class PolicyApprovalController : ControllerBase
             // Get total count for pagination
             var totalCount = await query.CountAsync();
 
-            // Apply pagination
+            // Get policy IDs first (before pagination to avoid SQL translation issues)
+            var allPolicyIds = await query
+                .Select(p => p.Id)
+                .ToListAsync();
+
+            // Apply pagination and get policy data
             var policies = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip((page - 1) * pageSize)
@@ -870,7 +875,7 @@ public class PolicyApprovalController : ControllerBase
                 })
                 .ToListAsync();
 
-            // Get policy IDs for approval lookup
+            // Get policy IDs for approval lookup (only for current page)
             var policyIds = policies.Select(p => p.id).ToList();
 
             // Get approval data with rejection reasons
