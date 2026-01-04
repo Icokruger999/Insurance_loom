@@ -389,6 +389,82 @@ public class PolicyApprovalController : ControllerBase
         }
     }
 
+    [HttpGet("all")]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> GetAllPolicies([FromQuery] string? region = null, [FromQuery] Guid? brokerId = null, [FromQuery] string? status = null, [FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
+    {
+        try
+        {
+            var query = _context.Policies
+                .Include(p => p.PolicyHolder)
+                .Include(p => p.Broker)
+                .Include(p => p.ServiceType)
+                .Include(p => p.PolicyApprovals.OrderByDescending(pa => pa.SubmittedDate).Take(1))
+                .AsQueryable();
+
+            // Filter by region (based on policy holder's province/city)
+            if (!string.IsNullOrWhiteSpace(region))
+            {
+                query = query.Where(p => 
+                    (p.PolicyHolder != null && 
+                     (p.PolicyHolder.Province != null && p.PolicyHolder.Province.Contains(region, StringComparison.OrdinalIgnoreCase) ||
+                      p.PolicyHolder.City != null && p.PolicyHolder.City.Contains(region, StringComparison.OrdinalIgnoreCase))));
+            }
+
+            // Filter by broker
+            if (brokerId.HasValue)
+            {
+                query = query.Where(p => p.BrokerId == brokerId.Value);
+            }
+
+            // Filter by status
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(p => p.Status == status);
+            }
+
+            // Filter by date range (created_at)
+            if (startDate.HasValue)
+            {
+                query = query.Where(p => p.CreatedAt >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                query = query.Where(p => p.CreatedAt <= endDate.Value.AddDays(1)); // Include the entire end date
+            }
+
+            var policies = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Select(p => new
+                {
+                    id = p.Id,
+                    policyNumber = p.PolicyNumber,
+                    policyHolderName = p.PolicyHolder != null ? $"{p.PolicyHolder.FirstName} {p.PolicyHolder.LastName}" : "N/A",
+                    policyHolderCity = p.PolicyHolder != null ? p.PolicyHolder.City : null,
+                    policyHolderProvince = p.PolicyHolder != null ? p.PolicyHolder.Province : null,
+                    brokerId = p.BrokerId,
+                    brokerName = p.Broker != null ? $"{p.Broker.FirstName} {p.Broker.LastName}" : "N/A",
+                    serviceType = p.ServiceType != null ? p.ServiceType.ServiceName : "N/A",
+                    coverageAmount = p.CoverageAmount,
+                    premiumAmount = p.PremiumAmount,
+                    status = p.Status,
+                    startDate = p.StartDate,
+                    createdAt = p.CreatedAt,
+                    updatedAt = p.UpdatedAt,
+                    approvalStatus = p.PolicyApprovals.OrderByDescending(pa => pa.SubmittedDate).Select(pa => pa.Status).FirstOrDefault(),
+                    hasDocuments = _context.Documents.Any(d => d.PolicyId == p.Id),
+                    documentsVerified = p.PolicyApprovals.OrderByDescending(pa => pa.SubmittedDate).Select(pa => pa.DocumentsVerified).FirstOrDefault()
+                })
+                .ToListAsync();
+
+            return Ok(policies);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error fetching policies", error = ex.Message });
+        }
+    }
+
     [HttpPost("{policyId}/approve")]
     [Authorize(Roles = "Manager")]
     public async Task<IActionResult> ApprovePolicy(Guid policyId, [FromBody] ApprovalRequest? request = null)

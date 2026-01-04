@@ -250,37 +250,61 @@ async function loadDashboard() {
                     </div>
                 </div>
                 
-                <!-- Pending Applications Table -->
+                <!-- All Policies Table with Filters -->
                 <div class="table-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Pending Applications (${pendingApps.length})</h3>
-                    ${pendingApps.length > 0 ? `
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid var(--border-color);">
-                                    <th style="text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Policy Number</th>
-                                    <th style="text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Policy Holder</th>
-                                    <th style="text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Broker</th>
-                                    <th style="text-align: left; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Service Type</th>
-                                    <th style="text-align: right; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Premium</th>
-                                    <th style="text-align: center; padding: 0.75rem; color: var(--text-muted); font-weight: 600; font-size: 0.875rem;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${pendingApps.slice(0, 10).map(app => `
-                                    <tr style="border-bottom: 1px solid var(--border-color);">
-                                        <td style="padding: 0.75rem; color: var(--text-primary);">${app.policyNumber}</td>
-                                        <td style="padding: 0.75rem; color: var(--text-primary);">${app.policyHolderName}</td>
-                                        <td style="padding: 0.75rem; color: var(--text-primary);">${app.brokerName}</td>
-                                        <td style="padding: 0.75rem; color: var(--text-secondary);">${app.serviceType}</td>
-                                        <td style="padding: 0.75rem; text-align: right; color: var(--text-primary); font-weight: 500;">R ${app.premiumAmount?.toFixed(2) || '0.00'}</td>
-                                        <td style="padding: 0.75rem; text-align: center;">
-                                            <button onclick="viewApplicationDetails('${app.policyId}')" style="padding: 0.375rem 0.75rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Review</button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    ` : '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No pending applications</p>'}
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0; color: var(--text-primary); font-size: 1.25rem;">All Policies</h3>
+                        <button onclick="loadAllPoliciesTable()" style="padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Refresh</button>
+                    </div>
+                    <div id="policiesFilters" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Region</label>
+                            <select id="filterRegion" onchange="filterPolicies()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                                <option value="">All Regions</option>
+                                <option value="Cape Town">Cape Town</option>
+                                <option value="Johannesburg">Johannesburg</option>
+                                <option value="Pretoria">Pretoria</option>
+                                <option value="Durban">Durban</option>
+                                <option value="Bloemfontein">Bloemfontein</option>
+                                <option value="Free State">Free State</option>
+                                <option value="Western Cape">Western Cape</option>
+                                <option value="Gauteng">Gauteng</option>
+                                <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Broker</label>
+                            <select id="filterBroker" onchange="filterPolicies()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                                <option value="">All Brokers</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Status</label>
+                            <select id="filterStatus" onchange="filterPolicies()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                                <option value="">All Statuses</option>
+                                <option value="Draft">Draft</option>
+                                <option value="PendingSubmission">Pending Submission</option>
+                                <option value="Submitted">Submitted</option>
+                                <option value="UnderReview">Under Review</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Active">Active</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="ChangesRequired">Changes Required</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">From Date</label>
+                            <input type="date" id="filterStartDate" onchange="filterPolicies()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">To Date</label>
+                            <input type="date" id="filterEndDate" onchange="filterPolicies()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
+                        </div>
+                    </div>
+                    <div id="allPoliciesTable">
+                        <p class="loading-text">Loading policies...</p>
+                    </div>
                 </div>
             </div>
         `;
