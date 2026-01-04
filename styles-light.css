@@ -1195,6 +1195,8 @@ section {
     
     .footer {
         padding: 2rem 0;
+        background-attachment: scroll; /* Better performance on mobile */
+        background-size: cover; /* Cover on mobile for better fit */
     }
     
     .footer .container {
