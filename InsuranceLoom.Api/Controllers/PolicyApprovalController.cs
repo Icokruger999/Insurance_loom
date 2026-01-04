@@ -451,7 +451,7 @@ public class PolicyApprovalController : ControllerBase
                     startDate = p.StartDate,
                     createdAt = p.CreatedAt,
                     updatedAt = p.UpdatedAt,
-                    hasDocuments = _context.Documents.Any(d => d.PolicyId == p.Id)
+                    hasDocuments = false
                 })
                 .ToListAsync();
 
@@ -655,7 +655,6 @@ public class PolicyApprovalController : ControllerBase
         try
         {
             var policies = await _context.Policies
-                .Include(p => p.Broker)
                 .ToListAsync();
 
             var active = policies.Count(p => p.Status == "Active" || p.Status == "Approved");
@@ -733,14 +732,18 @@ public class PolicyApprovalController : ControllerBase
     {
         try
         {
-            var brokerPerformance = await _context.Policies
+            // Load data first, then do string operations client-side
+            var policies = await _context.Policies
                 .Include(p => p.Broker)
                 .Where(p => p.Broker != null)
-                .GroupBy(p => new { p.BrokerId, BrokerName = $"{p.Broker!.FirstName} {p.Broker.LastName}" })
+                .ToListAsync();
+
+            var brokerPerformance = policies
+                .GroupBy(p => new { p.BrokerId, p.Broker!.FirstName, p.Broker.LastName })
                 .Select(g => new
                 {
                     brokerId = g.Key.BrokerId,
-                    brokerName = g.Key.BrokerName,
+                    brokerName = $"{g.Key.FirstName} {g.Key.LastName}",
                     policiesCount = g.Count(),
                     totalPremium = g.Sum(p => p.PremiumAmount ?? 0),
                     totalCoverage = g.Sum(p => p.CoverageAmount ?? 0),
@@ -749,7 +752,7 @@ public class PolicyApprovalController : ControllerBase
                 })
                 .OrderByDescending(b => b.totalPremium)
                 .Take(10)
-                .ToListAsync();
+                .ToList();
 
             return Ok(brokerPerformance);
         }
