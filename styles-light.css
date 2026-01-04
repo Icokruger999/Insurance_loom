@@ -991,6 +991,10 @@ section {
         display: block;
     }
     
+    .nav-toggle:active {
+        opacity: 0.7;
+    }
+    
     .nav-actions {
         gap: 0.5rem;
         margin-right: 0;
