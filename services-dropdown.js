@@ -4,7 +4,8 @@
 // Load services for dropdown
 async function loadServicesForDropdown() {
     try {
-        const response = await fetch(`${API_BASE_URL}/servicetypes`);
+        const apiUrl = window.API_BASE_URL || API_BASE_URL;
+        const response = await fetch(`${apiUrl}/servicetypes`);
         if (response.ok) {
             const services = await response.json();
             const servicesList = document.getElementById('servicesList');

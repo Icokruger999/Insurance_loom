@@ -48,18 +48,22 @@ const managerModal = document.getElementById('managerModal');
 const managerLoginForm = document.getElementById('managerLoginForm');
 
 // API Base URL - Automatically detects environment
-const API_BASE_URL = (() => {
-    const hostname = window.location.hostname;
-    
-    // Production (AWS)
-    if (hostname === 'insuranceloom.com' || hostname === 'www.insuranceloom.com') {
-        // Use HTTPS API subdomain
-        return 'https://api.insuranceloom.com/api';
-    }
-    
-    // Development (localhost)
-    return 'http://localhost:5000/api';
-})();
+// Use window object to avoid duplicate declaration errors
+if (typeof window.API_BASE_URL === 'undefined') {
+    window.API_BASE_URL = (() => {
+        const hostname = window.location.hostname;
+        
+        // Production (AWS)
+        if (hostname === 'insuranceloom.com' || hostname === 'www.insuranceloom.com') {
+            // Use HTTPS API subdomain
+            return 'https://api.insuranceloom.com/api';
+        }
+        
+        // Development (localhost)
+        return 'http://localhost:5000/api';
+    })();
+}
+const API_BASE_URL = window.API_BASE_URL;
 
 // Load companies list on page load
 async function loadCompanies() {
