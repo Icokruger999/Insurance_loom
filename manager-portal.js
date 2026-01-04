@@ -1146,6 +1146,216 @@ async function loadBrokerActivity() {
     }
 }
 
+// Load Detailed Policies with Filters (accessible globally)
+let currentDetailedPage = 1;
+let currentDetailedPageSize = 50;
+
+window.loadDetailedPolicies = async function(page = 1) {
+    const content = document.getElementById('detailedPoliciesList');
+    if (!content) return;
+    
+    currentDetailedPage = page;
+    
+    try {
+        const token = localStorage.getItem('managerToken');
+        if (!token) {
+            content.innerHTML = '<p style="color: var(--danger-color);">Please log in to view policies.</p>';
+            return;
+        }
+        
+        // Get filter values
+        const startDate = document.getElementById('filterStartDate')?.value || '';
+        const endDate = document.getElementById('filterEndDate')?.value || '';
+        const status = document.getElementById('filterStatus')?.value || '';
+        
+        // Build query string
+        const params = new URLSearchParams();
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        if (status) params.append('status', status);
+        params.append('page', page);
+        params.append('pageSize', currentDetailedPageSize);
+        
+        content.innerHTML = '<p class="loading-text">Loading policies...</p>';
+        
+        const response = await fetch(`${API_BASE_URL}/policy-approval/detailed?${params.toString()}`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                content.innerHTML = '<p style="color: var(--danger-color);">Session expired. Please <a href="/" style="color: var(--primary-color);">log in again</a>.</p>';
+                return;
+            }
+            const errorText = await response.text();
+            content.innerHTML = `<p style="color: var(--danger-color);">Error loading policies: ${errorText}</p>`;
+            return;
+        }
+        
+        const data = await response.json();
+        const policies = data.policies || [];
+        const totalCount = data.totalCount || 0;
+        const totalPages = data.totalPages || 1;
+        
+        if (policies.length === 0) {
+            content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No policies found matching your filters.</p>';
+            document.getElementById('detailedPoliciesPagination').style.display = 'none';
+            return;
+        }
+        
+        // Render policies table
+        let html = `
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Policy #</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Policy Holder</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Agent</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Service Type</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Status</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Rejection Reason</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        policies.forEach(policy => {
+            const statusColors = {
+                'Active': '#28a745',
+                'Approved': '#28a745',
+                'Rejected': '#dc3545',
+                'UnderReview': '#17a2b8',
+                'PendingSubmission': '#ffc107',
+                'Draft': '#6c757d',
+                'Cancelled': '#6c757d',
+                'ChangesRequired': '#fd7e14',
+                'Submitted': '#007bff'
+            };
+            
+            const statusColor = statusColors[policy.status] || '#6c757d';
+            const rejectionReason = policy.rejectionReason || (policy.status === 'Rejected' ? 'No reason provided' : '-');
+            const createdDate = new Date(policy.createdAt).toLocaleDateString();
+            
+            html += `
+                <tr style="border-bottom: 1px solid #dee2e6; transition: background 0.2s;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''">
+                    <td style="padding: 0.75rem;">${policy.policyNumber}</td>
+                    <td style="padding: 0.75rem;">
+                        <div style="font-weight: 500;">${policy.policyHolderName}</div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary);">${policy.policyHolderPhone || 'N/A'}</div>
+                        ${policy.policyHolderCity ? `<div style="font-size: 0.875rem; color: var(--text-secondary);">${policy.policyHolderCity}, ${policy.policyHolderProvince || ''}</div>` : ''}
+                    </td>
+                    <td style="padding: 0.75rem;">${policy.brokerName}</td>
+                    <td style="padding: 0.75rem;">${policy.serviceType}</td>
+                    <td style="padding: 0.75rem;">
+                        <span style="padding: 0.25rem 0.5rem; background: ${statusColor}; color: white; border-radius: 4px; font-size: 0.875rem; font-weight: 500;">
+                            ${policy.status}
+                        </span>
+                    </td>
+                    <td style="padding: 0.75rem; max-width: 300px;">
+                        <div style="font-size: 0.875rem; color: ${policy.status === 'Rejected' ? '#dc3545' : 'var(--text-secondary)'};">
+                            ${rejectionReason}
+                        </div>
+                        ${policy.rejectedDate ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Rejected: ${new Date(policy.rejectedDate).toLocaleDateString()}</div>` : ''}
+                    </td>
+                    <td style="padding: 0.75rem;">${createdDate}</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <strong>Total Policies:</strong> ${totalCount} | <strong>Page:</strong> ${page} of ${totalPages}
+            </div>
+        `;
+        
+        content.innerHTML = html;
+        
+        // Render pagination
+        renderDetailedPagination(page, totalPages);
+        
+    } catch (error) {
+        console.error('Error loading detailed policies:', error);
+        content.innerHTML = `<p style="color: var(--danger-color);">Error loading policies: ${error.message}</p>`;
+    }
+}
+
+function renderDetailedPagination(currentPage, totalPages) {
+    const pagination = document.getElementById('detailedPoliciesPagination');
+    if (!pagination || totalPages <= 1) {
+        if (pagination) pagination.style.display = 'none';
+        return;
+    }
+    
+    pagination.style.display = 'flex';
+    
+    let html = '';
+    
+    // Previous button
+    html += `<button onclick="loadDetailedPolicies(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+        style="padding: 0.5rem 1rem; border: 1px solid #ddd; background: ${currentPage === 1 ? '#f8f9fa' : 'white'}; 
+        color: ${currentPage === 1 ? '#6c757d' : 'var(--text-primary)'}; border-radius: 4px; cursor: ${currentPage === 1 ? 'not-allowed' : 'pointer'};">
+        Previous
+    </button>`;
+    
+    // Page numbers
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage < maxPagesToShow - 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    if (startPage > 1) {
+        html += `<button onclick="loadDetailedPolicies(1)" style="padding: 0.5rem 1rem; border: 1px solid #ddd; background: white; color: var(--text-primary); border-radius: 4px; cursor: pointer;">1</button>`;
+        if (startPage > 2) html += `<span style="padding: 0.5rem;">...</span>`;
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button onclick="loadDetailedPolicies(${i})" 
+            style="padding: 0.5rem 1rem; border: 1px solid #ddd; background: ${i === currentPage ? 'var(--primary-color)' : 'white'}; 
+            color: ${i === currentPage ? 'white' : 'var(--text-primary)'}; border-radius: 4px; cursor: pointer; font-weight: ${i === currentPage ? '600' : 'normal'};">
+            ${i}
+        </button>`;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<span style="padding: 0.5rem;">...</span>`;
+        html += `<button onclick="loadDetailedPolicies(${totalPages})" style="padding: 0.5rem 1rem; border: 1px solid #ddd; background: white; color: var(--text-primary); border-radius: 4px; cursor: pointer;">${totalPages}</button>`;
+    }
+    
+    // Next button
+    html += `<button onclick="loadDetailedPolicies(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+        style="padding: 0.5rem 1rem; border: 1px solid #ddd; background: ${currentPage === totalPages ? '#f8f9fa' : 'white'}; 
+        color: ${currentPage === totalPages ? '#6c757d' : 'var(--text-primary)'}; border-radius: 4px; cursor: ${currentPage === totalPages ? 'not-allowed' : 'pointer'};">
+        Next
+    </button>`;
+    
+    pagination.innerHTML = html;
+}
+
+window.clearDetailedFilters = function() {
+    const startDateInput = document.getElementById('filterStartDate');
+    const endDateInput = document.getElementById('filterEndDate');
+    const statusSelect = document.getElementById('filterStatus');
+    
+    if (startDateInput) startDateInput.value = '';
+    if (endDateInput) endDateInput.value = '';
+    if (statusSelect) statusSelect.value = '';
+    
+    if (window.loadDetailedPolicies) {
+        window.loadDetailedPolicies(1);
+    }
+}
+
 // Refresh Agent Activity
 async function refreshBrokerActivity() {
     const btn = document.getElementById('refreshBrokerActivityBtn');
