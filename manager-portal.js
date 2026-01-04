@@ -878,35 +878,78 @@ async function loadBrokerActivity() {
     try {
         const token = localStorage.getItem('managerToken');
         
+        if (!token) {
+            console.error('No manager token found. Please log in again.');
+            content.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Please log in to view agent activity.</p>';
+            return;
+        }
+        
         // Fetch agent statistics
         const statsResponse = await fetch(`${API_BASE_URL}/policy-approval/agents/activity/stats`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
         
         // Fetch latest policies sold by agents
         const policiesResponse = await fetch(`${API_BASE_URL}/policy-approval/agents/activity/latest-policies`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
         
         // Fetch agent performance data
         const performanceResponse = await fetch(`${API_BASE_URL}/policy-approval/agents/activity/performance`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
+        
+        // Check for authentication errors
+        if (statsResponse.status === 401 || policiesResponse.status === 401 || performanceResponse.status === 401) {
+            console.error('Authentication failed. Token may be expired. Please log in again.');
+            content.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Session expired. Please <a href="/" style="color: var(--primary-color);">log in again</a>.</p>';
+            return;
+        }
         
         // Check for errors and log them
         if (!statsResponse.ok) {
-            console.error('Stats API error:', statsResponse.status, await statsResponse.text());
+            const errorText = await statsResponse.text();
+            console.error('Stats API error:', statsResponse.status, errorText);
         }
         if (!policiesResponse.ok) {
-            console.error('Policies API error:', policiesResponse.status, await policiesResponse.text());
+            const errorText = await policiesResponse.text();
+            console.error('Policies API error:', policiesResponse.status, errorText);
         }
         if (!performanceResponse.ok) {
-            console.error('Performance API error:', performanceResponse.status, await performanceResponse.text());
+            const errorText = await performanceResponse.text();
+            console.error('Performance API error:', performanceResponse.status, errorText);
         }
         
-        const stats = statsResponse.ok ? await statsResponse.json() : { active: 0, expired: 0, pending: 0, reviewed: 0, pendingReview: 0, renewalsReviewed: 0, renewalsPending: 0 };
-        const latestPolicies = policiesResponse.ok ? await policiesResponse.json() : [];
-        const performance = performanceResponse.ok ? await performanceResponse.json() : [];
+        let stats = { active: 0, expired: 0, pending: 0, reviewed: 0, pendingReview: 0, renewalsReviewed: 0, renewalsPending: 0 };
+        let latestPolicies = [];
+        let performance = [];
+        
+        if (statsResponse.ok) {
+            stats = await statsResponse.json();
+        } else {
+            console.error('Failed to fetch stats:', statsResponse.status);
+        }
+        
+        if (policiesResponse.ok) {
+            latestPolicies = await policiesResponse.json();
+        } else {
+            console.error('Failed to fetch latest policies:', policiesResponse.status);
+        }
+        
+        if (performanceResponse.ok) {
+            performance = await performanceResponse.json();
+        } else {
+            console.error('Failed to fetch performance:', performanceResponse.status);
+        }
         
         // Calculate percentages for donut charts
         const totalPolicies = stats.active + stats.expired + stats.pending;
