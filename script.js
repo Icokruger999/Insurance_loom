@@ -108,8 +108,7 @@ async function loadCompanies() {
 // Load companies and services when page loads
 document.addEventListener('DOMContentLoaded', () => {
     loadCompanies();
-    loadServicesForDropdown();
-    initServicesDropdown();
+    // Note: loadServicesForDropdown() and initServicesDropdown() are called in services-dropdown.js
     initMobileMenu(); // Initialize mobile menu toggle
     
     // Login button event listener - get element after DOM is ready
