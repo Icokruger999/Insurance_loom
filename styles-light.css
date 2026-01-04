@@ -1140,6 +1140,11 @@ section {
         font-size: 1.25rem;
     }
     
+    .about {
+        padding: 4rem 0;
+        background-attachment: scroll; /* Better performance on mobile */
+    }
+    
     .about-content {
         padding: 0 15px;
     }
