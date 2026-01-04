@@ -3,35 +3,23 @@ let navToggle = null;
 let navMenu = null;
 
 function initMobileMenu() {
-    navToggle = document.querySelector('.nav-toggle');
-    navMenu = document.querySelector('.nav-menu');
+    const toggle = document.querySelector('.nav-toggle');
+    const menu = document.querySelector('.nav-menu');
     
-    if (navToggle && navMenu) {
-        navToggle.addEventListener('click', (e) => {
+    if (toggle && menu) {
+        toggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            navMenu.classList.toggle('active');
-            console.log('Hamburger menu clicked, menu active:', navMenu.classList.contains('active'));
+            menu.classList.toggle('active');
         });
         
         // Close mobile menu when clicking on a link
-        const navLinks = document.querySelectorAll('.nav-menu a');
+        const navLinks = menu.querySelectorAll('a');
         navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
+            link.addEventListener('click', function() {
+                menu.classList.remove('active');
             });
         });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (navMenu && navMenu.classList.contains('active')) {
-                if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
-                    navMenu.classList.remove('active');
-                }
-            }
-        });
-    } else {
-        console.error('Navigation toggle or menu not found:', { navToggle, navMenu });
     }
 }
 
@@ -523,4 +511,5 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(card);
     });
 });
+
 
