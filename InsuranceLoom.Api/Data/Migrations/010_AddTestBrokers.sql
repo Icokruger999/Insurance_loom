@@ -76,14 +76,13 @@ BEGIN
         RETURNING id INTO v_user_id;
         
         -- Create broker
-        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, email, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
+        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
         VALUES (
             gen_random_uuid(),
             v_user_id,
             'TEST-BRK-002',
             'Sarah',
             'Johnson',
-            'broker2.johannesburg@test.com',
             '0822222222',
             'Pogo Group',
             'LIC002',
@@ -110,14 +109,13 @@ BEGIN
         RETURNING id INTO v_user_id;
         
         -- Create broker
-        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, email, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
+        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
         VALUES (
             gen_random_uuid(),
             v_user_id,
             'TEST-BRK-003',
             'Mike',
             'Williams',
-            'broker3.durban@test.com',
             '0823333333',
             'Astutetech Data',
             'LIC003',
@@ -144,14 +142,13 @@ BEGIN
         RETURNING id INTO v_user_id;
         
         -- Create broker
-        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, email, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
+        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
         VALUES (
             gen_random_uuid(),
             v_user_id,
             'TEST-BRK-004',
             'Lisa',
             'Brown',
-            'broker4.pretoria@test.com',
             '0824444444',
             'Pogo Group',
             'LIC004',
@@ -178,14 +175,13 @@ BEGIN
         RETURNING id INTO v_user_id;
         
         -- Create broker
-        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, email, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
+        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
         VALUES (
             gen_random_uuid(),
             v_user_id,
             'TEST-BRK-005',
             'David',
             'Miller',
-            'broker5.bloemfontein@test.com',
             '0825555555',
             'Astutetech Data',
             'LIC005',
