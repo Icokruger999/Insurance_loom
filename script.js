@@ -51,11 +51,6 @@ const managerForgotPasswordModal = document.getElementById('managerForgotPasswor
 const managerForgotPasswordForm = document.getElementById('managerForgotPasswordForm');
 const closeManagerForgotPasswordModal = document.getElementById('closeManagerForgotPasswordModal');
 const backToManagerLoginLink = document.getElementById('backToManagerLoginLink');
-const managerForgotPasswordLink = document.getElementById('managerForgotPasswordLink');
-const managerForgotPasswordModal = document.getElementById('managerForgotPasswordModal');
-const managerForgotPasswordForm = document.getElementById('managerForgotPasswordForm');
-const closeManagerForgotPasswordModal = document.getElementById('closeManagerForgotPasswordModal');
-const backToManagerLoginLink = document.getElementById('backToManagerLoginLink');
 
 // API Base URL - Automatically detects environment
 // Use window object to avoid duplicate declaration errors
@@ -441,6 +436,81 @@ if (managerModal) {
             e.stopPropagation();
         });
     }
+}
+
+// Manager Forgot Password Modal Handlers
+if (managerForgotPasswordLink) {
+    managerForgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeManagerModal();
+        if (managerForgotPasswordModal) {
+            managerForgotPasswordModal.style.display = 'block';
+        }
+    });
+}
+
+if (closeManagerForgotPasswordModal) {
+    closeManagerForgotPasswordModal.addEventListener('click', () => {
+        if (managerForgotPasswordModal) {
+            managerForgotPasswordModal.style.display = 'none';
+        }
+    });
+}
+
+if (backToManagerLoginLink) {
+    backToManagerLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (managerForgotPasswordModal) {
+            managerForgotPasswordModal.style.display = 'none';
+        }
+        if (managerModal) {
+            managerModal.style.display = 'block';
+        }
+    });
+}
+
+// Manager Forgot Password Form Handler
+if (managerForgotPasswordForm) {
+    managerForgotPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorDiv = document.getElementById('managerForgotPasswordError');
+        const successDiv = document.getElementById('managerForgotPasswordSuccess');
+        if (errorDiv) errorDiv.classList.remove('show');
+        if (successDiv) successDiv.style.display = 'none';
+
+        const email = document.getElementById('managerForgotPasswordEmail').value;
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/auth/manager/forgot-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (successDiv) {
+                    successDiv.textContent = 'Password reset email has been sent. Please check your inbox for your temporary password.';
+                    successDiv.style.display = 'block';
+                }
+                if (managerForgotPasswordForm) managerForgotPasswordForm.reset();
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = data.message || 'Failed to send reset link. Please try again.';
+                    errorDiv.classList.add('show');
+                }
+            }
+        } catch (error) {
+            console.error('Forgot password error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = 'Connection error. Please make sure the API is running.';
+                errorDiv.classList.add('show');
+            }
+        }
+    });
 }
 
 // Manager Login Form Handler
