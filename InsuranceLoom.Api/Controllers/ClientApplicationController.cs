@@ -159,7 +159,7 @@ public class ClientApplicationController : ControllerBase
             {
                 var broker = await _context.Brokers
                     .Include(b => b.User)
-                    .FirstOrDefaultAsync(b => b.Id == assignedBroker.Id);
+                    .FirstOrDefaultAsync(b => b.Id == brokerId);
 
                 if (broker?.User != null)
                 {
@@ -193,7 +193,7 @@ public class ClientApplicationController : ControllerBase
                 message = "Application submitted successfully. A broker will review your application and contact you shortly.",
                 policyId = policy.Id,
                 policyNumber = policyNumber,
-                brokerId = assignedBroker.Id
+                brokerId = brokerId
             });
         }
         catch (Exception ex)
