@@ -244,37 +244,38 @@ body {
 }
 
 .btn-whatsapp-header {
-    background-color: #25D366;
+    background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%);
     color: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0.5rem;
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 50%;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
     cursor: pointer;
     font-size: 0.9375rem;
     line-height: 1.5;
-    margin-right: 0.5rem;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
 }
 
 .btn-whatsapp-header svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     display: block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 .btn-whatsapp-header:hover {
-    background-color: #20BA5A;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #20BA5A 0%, #1DA850 100%);
+    transform: translateY(-3px) scale(1.08);
+    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
     color: #ffffff;
 }
 
