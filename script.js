@@ -46,6 +46,16 @@ const closeLoginTypeModal = document.getElementById('closeLoginTypeModal');
 const clientModal = document.getElementById('clientModal');
 const managerModal = document.getElementById('managerModal');
 const managerLoginForm = document.getElementById('managerLoginForm');
+const managerForgotPasswordLink = document.getElementById('managerForgotPasswordLink');
+const managerForgotPasswordModal = document.getElementById('managerForgotPasswordModal');
+const managerForgotPasswordForm = document.getElementById('managerForgotPasswordForm');
+const closeManagerForgotPasswordModal = document.getElementById('closeManagerForgotPasswordModal');
+const backToManagerLoginLink = document.getElementById('backToManagerLoginLink');
+const managerForgotPasswordLink = document.getElementById('managerForgotPasswordLink');
+const managerForgotPasswordModal = document.getElementById('managerForgotPasswordModal');
+const managerForgotPasswordForm = document.getElementById('managerForgotPasswordForm');
+const closeManagerForgotPasswordModal = document.getElementById('closeManagerForgotPasswordModal');
+const backToManagerLoginLink = document.getElementById('backToManagerLoginLink');
 
 // API Base URL - Automatically detects environment
 // Use window object to avoid duplicate declaration errors

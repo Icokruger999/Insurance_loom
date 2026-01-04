@@ -375,9 +375,33 @@
                 <div class="form-group">
                     <label for="managerPassword">Password</label>
                     <input type="password" id="managerPassword" name="password" required>
+                    <div style="text-align: right; margin-top: 0.5rem;">
+                        <a href="#" id="managerForgotPasswordLink" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem;">Forgot Password?</a>
+                    </div>
                 </div>
                 <div id="managerLoginError" class="error-message"></div>
                 <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manager Forgot Password Modal -->
+    <div id="managerForgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeManagerForgotPasswordModal">&times;</span>
+            <h2>Reset Password</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Enter your email address and we'll send you a link to reset your password.</p>
+            <form id="managerForgotPasswordForm">
+                <div class="form-group">
+                    <label for="managerForgotPasswordEmail">Email</label>
+                    <input type="email" id="managerForgotPasswordEmail" name="email" required>
+                </div>
+                <div id="managerForgotPasswordError" class="error-message"></div>
+                <div id="managerForgotPasswordSuccess" class="success-message" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="#" id="backToManagerLoginLink" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem;">Back to Login</a>
+                </div>
             </form>
         </div>
     </div>
