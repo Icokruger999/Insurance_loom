@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Claim = System.Security.Claims.Claim;
 
 namespace InsuranceLoom.Api.Controllers;
 

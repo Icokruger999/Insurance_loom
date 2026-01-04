@@ -121,8 +121,6 @@ public class ClientApplicationController : ControllerBase
                     Frequency = "Monthly",
                     NextDebitDate = nextDebitDate,
                     Status = "Pending", // Pending until bank details are added
-                    PaymentDay = request.PaymentDate.Value,
-                    IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
