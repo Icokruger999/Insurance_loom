@@ -201,6 +201,116 @@ public class PolicyApprovalController : ControllerBase
         }
     }
 
+    [HttpGet("broker/pending")]
+    [Authorize(Roles = "Broker")]
+    public async Task<IActionResult> GetBrokerPendingApplications()
+    {
+        try
+        {
+            // Get broker ID from authenticated user
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var brokerUserId))
+            {
+                return Unauthorized(new { message = "Broker user ID not found in token." });
+            }
+
+            var broker = await _context.Brokers
+                .FirstOrDefaultAsync(b => b.UserId == brokerUserId);
+
+            if (broker == null)
+            {
+                return NotFound(new { message = "Broker not found" });
+            }
+
+            var applications = await _context.PolicyApprovals
+                .Include(a => a.Policy)
+                    .ThenInclude(p => p.PolicyHolder)
+                .Include(a => a.Policy)
+                    .ThenInclude(p => p.ServiceType)
+                .Include(a => a.AssignedManager)
+                    .ThenInclude(m => m!.User)
+                .Where(a => a.BrokerId == broker.Id && (a.Status == "Pending" || a.Status == "UnderReview"))
+                .OrderByDescending(a => a.SubmittedDate)
+                .Select(a => new
+                {
+                    id = a.Id,
+                    policyId = a.PolicyId,
+                    policyNumber = a.Policy!.PolicyNumber,
+                    policyHolderName = $"{a.PolicyHolder!.FirstName} {a.PolicyHolder.LastName}",
+                    managerName = a.AssignedManager != null ? $"{a.AssignedManager.User!.FirstName} {a.AssignedManager.User.LastName}" : null,
+                    managerEmail = a.AssignedManager != null ? a.AssignedManager.User!.Email : null,
+                    serviceType = a.Policy.ServiceType!.ServiceName,
+                    coverageAmount = a.Policy.CoverageAmount,
+                    premiumAmount = a.Policy.PremiumAmount,
+                    status = a.Status,
+                    submittedDate = a.SubmittedDate,
+                    createdAt = a.CreatedAt
+                })
+                .ToListAsync();
+
+            return Ok(applications);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error fetching broker pending applications", error = ex.Message });
+        }
+    }
+
+    [HttpGet("broker/approved")]
+    [Authorize(Roles = "Broker")]
+    public async Task<IActionResult> GetBrokerApprovedApplications()
+    {
+        try
+        {
+            // Get broker ID from authenticated user
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var brokerUserId))
+            {
+                return Unauthorized(new { message = "Broker user ID not found in token." });
+            }
+
+            var broker = await _context.Brokers
+                .FirstOrDefaultAsync(b => b.UserId == brokerUserId);
+
+            if (broker == null)
+            {
+                return NotFound(new { message = "Broker not found" });
+            }
+
+            var applications = await _context.PolicyApprovals
+                .Include(a => a.Policy)
+                    .ThenInclude(p => p.PolicyHolder)
+                .Include(a => a.Policy)
+                    .ThenInclude(p => p.ServiceType)
+                .Include(a => a.AssignedManager)
+                    .ThenInclude(m => m!.User)
+                .Where(a => a.BrokerId == broker.Id && a.Status == "Approved")
+                .OrderByDescending(a => a.ApprovedDate)
+                .Select(a => new
+                {
+                    id = a.Id,
+                    policyId = a.PolicyId,
+                    policyNumber = a.Policy!.PolicyNumber,
+                    policyHolderName = $"{a.PolicyHolder!.FirstName} {a.PolicyHolder.LastName}",
+                    managerName = a.AssignedManager != null ? $"{a.AssignedManager.User!.FirstName} {a.AssignedManager.User.LastName}" : null,
+                    serviceType = a.Policy.ServiceType!.ServiceName,
+                    coverageAmount = a.Policy.CoverageAmount,
+                    premiumAmount = a.Policy.PremiumAmount,
+                    status = a.Status,
+                    approvedDate = a.ApprovedDate,
+                    documentsVerified = a.DocumentsVerified,
+                    submittedDate = a.SubmittedDate
+                })
+                .ToListAsync();
+
+            return Ok(applications);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error fetching broker approved applications", error = ex.Message });
+        }
+    }
+
     [HttpGet("approved")]
     [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetApprovedApplications()
