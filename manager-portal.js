@@ -1179,7 +1179,7 @@ async function loadBrokerActivity() {
 
                     <!-- Policies Table -->
                     <div id="detailedPoliciesList" style="min-height: 200px;">
-                        <p class="loading-text">Use filters above to view detailed policies...</p>
+                        <p class="loading-text">Loading all policies...</p>
                     </div>
 
                     <!-- Pagination -->
