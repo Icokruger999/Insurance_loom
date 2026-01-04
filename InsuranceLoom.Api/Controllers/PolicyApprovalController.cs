@@ -399,7 +399,6 @@ public class PolicyApprovalController : ControllerBase
                 .Include(p => p.PolicyHolder)
                 .Include(p => p.Broker)
                 .Include(p => p.ServiceType)
-                .Include(p => p.PolicyApprovals.OrderByDescending(pa => pa.SubmittedDate).Take(1))
                 .AsQueryable();
 
             // Filter by region (based on policy holder's province/city)
@@ -434,6 +433,8 @@ public class PolicyApprovalController : ControllerBase
                 query = query.Where(p => p.CreatedAt <= endDate.Value.AddDays(1)); // Include the entire end date
             }
 
+            var policyIds = await query.Select(p => p.Id).ToListAsync();
+            
             var policies = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Select(p => new
@@ -452,13 +453,45 @@ public class PolicyApprovalController : ControllerBase
                     startDate = p.StartDate,
                     createdAt = p.CreatedAt,
                     updatedAt = p.UpdatedAt,
-                    approvalStatus = p.PolicyApprovals.OrderByDescending(pa => pa.SubmittedDate).Select(pa => pa.Status).FirstOrDefault(),
-                    hasDocuments = _context.Documents.Any(d => d.PolicyId == p.Id),
-                    documentsVerified = p.PolicyApprovals.OrderByDescending(pa => pa.SubmittedDate).Select(pa => pa.DocumentsVerified).FirstOrDefault()
+                    hasDocuments = _context.Documents.Any(d => d.PolicyId == p.Id)
                 })
                 .ToListAsync();
 
-            return Ok(policies);
+            // Get approval statuses separately
+            var approvals = await _context.PolicyApprovals
+                .Where(pa => policyIds.Contains(pa.PolicyId))
+                .GroupBy(pa => pa.PolicyId)
+                .Select(g => new
+                {
+                    PolicyId = g.Key,
+                    ApprovalStatus = g.OrderByDescending(pa => pa.SubmittedDate).Select(pa => pa.Status).FirstOrDefault(),
+                    DocumentsVerified = g.OrderByDescending(pa => pa.SubmittedDate).Select(pa => pa.DocumentsVerified).FirstOrDefault()
+                })
+                .ToListAsync();
+
+            // Merge approval data
+            var result = policies.Select(p => new
+            {
+                p.id,
+                p.policyNumber,
+                p.policyHolderName,
+                p.policyHolderCity,
+                p.policyHolderProvince,
+                p.brokerId,
+                p.brokerName,
+                p.serviceType,
+                p.coverageAmount,
+                p.premiumAmount,
+                p.status,
+                p.startDate,
+                p.createdAt,
+                p.updatedAt,
+                approvalStatus = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.ApprovalStatus,
+                p.hasDocuments,
+                documentsVerified = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.DocumentsVerified ?? false
+            }).ToList();
+
+            return Ok(result);
         }
         catch (Exception ex)
         {

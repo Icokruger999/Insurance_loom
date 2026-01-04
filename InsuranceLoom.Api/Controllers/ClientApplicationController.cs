@@ -58,9 +58,6 @@ public class ClientApplicationController : ControllerBase
             // Generate policy number
             string policyNumber = await GenerateUniquePolicyNumberAsync();
 
-            // Combine address fields
-            var fullAddress = $"{request.StreetName}, {request.Suburb}, {request.Region}";
-
             // Create policy holder without user account (anonymous submission)
             var policyHolder = new PolicyHolder
             {
@@ -71,7 +68,10 @@ public class ClientApplicationController : ControllerBase
                 LastName = request.LastName,
                 IdNumber = request.IdNumber,
                 Phone = request.Phone,
-                Address = fullAddress,
+                StreetAddress = request.StreetName,
+                City = request.Suburb,
+                Province = request.Region,
+                Country = "South Africa",
                 DateOfBirth = request.DateOfBirth,
                 MonthlyIncome = request.MonthlyIncome,
                 MonthlyExpenses = request.MonthlyExpenses,
