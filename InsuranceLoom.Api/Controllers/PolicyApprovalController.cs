@@ -121,7 +121,7 @@ public class PolicyApprovalController : ControllerBase
                         <ul>
                             <li><strong>Policy Number:</strong> {policy.PolicyNumber}</li>
                             <li><strong>Policy Holder:</strong> {policy.PolicyHolder?.FirstName} {policy.PolicyHolder?.LastName}</li>
-                            <li><strong>Broker:</strong> {broker?.FirstName} {broker?.LastName}</li>
+                            <li><strong>Agent:</strong> {broker?.FirstName} {broker?.LastName}</li>
                             <li><strong>Submitted Date:</strong> {DateTime.UtcNow:yyyy-MM-dd HH:mm}</li>
                         </ul>
                         <p>Please log in to your manager portal to review and approve this policy.</p>
@@ -614,7 +614,7 @@ public class PolicyApprovalController : ControllerBase
         }
     }
 
-    [HttpGet("brokers/activity/stats")]
+    [HttpGet("agents/activity/stats")]
     [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetBrokerActivityStats()
     {
@@ -658,7 +658,7 @@ public class PolicyApprovalController : ControllerBase
         }
     }
 
-    [HttpGet("brokers/activity/latest-policies")]
+    [HttpGet("agents/activity/latest-policies")]
     [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetLatestPoliciesSold()
     {
@@ -693,7 +693,7 @@ public class PolicyApprovalController : ControllerBase
         }
     }
 
-    [HttpGet("brokers/activity/performance")]
+    [HttpGet("agents/activity/performance")]
     [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetBrokerPerformance()
     {
@@ -722,6 +722,41 @@ public class PolicyApprovalController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "Error fetching broker performance", error = ex.Message });
+        }
+    }
+
+    [HttpGet("regions/statistics")]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> GetRegionStatistics()
+    {
+        try
+        {
+            var regionStats = await _context.Policies
+                .Include(p => p.PolicyHolder)
+                .Where(p => p.PolicyHolder != null && (p.PolicyHolder.Province != null || p.PolicyHolder.City != null))
+                .GroupBy(p => new
+                {
+                    Region = p.PolicyHolder!.Province ?? p.PolicyHolder.City ?? "Unknown",
+                    City = p.PolicyHolder.City ?? "Unknown"
+                })
+                .Select(g => new
+                {
+                    name = g.Key.Region,
+                    city = g.Key.City,
+                    policies = g.Count(),
+                    premium = g.Sum(p => p.PremiumAmount ?? 0),
+                    coverage = g.Sum(p => p.CoverageAmount ?? 0),
+                    activePolicies = g.Count(p => p.Status == "Active" || p.Status == "Approved"),
+                    pendingPolicies = g.Count(p => p.Status == "PendingSubmission" || p.Status == "UnderReview" || p.Status == "Pending")
+                })
+                .OrderByDescending(r => r.policies)
+                .ToListAsync();
+
+            return Ok(regionStats);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error fetching region statistics", error = ex.Message });
         }
     }
 }

@@ -2,6 +2,17 @@
 -- This script creates additional test policies with various statuses and dates
 -- to populate the Broker Activity Dashboard
 
+-- Add address columns to policy_holders table (replacing the text address column)
+ALTER TABLE policy_holders
+ADD COLUMN IF NOT EXISTS street_address VARCHAR(255),
+ADD COLUMN IF NOT EXISTS city VARCHAR(100),
+ADD COLUMN IF NOT EXISTS province VARCHAR(100),
+ADD COLUMN IF NOT EXISTS postal_code VARCHAR(20),
+ADD COLUMN IF NOT EXISTS country VARCHAR(100) DEFAULT 'South Africa';
+
+-- Drop the old address column if it exists
+ALTER TABLE policy_holders DROP COLUMN IF EXISTS address;
+
 DO $$
 DECLARE
     v_broker_ids UUID[];
@@ -14,7 +25,7 @@ DECLARE
     v_service_type_id UUID;
     v_policy_holder_id UUID;
     v_user_id UUID;
-    v_statuses TEXT[] := ARRAY['Active', 'Approved', 'Pending', 'PendingSubmission', 'UnderReview', 'Rejected', 'Draft'];
+    v_statuses TEXT[] := ARRAY['Active', 'Approved', 'PendingSubmission', 'Submitted', 'UnderReview', 'Rejected', 'Draft', 'Cancelled', 'ChangesRequired'];
     v_service_types TEXT[] := ARRAY['FUNERAL', 'LIFE', 'HEALTH', 'DISABILITY', 'INCOME'];
     i INT;
     j INT;
@@ -54,7 +65,7 @@ BEGIN
         v_user_ids := array_append(v_user_ids, v_user_id);
         
         -- Create policy holder
-        INSERT INTO policy_holders (id, user_id, policy_number, first_name, last_name, phone, city, province, is_active, created_at, updated_at)
+        INSERT INTO policy_holders (id, user_id, policy_number, first_name, last_name, phone, street_address, city, province, postal_code, country, is_active, created_at, updated_at)
         VALUES (
             gen_random_uuid(),
             v_user_id,
@@ -62,6 +73,12 @@ BEGIN
             'Test' || i,
             'Holder' || i,
             '082' || LPAD((1000000 + i)::TEXT, 7, '0'),
+            CASE (i % 4)
+                WHEN 0 THEN '123 Test St'
+                WHEN 1 THEN '456 Test Ave'
+                WHEN 2 THEN '789 Test Rd'
+                ELSE '321 Test Dr'
+            END,
             CASE (i % 4)
                 WHEN 0 THEN 'Cape Town'
                 WHEN 1 THEN 'Johannesburg'
@@ -74,6 +91,13 @@ BEGIN
                 WHEN 2 THEN 'KwaZulu-Natal'
                 ELSE 'Gauteng'
             END,
+            CASE (i % 4)
+                WHEN 0 THEN '8001'
+                WHEN 1 THEN '2001'
+                WHEN 2 THEN '4001'
+                ELSE '0001'
+            END,
+            'South Africa',
             true,
             CURRENT_TIMESTAMP - (RANDOM() * INTERVAL '365 days'),
             CURRENT_TIMESTAMP
@@ -125,7 +149,7 @@ BEGIN
             RETURNING id INTO v_policy_id;
             
             -- Create approval record for pending/under review policies
-            IF v_status IN ('Pending', 'PendingSubmission', 'UnderReview', 'Approved', 'Rejected') THEN
+            IF v_status IN ('PendingSubmission', 'Submitted', 'UnderReview', 'Approved', 'Rejected', 'ChangesRequired') THEN
                 INSERT INTO policy_approvals (
                     id, policy_id, broker_id, policy_holder_id, status, submitted_date, 
                     assigned_manager_id, assigned_date, created_at, updated_at
@@ -139,6 +163,7 @@ BEGIN
                         WHEN 'Approved' THEN 'Approved'
                         WHEN 'Rejected' THEN 'Rejected'
                         WHEN 'UnderReview' THEN 'UnderReview'
+                        WHEN 'ChangesRequired' THEN 'RequiresChanges'
                         ELSE 'Pending'
                     END,
                     CURRENT_TIMESTAMP - (RANDOM() * INTERVAL '30 days'),

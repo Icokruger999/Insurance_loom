@@ -101,7 +101,11 @@ public class ApplicationController : ControllerBase
                 <tr><td style=""padding: 8px; font-weight: bold;"">Occupation:</td><td style=""padding: 8px;"">{formData.Occupation ?? ""}</td></tr>
                 <tr><td style=""padding: 8px; font-weight: bold;"">Email:</td><td style=""padding: 8px;"">{formData.Email ?? ""}</td></tr>
                 <tr><td style=""padding: 8px; font-weight: bold;"">Phone:</td><td style=""padding: 8px;"">{formData.Phone ?? ""}</td></tr>
-                <tr><td style=""padding: 8px; font-weight: bold;"">Address:</td><td style=""padding: 8px;"">{formData.Address ?? ""}</td></tr>
+                <tr><td style=""padding: 8px; font-weight: bold;"">Street Address:</td><td style=""padding: 8px;"">{formData.StreetAddress ?? ""}</td></tr>
+                <tr><td style=""padding: 8px; font-weight: bold;"">City:</td><td style=""padding: 8px;"">{formData.City ?? ""}</td></tr>
+                <tr><td style=""padding: 8px; font-weight: bold;"">Province:</td><td style=""padding: 8px;"">{formData.Province ?? ""}</td></tr>
+                <tr><td style=""padding: 8px; font-weight: bold;"">Postal Code:</td><td style=""padding: 8px;"">{formData.PostalCode ?? ""}</td></tr>
+                <tr><td style=""padding: 8px; font-weight: bold;"">Country:</td><td style=""padding: 8px;"">{formData.Country ?? ""}</td></tr>
             </table>
             
             <h3 style=""border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px;"">Insurance Product Selection</h3>
@@ -159,7 +163,11 @@ public class ApplicationFormData
     public string? Sex { get; set; }
     public string? CivilStatus { get; set; }
     public string? Occupation { get; set; }
-    public string Address { get; set; } = string.Empty;
+    public string? StreetAddress { get; set; }
+    public string? City { get; set; }
+    public string? Province { get; set; }
+    public string? PostalCode { get; set; }
+    public string? Country { get; set; }
     public string? ServiceType { get; set; }
     public decimal? CoverageAmount { get; set; }
     public decimal? PremiumAmount { get; set; }

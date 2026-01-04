@@ -51,7 +51,7 @@ public class PolicyHolderController : ControllerBase
 
             if (broker == null || !broker.IsActive)
             {
-                return Unauthorized(new { message = "Broker not found or inactive" });
+                return Unauthorized(new { message = "Agent not found or inactive" });
             }
 
             // Generate unique policy number
@@ -84,7 +84,11 @@ public class PolicyHolderController : ControllerBase
                 LastName = request.LastName,
                 IdNumber = request.IdNumber,
                 Phone = request.Phone,
-                Address = request.Address,
+                StreetAddress = request.StreetAddress,
+                City = request.City,
+                Province = request.Province,
+                PostalCode = request.PostalCode,
+                Country = request.Country ?? "South Africa",
                 DateOfBirth = request.DateOfBirth,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -211,7 +215,7 @@ public class PolicyHolderController : ControllerBase
                             </div>
                             <div style=""background-color: #ffffff; padding: 30px;"">
                                 <h2 style=""color: #333333;"">Welcome, {request.FirstName}!</h2>
-                                <p style=""color: #666666; line-height: 1.6;"">Your account has been created by your broker.</p>
+                                <p style=""color: #666666; line-height: 1.6;"">Your account has been created by your agent.</p>
                                 <div style=""background-color: #f8f9fa; padding: 20px; border-left: 4px solid #2563eb; margin: 20px 0;"">
                                     <p style=""margin: 0; color: #333333;""><strong>Your Policy Number:</strong> <span style=""font-size: 18px; color: #1a1a1a;"">{policyNumber}</span></p>
                                     <p style=""margin: 10px 0 0; color: #333333;""><strong>Temporary Password:</strong> <span style=""font-size: 16px; color: #1a1a1a; font-family: monospace;"">{tempPassword}</span></p>
@@ -240,7 +244,11 @@ public class PolicyHolderController : ControllerBase
                 Email = user.Email,
                 Phone = policyHolder.Phone,
                 IdNumber = policyHolder.IdNumber,
-                Address = policyHolder.Address,
+                StreetAddress = policyHolder.StreetAddress,
+                City = policyHolder.City,
+                Province = policyHolder.Province,
+                PostalCode = policyHolder.PostalCode,
+                Country = policyHolder.Country,
                 DateOfBirth = policyHolder.DateOfBirth,
                 IsActive = policyHolder.IsActive,
                 CreatedAt = policyHolder.CreatedAt,
@@ -294,10 +302,11 @@ public class CreatePolicyHolderRequest
     public string? Phone { get; set; }
     public string? IdNumber { get; set; }
     public DateTime? DateOfBirth { get; set; }
-    public string? Address { get; set; }
-    public string? StreetName { get; set; } // New: Street name
-    public string? Suburb { get; set; } // New: Suburb
-    public string? Region { get; set; } // New: Region/Province
+    public string? StreetAddress { get; set; }
+    public string? City { get; set; }
+    public string? Province { get; set; }
+    public string? PostalCode { get; set; }
+    public string? Country { get; set; }
     public Guid? ServiceTypeId { get; set; }
     public decimal? CoverageAmount { get; set; }
     public decimal? PremiumAmount { get; set; }
@@ -320,7 +329,11 @@ public class PolicyHolderDto
     public string? Phone { get; set; }
     public string? IdNumber { get; set; }
     public DateTime? DateOfBirth { get; set; }
-    public string? Address { get; set; }
+    public string? StreetAddress { get; set; }
+    public string? City { get; set; }
+    public string? Province { get; set; }
+    public string? PostalCode { get; set; }
+    public string? Country { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
     public Guid? PolicyId { get; set; }

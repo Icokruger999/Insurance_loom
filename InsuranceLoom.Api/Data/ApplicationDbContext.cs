@@ -94,7 +94,11 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.MiddleName).HasColumnName("middle_name");
             entity.Property(e => e.IdNumber).HasColumnName("id_number");
             entity.Property(e => e.Phone).HasColumnName("phone");
-            entity.Property(e => e.Address).HasColumnName("address");
+            entity.Property(e => e.StreetAddress).HasColumnName("street_address");
+            entity.Property(e => e.City).HasColumnName("city");
+            entity.Property(e => e.Province).HasColumnName("province");
+            entity.Property(e => e.PostalCode).HasColumnName("postal_code");
+            entity.Property(e => e.Country).HasColumnName("country");
             entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
             entity.Property(e => e.Birthplace).HasColumnName("birthplace");
             entity.Property(e => e.Sex).HasColumnName("sex").HasMaxLength(20);

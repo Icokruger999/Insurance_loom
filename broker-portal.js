@@ -1,4 +1,4 @@
-// Broker Portal JavaScript
+// Agent Portal JavaScript
 
 // API Base URL
 const API_BASE_URL = (() => {
@@ -37,7 +37,7 @@ function loadBrokerInfo() {
             const brokerEmailEl = document.getElementById('brokerEmail');
             
             if (brokerNameEl) {
-                brokerNameEl.textContent = `${broker.firstName || ''} ${broker.lastName || ''}`.trim() || 'Broker';
+                brokerNameEl.textContent = `${broker.firstName || ''} ${broker.lastName || ''}`.trim() || 'Agent';
             }
             
             if (brokerEmailEl) {

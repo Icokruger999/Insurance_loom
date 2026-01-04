@@ -85,15 +85,15 @@ public class EmailService : IEmailService
 
     public async Task SendBrokerApprovalRequestAsync(string approverEmail, string brokerEmail, string agentNumber, string firstName, string lastName, string companyName, Guid brokerId)
     {
-        var subject = $"New Broker Registration Requires Approval - {agentNumber}";
+        var subject = $"New Agent Registration Requires Approval - {agentNumber}";
         var body = $@"
             <div style=""font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;"">
                 <div style=""background-color: #1a1a1a; color: #ffffff; padding: 20px; text-align: center;"">
                     <h1 style=""margin: 0;"">Insurance Loom</h1>
                 </div>
                 <div style=""background-color: #ffffff; padding: 30px;"">
-                    <h2 style=""color: #333333;"">New Broker Registration - Approval Required</h2>
-                    <p style=""color: #666666; line-height: 1.6;"">A new broker has registered and requires your approval.</p>
+                    <h2 style=""color: #333333;"">New Agent Registration - Approval Required</h2>
+                    <p style=""color: #666666; line-height: 1.6;"">A new agent has registered and requires your approval.</p>
                     <div style=""background-color: #f8f9fa; padding: 20px; border-left: 4px solid #4a4a4a; margin: 20px 0;"">
                         <p style=""margin: 0; color: #333333;""><strong>Agent Number:</strong> {agentNumber}</p>
                         <p style=""margin: 5px 0; color: #333333;""><strong>Name:</strong> {firstName} {lastName}</p>
@@ -101,10 +101,10 @@ public class EmailService : IEmailService
                         {(!string.IsNullOrEmpty(companyName) ? $@"<p style=""margin: 5px 0; color: #333333;""><strong>Company:</strong> {companyName}</p>" : "")}
                     </div>
                     <div style=""text-align: center; margin: 30px 0;"">
-                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/approve?managerEmail={Uri.EscapeDataString(approverEmail)}"" style=""display: inline-block; background-color: #28a745; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-right: 10px;"">Approve Broker</a>
-                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/reject?managerEmail={Uri.EscapeDataString(approverEmail)}"" style=""display: inline-block; background-color: #dc3545; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px;"">Reject Broker</a>
+                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/approve?managerEmail={Uri.EscapeDataString(approverEmail)}"" style=""display: inline-block; background-color: #28a745; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-right: 10px;"">Approve Agent</a>
+                        <a href=""https://api.insuranceloom.com/api/broker/{brokerId}/reject?managerEmail={Uri.EscapeDataString(approverEmail)}"" style=""display: inline-block; background-color: #dc3545; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px;"">Reject Agent</a>
                     </div>
-                    <p style=""color: #666666; line-height: 1.6; font-size: 14px;"">Please review the broker's information and approve or reject their registration.</p>
+                    <p style=""color: #666666; line-height: 1.6; font-size: 14px;"">Please review the agent's information and approve or reject their registration.</p>
                 </div>
             </div>
         ";

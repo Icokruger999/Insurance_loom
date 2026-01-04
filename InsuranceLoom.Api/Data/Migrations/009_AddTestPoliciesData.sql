@@ -3,6 +3,17 @@
 -- These can be cleaned up later with: DELETE FROM policy_approvals WHERE id IN (SELECT id FROM policy_approvals WHERE review_notes LIKE '%TEST DATA%');
 -- DELETE FROM policies WHERE policy_number LIKE 'TEST-%';
 
+-- Add address columns to policy_holders table (replacing the text address column)
+ALTER TABLE policy_holders
+ADD COLUMN IF NOT EXISTS street_address VARCHAR(255),
+ADD COLUMN IF NOT EXISTS city VARCHAR(100),
+ADD COLUMN IF NOT EXISTS province VARCHAR(100),
+ADD COLUMN IF NOT EXISTS postal_code VARCHAR(20),
+ADD COLUMN IF NOT EXISTS country VARCHAR(100) DEFAULT 'South Africa';
+
+-- Drop the old address column if it exists
+ALTER TABLE policy_holders DROP COLUMN IF EXISTS address;
+
 DO $$
 DECLARE
     v_broker1_id UUID;
@@ -62,13 +73,13 @@ BEGIN
         SELECT id INTO v_user5_id FROM users WHERE email = 'test.policyholder5@test.com';
         
         -- Create test policy holders
-        INSERT INTO policy_holders (id, user_id, first_name, last_name, email, phone_number, id_number, date_of_birth, address_line1, city, province, postal_code, country, created_at, updated_at)
+        INSERT INTO policy_holders (id, user_id, first_name, last_name, phone, id_number, date_of_birth, street_address, city, province, postal_code, country, is_active, created_at, updated_at)
         VALUES 
-            (gen_random_uuid(), v_user1_id, 'John', 'Doe', 'test.policyholder1@test.com', '0821234567', '8501015800081', '1985-01-01', '123 Main St', 'Cape Town', 'Western Cape', '8001', 'South Africa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-            (gen_random_uuid(), v_user2_id, 'Jane', 'Smith', 'test.policyholder2@test.com', '0822345678', '9002025800082', '1990-02-02', '456 Oak Ave', 'Johannesburg', 'Gauteng', '2000', 'South Africa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-            (gen_random_uuid(), v_user3_id, 'Mike', 'Johnson', 'test.policyholder3@test.com', '0823456789', '8803035800083', '1988-03-03', '789 Pine Rd', 'Durban', 'KwaZulu-Natal', '4001', 'South Africa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-            (gen_random_uuid(), v_user4_id, 'Sarah', 'Williams', 'test.policyholder4@test.com', '0824567890', '9204045800084', '1992-04-04', '321 Elm St', 'Pretoria', 'Gauteng', '0001', 'South Africa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-            (gen_random_uuid(), v_user5_id, 'David', 'Brown', 'test.policyholder5@test.com', '0825678901', '8605055800085', '1986-05-05', '654 Maple Dr', 'Bloemfontein', 'Free State', '9301', 'South Africa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            (gen_random_uuid(), v_user1_id, 'John', 'Doe', '0821234567', '8501015800081', '1985-01-01', '123 Main St', 'Cape Town', 'Western Cape', '8001', 'South Africa', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (gen_random_uuid(), v_user2_id, 'Jane', 'Smith', '0822345678', '9002025800082', '1990-02-02', '456 Oak Ave', 'Johannesburg', 'Gauteng', '2000', 'South Africa', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (gen_random_uuid(), v_user3_id, 'Mike', 'Johnson', '0823456789', '8803035800083', '1988-03-03', '789 Pine Rd', 'Durban', 'KwaZulu-Natal', '4001', 'South Africa', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (gen_random_uuid(), v_user4_id, 'Sarah', 'Williams', '0824567890', '9204045800084', '1992-04-04', '321 Elm St', 'Pretoria', 'Gauteng', '0001', 'South Africa', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (gen_random_uuid(), v_user5_id, 'David', 'Brown', '0825678901', '8605055800085', '1986-05-05', '654 Maple Dr', 'Bloemfontein', 'Free State', '9301', 'South Africa', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         ON CONFLICT DO NOTHING
         RETURNING id INTO v_policy_holder1_id;
         

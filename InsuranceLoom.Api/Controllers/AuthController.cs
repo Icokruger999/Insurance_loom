@@ -178,7 +178,7 @@ public class AuthController : ControllerBase
             var emailBody = $@"
                 <h2>Password Reset Request</h2>
                 <p>Hello {broker.FirstName} {broker.LastName},</p>
-                <p>You have requested to reset your password for your Insurance Loom Broker account.</p>
+                <p>You have requested to reset your password for your Insurance Loom Agent account.</p>
                 <p><strong>Your temporary password is: {tempPassword}</strong></p>
                 <p>Please log in with this temporary password and change it immediately after logging in.</p>
                 <p>If you did not request this password reset, please contact support immediately.</p>

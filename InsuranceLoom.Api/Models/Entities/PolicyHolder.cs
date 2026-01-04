@@ -11,7 +11,11 @@ public class PolicyHolder
     public string? MiddleName { get; set; }
     public string? IdNumber { get; set; }
     public string? Phone { get; set; }
-    public string? Address { get; set; }
+    public string? StreetAddress { get; set; }
+    public string? City { get; set; }
+    public string? Province { get; set; }
+    public string? PostalCode { get; set; }
+    public string? Country { get; set; }
     public DateTime? DateOfBirth { get; set; }
     public string? Birthplace { get; set; }
     public string? Sex { get; set; }

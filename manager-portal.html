@@ -19,7 +19,10 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <button class="nav-btn active" data-section="dashboard">
+                <button class="nav-btn active" data-section="broker-activity">
+                    <span class="nav-text">Broker Activity</span>
+                </button>
+                <button class="nav-btn" data-section="dashboard">
                     <span class="nav-text">Dashboard</span>
                 </button>
                 <button class="nav-btn" data-section="pending-applications">
@@ -30,9 +33,6 @@
                 </button>
                 <button class="nav-btn" data-section="rejected-applications">
                     <span class="nav-text">Rejected Applications</span>
-                </button>
-                <button class="nav-btn" data-section="broker-activity">
-                    <span class="nav-text">Broker Activity</span>
                 </button>
                 <button class="nav-btn" data-section="agents">
                     <span class="nav-text">Agents by Region</span>
@@ -52,8 +52,17 @@
                 <h2 id="sectionTitle">Dashboard</h2>
             </div>
 
+            <!-- Broker Activity Section -->
+            <section id="broker-activity" class="content-section active">
+                <div class="section-content">
+                    <div id="brokerActivityContent">
+                        <p class="loading-text">Loading broker activity...</p>
+                    </div>
+                </div>
+            </section>
+
             <!-- Dashboard Section -->
-            <section id="dashboard" class="content-section active">
+            <section id="dashboard" class="content-section">
                 <div class="section-content">
                     <div id="dashboardContent">
                         <p class="loading-text">Loading dashboard...</p>
@@ -90,15 +99,6 @@
                     <p>View all rejected applications.</p>
                     <div id="rejectedApplicationsList" class="applications-list">
                         <p class="loading-text">Loading rejected applications...</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Broker Activity Section -->
-            <section id="broker-activity" class="content-section">
-                <div class="section-content">
-                    <div id="brokerActivityContent">
-                        <p class="loading-text">Loading broker activity...</p>
                     </div>
                 </div>
             </section>

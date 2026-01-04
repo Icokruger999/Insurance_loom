@@ -56,6 +56,7 @@ function initNavigation() {
     const sectionTitle = document.getElementById('sectionTitle');
     
     const sectionTitles = {
+        'broker-activity': 'Agent Activity',
         'dashboard': 'Dashboard',
         'pending-applications': 'Pending Applications',
         'approved-applications': 'Approved Applications',
@@ -109,6 +110,9 @@ async function loadSectionData(sectionId) {
     
     try {
         switch (sectionId) {
+            case 'broker-activity':
+                await loadBrokerActivity();
+                break;
             case 'dashboard':
                 await loadDashboard();
                 break;
@@ -120,9 +124,6 @@ async function loadSectionData(sectionId) {
                 break;
             case 'rejected-applications':
                 await loadRejectedApplications();
-                break;
-            case 'broker-activity':
-                await loadBrokerActivity();
                 break;
             case 'agents':
                 await loadAgents();
@@ -166,20 +167,23 @@ async function loadDashboard() {
         const pendingPolicies = pendingApps.length;
         const rejectedPolicies = rejectedApps.length;
         
-        // South African regions
-        const regions = [
-            'Cape Town', 'Johannesburg', 'Pretoria', 'Durban', 
-            'Port Elizabeth', 'Bloemfontein', 'Free State', 'Limpopo',
-            'Mpumalanga', 'North West', 'Northern Cape', 'Eastern Cape',
-            'Western Cape', 'KwaZulu-Natal', 'Gauteng'
-        ];
+        // Fetch region statistics from API
+        const regionResponse = await fetch(`${API_BASE_URL}/policy-approval/regions/statistics`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         
-        // For now, we'll use mock data for regions - this should come from API later
-        const regionData = regions.map(region => ({
-            name: region,
-            policies: Math.floor(Math.random() * 50) + 10, // Mock data
-            premium: Math.floor(Math.random() * 100000) + 50000
-        }));
+        let regionData = [];
+        if (regionResponse.ok) {
+            const regionStats = await regionResponse.json();
+            regionData = regionStats.map(region => ({
+                name: region.name,
+                policies: region.policies || 0,
+                premium: region.premium || 0
+            }));
+        } else {
+            // Fallback to empty array if API fails
+            regionData = [];
+        }
         
         dashboardContent.innerHTML = `
             <div class="dashboard-container" style="background: #f0f8f4; padding: 1.5rem; border-radius: 8px; min-height: 100vh;">
@@ -219,9 +223,10 @@ async function loadDashboard() {
                     <!-- Business Overview by Region -->
                     <div class="chart-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Business Overview by Region</h3>
+                        ${regionData.length > 0 ? `
                         <div style="height: 300px; display: flex; align-items: flex-end; gap: 0.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 2.5rem;">
                             ${regionData.slice(0, 8).map(region => {
-                                const maxPolicies = Math.max(...regionData.map(r => r.policies));
+                                const maxPolicies = Math.max(...regionData.map(r => r.policies), 1);
                                 const height = maxPolicies > 0 ? (region.policies / maxPolicies) * 100 : 20;
                                 return `
                                     <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
@@ -231,6 +236,7 @@ async function loadDashboard() {
                                 `;
                             }).join('')}
                         </div>
+                        ` : '<p style="color: var(--text-secondary); padding: 2rem; text-align: center;">No region data available.</p>'}
                     </div>
                     
                     <!-- Policy Volume Comparison -->
@@ -286,9 +292,9 @@ async function loadDashboard() {
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Broker</label>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Agent</label>
                             <select id="filterBroker" onchange="filterPolicies()" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.875rem;">
-                                <option value="">All Brokers</option>
+                                <option value="">All Agents</option>
                             </select>
                         </div>
                         <div>
@@ -393,7 +399,7 @@ async function loadPendingApplications() {
                     <div>
                         <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary);">${app.policyNumber}</h4>
                         <p style="margin: 0; color: var(--text-secondary);"><strong>Policy Holder:</strong> ${app.policyHolderName}</p>
-                        <p style="margin: 0.5rem 0; color: var(--text-secondary);"><strong>Broker:</strong> ${app.brokerName}</p>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);"><strong>Agent:</strong> ${app.brokerName}</p>
                         <p style="margin: 0.5rem 0; color: var(--text-secondary); font-size: 0.9rem;">${app.serviceType}</p>
                         <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.875rem;">
                             Submitted: ${new Date(app.submittedDate).toLocaleDateString()}
@@ -466,7 +472,7 @@ async function loadApprovedApplications() {
                     <div>
                         <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary);">${app.policyNumber}</h4>
                         <p style="margin: 0; color: var(--text-secondary);"><strong>Policy Holder:</strong> ${app.policyHolderName}</p>
-                        <p style="margin: 0.5rem 0; color: var(--text-secondary);"><strong>Broker:</strong> ${app.brokerName}</p>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);"><strong>Agent:</strong> ${app.brokerName}</p>
                         <p style="margin: 0.5rem 0; color: var(--text-secondary); font-size: 0.9rem;">${app.serviceType}</p>
                         <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.875rem;">
                             Approved: ${app.approvedDate ? new Date(app.approvedDate).toLocaleDateString() : 'N/A'}
@@ -528,7 +534,7 @@ async function loadRejectedApplications() {
                     <div>
                         <h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary);">${app.policyNumber}</h4>
                         <p style="margin: 0; color: var(--text-secondary);"><strong>Policy Holder:</strong> ${app.policyHolderName}</p>
-                        <p style="margin: 0.5rem 0; color: var(--text-secondary);"><strong>Broker:</strong> ${app.brokerName}</p>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);"><strong>Agent:</strong> ${app.brokerName}</p>
                         <p style="margin: 0.5rem 0; color: var(--text-secondary); font-size: 0.9rem;">${app.serviceType}</p>
                         <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.875rem;">
                             Rejected: ${app.rejectedDate ? new Date(app.rejectedDate).toLocaleDateString() : 'N/A'}
@@ -797,7 +803,7 @@ function renderPoliciesTable(policies) {
                     <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-color);">
                         <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Policy #</th>
                         <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Policy Holder</th>
-                        <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Broker</th>
+                        <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Agent</th>
                         <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Service Type</th>
                         <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary);">Status</th>
                         <th style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--text-primary);">Coverage</th>
@@ -867,23 +873,23 @@ async function loadBrokerActivity() {
     const content = document.getElementById('brokerActivityContent');
     if (!content) return;
     
-    content.innerHTML = '<p class="loading-text">Loading broker activity...</p>';
+        content.innerHTML = '<p class="loading-text">Loading agent activity...</p>';
     
     try {
         const token = localStorage.getItem('managerToken');
         
-        // Fetch broker statistics
-        const statsResponse = await fetch(`${API_BASE_URL}/policy-approval/brokers/activity/stats`, {
+        // Fetch agent statistics
+        const statsResponse = await fetch(`${API_BASE_URL}/policy-approval/agents/activity/stats`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        // Fetch latest policies sold by brokers
-        const policiesResponse = await fetch(`${API_BASE_URL}/policy-approval/brokers/activity/latest-policies`, {
+        // Fetch latest policies sold by agents
+        const policiesResponse = await fetch(`${API_BASE_URL}/policy-approval/agents/activity/latest-policies`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        // Fetch broker performance data
-        const performanceResponse = await fetch(`${API_BASE_URL}/policy-approval/brokers/activity/performance`, {
+        // Fetch agent performance data
+        const performanceResponse = await fetch(`${API_BASE_URL}/policy-approval/agents/activity/performance`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -909,7 +915,7 @@ async function loadBrokerActivity() {
         content.innerHTML = `
             <div style="background: #f0f8f4; padding: 1.5rem; border-radius: 8px; min-height: 100vh;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h2 style="margin: 0; color: var(--text-primary);">Broker Activity Dashboard</h2>
+                    <h2 style="margin: 0; color: var(--text-primary);">Agent Activity Dashboard</h2>
                     <button onclick="refreshBrokerActivity()" id="refreshBrokerActivityBtn" style="padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;">
                         <span id="refreshBrokerIcon">🔄</span> Refresh
                     </button>
@@ -1028,7 +1034,7 @@ async function loadBrokerActivity() {
                 
                 <!-- Latest Policies Sold Section -->
                 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
-                    <!-- Latest Policies Sold by Brokers -->
+                    <!-- Latest Policies Sold by Agents -->
                     <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Latest Policies Sold</h3>
                         <div style="max-height: 500px; overflow-y: auto;">
@@ -1040,7 +1046,7 @@ async function loadBrokerActivity() {
                                         ${policy.brokerName ? policy.brokerName.charAt(0).toUpperCase() : 'B'}
                                     </div>
                                     <div style="flex: 1;">
-                                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">${policy.brokerName || 'Unknown Broker'}</div>
+                                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">${policy.brokerName || 'Unknown Agent'}</div>
                                         <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${policy.brokerPhone || 'N/A'}</div>
                                         <div style="font-size: 0.875rem; color: var(--text-muted);">
                                             ${policy.serviceType || 'N/A'} (${policy.startDate ? new Date(policy.startDate).toLocaleDateString() : 'N/A'} to ${policy.endDate ? new Date(policy.endDate).toLocaleDateString() : 'N/A'})
@@ -1058,7 +1064,7 @@ async function loadBrokerActivity() {
                         </div>
                     </div>
                     
-                    <!-- Broker Performance Summary -->
+                    <!-- Agent Performance Summary -->
                     <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Top Performers</h3>
                         <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -1081,12 +1087,12 @@ async function loadBrokerActivity() {
             </div>
         `;
     } catch (error) {
-        console.error('Error loading broker activity:', error);
-        content.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading broker activity</p>';
+        console.error('Error loading agent activity:', error);
+        content.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading agent activity</p>';
     }
 }
 
-// Refresh Broker Activity
+// Refresh Agent Activity
 async function refreshBrokerActivity() {
     const btn = document.getElementById('refreshBrokerActivityBtn');
     const icon = document.getElementById('refreshBrokerIcon');
@@ -1108,7 +1114,7 @@ async function refreshBrokerActivity() {
             }, 1000);
         }
     } catch (error) {
-        console.error('Error refreshing broker activity:', error);
+        console.error('Error refreshing agent activity:', error);
         if (btn) {
             btn.disabled = false;
             btn.style.opacity = '1';
@@ -1147,6 +1153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initLogout();
     
     // Load initial section data
-    loadSectionData('dashboard');
+    loadSectionData('broker-activity');
 });
 
