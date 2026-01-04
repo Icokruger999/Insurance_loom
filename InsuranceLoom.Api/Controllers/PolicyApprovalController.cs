@@ -116,7 +116,7 @@ public class PolicyApprovalController : ControllerBase
                 {
                     var emailBody = $@"
                         <h2>New Policy Submitted for Approval</h2>
-                        <p>Hello {manager.User.FirstName} {manager.User.LastName},</p>
+                        <p>Hello {manager.FirstName} {manager.LastName},</p>
                         <p>A new policy has been submitted for your approval:</p>
                         <ul>
                             <li><strong>Policy Number:</strong> {policy.PolicyNumber}</li>
