@@ -844,39 +844,36 @@ public class PolicyApprovalController : ControllerBase
             // Get total count for pagination
             var totalCount = await query.CountAsync();
 
-            // Get policy IDs first (before pagination to avoid SQL translation issues)
-            var allPolicyIds = await query
-                .Select(p => p.Id)
-                .ToListAsync();
-
             // Apply pagination and get policy data
             var policies = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(p => new
-                {
-                    id = p.Id,
-                    policyNumber = p.PolicyNumber,
-                    policyHolderName = p.PolicyHolder != null ? $"{p.PolicyHolder.FirstName} {p.PolicyHolder.LastName}" : "N/A",
-                    policyHolderPhone = p.PolicyHolder != null ? p.PolicyHolder.Phone : null,
-                    policyHolderCity = p.PolicyHolder != null ? p.PolicyHolder.City : null,
-                    policyHolderProvince = p.PolicyHolder != null ? p.PolicyHolder.Province : null,
-                    brokerId = p.BrokerId,
-                    brokerName = p.Broker != null ? $"{p.Broker.FirstName} {p.Broker.LastName}" : "N/A",
-                    serviceType = p.ServiceType != null ? p.ServiceType.ServiceName : "N/A",
-                    coverageAmount = p.CoverageAmount,
-                    premiumAmount = p.PremiumAmount,
-                    status = p.Status,
-                    startDate = p.StartDate,
-                    endDate = p.EndDate,
-                    createdAt = p.CreatedAt,
-                    updatedAt = p.UpdatedAt
-                })
                 .ToListAsync();
 
-            // Get policy IDs for approval lookup (only for current page)
-            var policyIds = policies.Select(p => p.id).ToList();
+            // Get policy IDs for approval lookup (from loaded policies)
+            var policyIds = policies.Select(p => p.Id).ToList();
+            
+            // Map to DTOs (do string operations in memory to avoid SQL translation issues)
+            var policyDtos = policies.Select(p => new
+            {
+                id = p.Id,
+                policyNumber = p.PolicyNumber,
+                policyHolderName = p.PolicyHolder != null ? $"{p.PolicyHolder.FirstName} {p.PolicyHolder.LastName}" : "N/A",
+                policyHolderPhone = p.PolicyHolder != null ? p.PolicyHolder.Phone : null,
+                policyHolderCity = p.PolicyHolder != null ? p.PolicyHolder.City : null,
+                policyHolderProvince = p.PolicyHolder != null ? p.PolicyHolder.Province : null,
+                brokerId = p.BrokerId,
+                brokerName = p.Broker != null ? $"{p.Broker.FirstName} {p.Broker.LastName}" : "N/A",
+                serviceType = p.ServiceType != null ? p.ServiceType.ServiceName : "N/A",
+                coverageAmount = p.CoverageAmount,
+                premiumAmount = p.PremiumAmount,
+                status = p.Status,
+                startDate = p.StartDate,
+                endDate = p.EndDate,
+                createdAt = p.CreatedAt,
+                updatedAt = p.UpdatedAt
+            }).ToList();
 
             // Get approval data with rejection reasons
             // Load approvals first, then group in memory to avoid SQL translation issues
