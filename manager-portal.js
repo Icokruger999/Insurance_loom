@@ -205,14 +205,14 @@ async function loadDashboard() {
                     <!-- Business Overview by Region -->
                     <div class="chart-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <h3 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.25rem;">Business Overview by Region</h3>
-                        <div style="height: 300px; display: flex; align-items: flex-end; gap: 0.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem;">
+                        <div style="height: 300px; display: flex; align-items: flex-end; gap: 0.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 2.5rem;">
                             ${regionData.slice(0, 8).map(region => {
                                 const maxPolicies = Math.max(...regionData.map(r => r.policies));
-                                const height = (region.policies / maxPolicies) * 100;
+                                const height = maxPolicies > 0 ? (region.policies / maxPolicies) * 100 : 20;
                                 return `
-                                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
                                         <div style="width: 100%; background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-hover) 100%); height: ${height}%; min-height: 20px; border-radius: 4px 4px 0 0; margin-bottom: 0.5rem;"></div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; transform: rotate(-45deg); transform-origin: center; white-space: nowrap;">${region.name}</div>
+                                        <div style="font-size: 0.7rem; color: var(--text-muted); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; padding: 0 0.25rem;">${region.name}</div>
                                     </div>
                                 `;
                             }).join('')}

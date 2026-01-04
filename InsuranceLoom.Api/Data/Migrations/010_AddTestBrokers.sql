@@ -43,14 +43,13 @@ BEGIN
         RETURNING id INTO v_user_id;
         
         -- Create broker
-        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, email, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
+        INSERT INTO brokers (id, user_id, agent_number, first_name, last_name, phone, company_name, license_number, commission_rate, is_active, created_at, updated_at)
         VALUES (
             gen_random_uuid(),
             v_user_id,
             'TEST-BRK-001',
             'John',
             'Smith',
-            'broker1.capetown@test.com',
             '0821111111',
             'Astutetech Data',
             'LIC001',
