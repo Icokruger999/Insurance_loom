@@ -941,7 +941,7 @@ section {
         gap: 0.5rem;
         margin-right: 0;
         margin-left: 0;
-        justify-content: center;
+        justify-content: flex-start;
         flex-wrap: wrap;
     }
     
@@ -982,9 +982,10 @@ section {
     }
     
     .hero {
-        padding: 3rem 0 2.5rem;
-        min-height: 400px;
+        padding: 2rem 0 1.5rem;
+        min-height: 280px;
         background-size: cover;
+        background-position: center top;
     }
     
     .hero-title {
