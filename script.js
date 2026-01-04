@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCompanies();
     loadServicesForDropdown();
     initServicesDropdown();
+    initMobileMenu(); // Initialize mobile menu toggle
     
     // Login button event listener - get element after DOM is ready
     loginBtn = document.getElementById('loginBtn');
