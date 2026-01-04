@@ -694,6 +694,21 @@ if (closeChangePasswordModal) {
     });
 }
 
+if (changePasswordModal) {
+    changePasswordModal.addEventListener('click', (e) => {
+        if (e.target === changePasswordModal) {
+            changePasswordModal.classList.remove('active');
+        }
+    });
+    
+    const modalContent = changePasswordModal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+}
+
 if (changePasswordForm) {
     changePasswordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
