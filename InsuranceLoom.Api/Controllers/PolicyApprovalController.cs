@@ -471,8 +471,8 @@ public class PolicyApprovalController : ControllerBase
 
             // Get document counts separately
             var documentCounts = await _context.Documents
-                .Where(d => policyIds.Contains(d.PolicyId))
-                .GroupBy(d => d.PolicyId)
+                .Where(d => d.PolicyId.HasValue && policyIds.Contains(d.PolicyId.Value))
+                .GroupBy(d => d.PolicyId!.Value)
                 .Select(g => new { PolicyId = g.Key, HasDocuments = g.Any() })
                 .ToListAsync();
             
