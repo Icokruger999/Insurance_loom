@@ -915,7 +915,14 @@ section {
     }
     
     .navbar .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
         flex-wrap: wrap;
+    }
+    
+    .nav-brand {
+        width: 100%;
     }
     
     .nav-brand h1 {
@@ -926,22 +933,12 @@ section {
         display: none;
     }
     
-    .navbar .container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-    }
-    
-    .nav-brand {
-        width: 100%;
-    }
-    
     .nav-actions {
         width: 100%;
         gap: 0.5rem;
         margin-right: 0;
         margin-left: 0;
-        justify-content: flex-start;
+        justify-content: center;
         flex-wrap: wrap;
     }
     
