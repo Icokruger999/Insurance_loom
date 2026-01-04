@@ -63,12 +63,12 @@ if (typeof window.API_BASE_URL === 'undefined') {
         return 'http://localhost:5000/api';
     })();
 }
-const API_BASE_URL = window.API_BASE_URL;
+// Reference to API_BASE_URL for convenience (use window.API_BASE_URL in code to avoid redeclaration)
 
 // Load companies list on page load
 async function loadCompanies() {
     try {
-        const response = await fetch(`${API_BASE_URL}/company?activeOnly=true`);
+        const response = await fetch(`/company?activeOnly=true`);
         if (response.ok) {
             const companies = await response.json();
             const companyList = document.getElementById('companyList');
@@ -268,7 +268,7 @@ if (brokerLoginForm) {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/broker/login`, {
+            const response = await fetch(`/auth/broker/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -322,7 +322,7 @@ if (brokerRegisterForm) {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/broker/register`, {
+            const response = await fetch(`/auth/broker/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -446,7 +446,7 @@ if (managerLoginForm) {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/manager/login`, {
+            const response = await fetch(`/auth/manager/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -532,5 +532,6 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(card);
     });
 });
+
 
 
