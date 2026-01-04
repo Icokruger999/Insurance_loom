@@ -1189,7 +1189,7 @@ async function loadBrokerActivity() {
             </div>
         `;
         
-        // Attach event listeners to filter buttons after HTML is rendered
+        // Attach event listeners to filter buttons after HTML is rendered and load initial data
         setTimeout(() => {
             const applyBtn = document.getElementById('applyFiltersBtn');
             const clearBtn = document.getElementById('clearFiltersBtn');
@@ -1198,6 +1198,10 @@ async function loadBrokerActivity() {
             }
             if (clearBtn) {
                 clearBtn.addEventListener('click', window.clearDetailedFilters);
+            }
+            // Load all policies by default (no filters)
+            if (window.loadDetailedPolicies) {
+                window.loadDetailedPolicies(1);
             }
         }, 100);
     } catch (error) {
