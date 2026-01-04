@@ -45,10 +45,14 @@ public class ClientApplicationController : ControllerBase
             }
 
             // Auto-assign broker
-            var assignedBroker = await _brokerAssignmentService.AssignBrokerAsync();
-            if (assignedBroker == null)
+            Guid brokerId;
+            try
             {
-                return StatusCode(503, new { message = "No active brokers available for assignment" });
+                brokerId = await _brokerAssignmentService.AssignBrokerAsync();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(503, new { message = ex.Message });
             }
 
             // Generate policy number
@@ -84,7 +88,7 @@ public class ClientApplicationController : ControllerBase
                 Id = Guid.NewGuid(),
                 PolicyNumber = policyNumber,
                 PolicyHolderId = policyHolder.Id,
-                BrokerId = assignedBroker.Id,
+                BrokerId = brokerId,
                 ServiceTypeId = request.ServiceTypeId.Value,
                 ServiceCode = serviceType.ServiceCode,
                 CoverageAmount = request.CoverageAmount,
@@ -130,7 +134,7 @@ public class ClientApplicationController : ControllerBase
             {
                 Id = Guid.NewGuid(),
                 PolicyId = policy.Id,
-                BrokerId = assignedBroker.Id,
+                BrokerId = brokerId,
                 PolicyHolderId = policyHolder.Id,
                 Status = "PendingSubmission",
                 SubmittedDate = DateTime.UtcNow,
