@@ -898,7 +898,7 @@ public class PolicyApprovalController : ControllerBase
                 .ToList();
 
             // Merge approval data
-            var result = policies.Select(p => new
+            var result = policyDtos.Select(p => new
             {
                 p.id,
                 p.policyNumber,
