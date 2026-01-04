@@ -187,12 +187,6 @@ function handleLogin(e) {
     openLoginTypeModal();
 }
 
-// Login button event listener
-const loginBtn = document.getElementById('loginBtn');
-if (loginBtn) {
-    loginBtn.addEventListener('click', handleLogin);
-}
-
 // Tab switching
 tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
