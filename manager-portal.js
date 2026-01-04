@@ -56,6 +56,7 @@ function initNavigation() {
     const sectionTitle = document.getElementById('sectionTitle');
     
     const sectionTitles = {
+        'dashboard': 'Dashboard',
         'pending-applications': 'Pending Applications',
         'approved-applications': 'Approved Applications',
         'rejected-applications': 'Rejected Applications',
@@ -273,7 +274,7 @@ async function loadDashboard() {
                                         <td style="padding: 0.75rem; color: var(--text-secondary);">${app.serviceType}</td>
                                         <td style="padding: 0.75rem; text-align: right; color: var(--text-primary); font-weight: 500;">R ${app.premiumAmount?.toFixed(2) || '0.00'}</td>
                                         <td style="padding: 0.75rem; text-align: center;">
-                                            <button onclick="viewApplication('${app.policyId}')" style="padding: 0.375rem 0.75rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Review</button>
+                                            <button onclick="viewApplicationDetails('${app.policyId}')" style="padding: 0.375rem 0.75rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Review</button>
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -623,6 +624,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initLogout();
     
     // Load initial section data
-    loadSectionData('pending-applications');
+    loadSectionData('dashboard');
 });
 
