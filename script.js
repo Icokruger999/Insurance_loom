@@ -77,9 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileMenu(); // Initialize mobile menu toggle
     
     // Login button event listener - get element after DOM is ready
-    loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', handleLogin);
+    const loginButton = document.getElementById('loginBtn');
+    if (loginButton) {
+        loginButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleLogin(e);
+        });
         console.log('Login button event listener attached');
     } else {
         console.error('Login button not found');
