@@ -351,6 +351,14 @@ if (loginTypeModal) {
             closeLoginTypeModalFunc();
         }
     });
+    
+    // Prevent clicks inside modal-content from closing the modal
+    const modalContent = loginTypeModal.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
 }
 
 // Close Client Modal
