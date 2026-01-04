@@ -893,7 +893,18 @@ async function loadBrokerActivity() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        const stats = statsResponse.ok ? await statsResponse.json() : { active: 0, expired: 0, pending: 0 };
+        // Check for errors and log them
+        if (!statsResponse.ok) {
+            console.error('Stats API error:', statsResponse.status, await statsResponse.text());
+        }
+        if (!policiesResponse.ok) {
+            console.error('Policies API error:', policiesResponse.status, await policiesResponse.text());
+        }
+        if (!performanceResponse.ok) {
+            console.error('Performance API error:', performanceResponse.status, await performanceResponse.text());
+        }
+        
+        const stats = statsResponse.ok ? await statsResponse.json() : { active: 0, expired: 0, pending: 0, reviewed: 0, pendingReview: 0, renewalsReviewed: 0, renewalsPending: 0 };
         const latestPolicies = policiesResponse.ok ? await policiesResponse.json() : [];
         const performance = performanceResponse.ok ? await performanceResponse.json() : [];
         

@@ -658,8 +658,8 @@ public class PolicyApprovalController : ControllerBase
                 .ToListAsync();
 
             var active = policies.Count(p => p.Status == "Active" || p.Status == "Approved");
-            var expired = policies.Count(p => p.Status == "Rejected" || (p.EndDate.HasValue && p.EndDate.Value < DateTime.UtcNow));
-            var pending = policies.Count(p => p.Status == "Pending" || p.Status == "PendingSubmission" || p.Status == "UnderReview");
+            var expired = policies.Count(p => p.Status == "Rejected" || p.Status == "Cancelled" || (p.EndDate.HasValue && p.EndDate.Value < DateTime.UtcNow));
+            var pending = policies.Count(p => p.Status == "PendingSubmission" || p.Status == "Submitted" || p.Status == "UnderReview" || p.Status == "Draft");
 
             var approvals = await _context.PolicyApprovals
                 .Where(a => a.Status == "Approved" || a.Status == "Pending")
@@ -672,7 +672,7 @@ public class PolicyApprovalController : ControllerBase
             var sevenDaysAgo = DateTime.UtcNow.AddDays(-7);
             var recentPolicies = policies.Where(p => p.CreatedAt >= sevenDaysAgo).ToList();
             var renewalsReviewed = recentPolicies.Count(p => p.Status == "Approved" || p.Status == "Active");
-            var renewalsPending = recentPolicies.Count(p => p.Status == "Pending" || p.Status == "PendingSubmission");
+            var renewalsPending = recentPolicies.Count(p => p.Status == "PendingSubmission" || p.Status == "Submitted" || p.Status == "UnderReview" || p.Status == "Draft");
 
             return Ok(new
             {
