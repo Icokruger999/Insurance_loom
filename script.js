@@ -512,11 +512,35 @@ if (managerForgotPasswordForm) {
                 body: JSON.stringify({ email })
             });
 
-            const data = await response.json();
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                try {
+                    data = await response.json();
+                } catch (jsonError) {
+                    console.error('Failed to parse JSON response:', jsonError);
+                    if (errorDiv) {
+                        errorDiv.textContent = 'Server error. Please try again later.';
+                        errorDiv.classList.add('show');
+                    }
+                    return;
+                }
+            } else {
+                // Response is not JSON (likely HTML error page)
+                if (errorDiv) {
+                    if (response.status === 404) {
+                        errorDiv.textContent = 'Endpoint not found. The API may need to be updated.';
+                    } else {
+                        errorDiv.textContent = 'Server error. Please try again later.';
+                    }
+                    errorDiv.classList.add('show');
+                }
+                return;
+            }
 
             if (response.ok) {
                 if (successDiv) {
-                    successDiv.textContent = 'Password reset email has been sent. Please check your inbox for your temporary password.';
+                    successDiv.textContent = data.message || 'Password reset email has been sent. Please check your inbox for your temporary password.';
                     successDiv.style.display = 'block';
                 }
                 if (managerForgotPasswordForm) managerForgotPasswordForm.reset();
@@ -529,7 +553,7 @@ if (managerForgotPasswordForm) {
         } catch (error) {
             console.error('Forgot password error:', error);
             if (errorDiv) {
-                errorDiv.textContent = 'Connection error. Please make sure the API is running.';
+                errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + window.API_BASE_URL;
                 errorDiv.classList.add('show');
             }
         }
