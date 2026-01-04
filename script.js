@@ -51,6 +51,20 @@ const managerForgotPasswordModal = document.getElementById('managerForgotPasswor
 const managerForgotPasswordForm = document.getElementById('managerForgotPasswordForm');
 const closeManagerForgotPasswordModal = document.getElementById('closeManagerForgotPasswordModal');
 const backToManagerLoginLink = document.getElementById('backToManagerLoginLink');
+const brokerForgotPasswordLink = document.getElementById('brokerForgotPasswordLink');
+const brokerForgotPasswordModal = document.getElementById('brokerForgotPasswordModal');
+const brokerForgotPasswordForm = document.getElementById('brokerForgotPasswordForm');
+const closeBrokerForgotPasswordModal = document.getElementById('closeBrokerForgotPasswordModal');
+const backToBrokerLoginLink = document.getElementById('backToBrokerLoginLink');
+const clientForgotPasswordLink = document.getElementById('clientForgotPasswordLink');
+const clientForgotPasswordModal = document.getElementById('clientForgotPasswordModal');
+const clientForgotPasswordForm = document.getElementById('clientForgotPasswordForm');
+const closeClientForgotPasswordModal = document.getElementById('closeClientForgotPasswordModal');
+const backToClientLoginLink = document.getElementById('backToClientLoginLink');
+const changePasswordModal = document.getElementById('changePasswordModal');
+const changePasswordForm = document.getElementById('changePasswordForm');
+const closeChangePasswordModal = document.getElementById('closeChangePasswordModal');
+let currentUserType = null; // 'manager', 'broker', or 'client'
 
 // API Base URL - Automatically detects environment
 // Use window object to avoid duplicate declaration errors
@@ -290,8 +304,18 @@ if (brokerLoginForm) {
                     localStorage.setItem('brokerInfo', JSON.stringify(data.broker));
                 }
                 closeBrokerModal();
-                // Redirect to broker portal
-                window.location.href = '/broker-portal.html';
+                
+                // Check if password looks temporary (12 chars, alphanumeric) and prompt for change
+                const password = formData.password;
+                if (password.length === 12 && /^[a-zA-Z0-9]+$/.test(password)) {
+                    currentUserType = 'broker';
+                    if (changePasswordModal) {
+                        changePasswordModal.classList.add('active');
+                    }
+                } else {
+                    // Redirect to broker portal
+                    window.location.href = '/broker-portal.html';
+                }
             } else {
                 errorDiv.textContent = data.message || 'Login failed. Please check your credentials.';
                 errorDiv.classList.add('show');
@@ -513,6 +537,273 @@ if (managerForgotPasswordForm) {
     });
 }
 
+// Broker Forgot Password Handlers
+if (brokerForgotPasswordLink) {
+    brokerForgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeBrokerModal();
+        if (brokerForgotPasswordModal) {
+            brokerForgotPasswordModal.classList.add('active');
+        }
+    });
+}
+
+if (closeBrokerForgotPasswordModal) {
+    closeBrokerForgotPasswordModal.addEventListener('click', () => {
+        if (brokerForgotPasswordModal) {
+            brokerForgotPasswordModal.classList.remove('active');
+        }
+    });
+}
+
+if (backToBrokerLoginLink) {
+    backToBrokerLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (brokerForgotPasswordModal) {
+            brokerForgotPasswordModal.classList.remove('active');
+        }
+        if (brokerModal) {
+            brokerModal.classList.add('active');
+        }
+    });
+}
+
+if (brokerForgotPasswordForm) {
+    brokerForgotPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorDiv = document.getElementById('brokerForgotPasswordError');
+        const successDiv = document.getElementById('brokerForgotPasswordSuccess');
+        if (errorDiv) errorDiv.classList.remove('show');
+        if (successDiv) successDiv.style.display = 'none';
+
+        const email = document.getElementById('brokerForgotPasswordEmail').value;
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/auth/broker/forgot-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (successDiv) {
+                    successDiv.textContent = 'Password reset email has been sent. Please check your inbox for your temporary password.';
+                    successDiv.style.display = 'block';
+                }
+                if (brokerForgotPasswordForm) brokerForgotPasswordForm.reset();
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = data.message || 'Failed to send reset link. Please try again.';
+                    errorDiv.classList.add('show');
+                }
+            }
+        } catch (error) {
+            console.error('Broker forgot password error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = 'Connection error. Please make sure the API is running.';
+                errorDiv.classList.add('show');
+            }
+        }
+    });
+}
+
+// Client Forgot Password Handlers
+if (clientForgotPasswordLink) {
+    clientForgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeClientModal();
+        if (clientForgotPasswordModal) {
+            clientForgotPasswordModal.classList.add('active');
+        }
+    });
+}
+
+if (closeClientForgotPasswordModal) {
+    closeClientForgotPasswordModal.addEventListener('click', () => {
+        if (clientForgotPasswordModal) {
+            clientForgotPasswordModal.classList.remove('active');
+        }
+    });
+}
+
+if (backToClientLoginLink) {
+    backToClientLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (clientForgotPasswordModal) {
+            clientForgotPasswordModal.classList.remove('active');
+        }
+        if (clientModal) {
+            clientModal.classList.add('active');
+        }
+    });
+}
+
+if (clientForgotPasswordForm) {
+    clientForgotPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorDiv = document.getElementById('clientForgotPasswordError');
+        const successDiv = document.getElementById('clientForgotPasswordSuccess');
+        if (errorDiv) errorDiv.classList.remove('show');
+        if (successDiv) successDiv.style.display = 'none';
+
+        const email = document.getElementById('clientForgotPasswordEmail').value;
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/auth/client/forgot-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (successDiv) {
+                    successDiv.textContent = 'Password reset email has been sent. Please check your inbox for your temporary password.';
+                    successDiv.style.display = 'block';
+                }
+                if (clientForgotPasswordForm) clientForgotPasswordForm.reset();
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = data.message || 'Failed to send reset link. Please try again.';
+                    errorDiv.classList.add('show');
+                }
+            }
+        } catch (error) {
+            console.error('Client forgot password error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = 'Connection error. Please make sure the API is running.';
+                errorDiv.classList.add('show');
+            }
+        }
+    });
+}
+
+// Change Password Modal Handler
+if (closeChangePasswordModal) {
+    closeChangePasswordModal.addEventListener('click', () => {
+        if (changePasswordModal) {
+            changePasswordModal.classList.remove('active');
+        }
+    });
+}
+
+if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorDiv = document.getElementById('changePasswordError');
+        const successDiv = document.getElementById('changePasswordSuccess');
+        if (errorDiv) errorDiv.classList.remove('show');
+        if (successDiv) successDiv.style.display = 'none';
+
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
+            if (errorDiv) {
+                errorDiv.textContent = 'New passwords do not match.';
+                errorDiv.classList.add('show');
+            }
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            if (errorDiv) {
+                errorDiv.textContent = 'Password must be at least 6 characters long.';
+                errorDiv.classList.add('show');
+            }
+            return;
+        }
+
+        const currentPassword = document.getElementById('currentPassword').value;
+        const token = localStorage.getItem('managerToken') || localStorage.getItem('brokerToken') || localStorage.getItem('clientToken');
+        
+        if (!token) {
+            if (errorDiv) {
+                errorDiv.textContent = 'You must be logged in to change your password.';
+                errorDiv.classList.add('show');
+            }
+            return;
+        }
+
+        // Determine user type from token storage
+        let endpoint = '';
+        if (localStorage.getItem('managerToken')) {
+            endpoint = '/auth/manager/change-password';
+            currentUserType = 'manager';
+        } else if (localStorage.getItem('brokerToken')) {
+            endpoint = '/auth/broker/change-password';
+            currentUserType = 'broker';
+        } else if (localStorage.getItem('clientToken')) {
+            endpoint = '/auth/client/change-password';
+            currentUserType = 'client';
+        }
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (successDiv) {
+                    successDiv.textContent = 'Password changed successfully! You can now use your new password to log in.';
+                    successDiv.style.display = 'block';
+                }
+                if (changePasswordForm) changePasswordForm.reset();
+                
+                // Close modal after 2 seconds and redirect to login
+                setTimeout(() => {
+                    if (changePasswordModal) {
+                        changePasswordModal.classList.remove('active');
+                    }
+                    // Clear tokens and redirect to login
+                    localStorage.removeItem('managerToken');
+                    localStorage.removeItem('brokerToken');
+                    localStorage.removeItem('clientToken');
+                    localStorage.removeItem('managerInfo');
+                    localStorage.removeItem('brokerInfo');
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = data.message || 'Failed to change password. Please try again.';
+                    errorDiv.classList.add('show');
+                }
+            }
+        } catch (error) {
+            console.error('Change password error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = 'Connection error. Please make sure the API is running.';
+                errorDiv.classList.add('show');
+            }
+        }
+    });
+}
+
+// Function to check if password is temporary and prompt for change
+function checkAndPromptPasswordChange(userType, token) {
+    // For now, we'll prompt after login if they used a temporary password
+    // This is a simple check - in production, you might want to add a flag in the user table
+    // For now, we'll show the change password modal after successful login
+    // You can enhance this by checking if the password looks like a temporary one (12 chars, alphanumeric)
+}
+
 // Manager Login Form Handler
 if (managerLoginForm) {
     managerLoginForm.addEventListener('submit', async (e) => {
@@ -543,8 +834,18 @@ if (managerLoginForm) {
                     localStorage.setItem('managerInfo', JSON.stringify(data.manager));
                 }
                 closeManagerModal();
-                // Redirect to manager portal
-                window.location.href = '/manager-portal.html';
+                
+                // Check if password looks temporary (12 chars, alphanumeric) and prompt for change
+                const password = formData.password;
+                if (password.length === 12 && /^[a-zA-Z0-9]+$/.test(password)) {
+                    currentUserType = 'manager';
+                    if (changePasswordModal) {
+                        changePasswordModal.classList.add('active');
+                    }
+                } else {
+                    // Redirect to manager portal
+                    window.location.href = '/manager-portal.html';
+                }
             } else {
                 errorDiv.textContent = data.message || 'Login failed. Please check your credentials.';
                 errorDiv.classList.add('show');
@@ -553,6 +854,65 @@ if (managerLoginForm) {
             console.error('Manager login error:', error);
             errorDiv.textContent = 'Connection error. Please make sure the API is running on ' + window.API_BASE_URL;
             errorDiv.classList.add('show');
+        }
+    });
+}
+
+// Client Login Form Handler
+const clientLoginForm = document.getElementById('clientLoginForm');
+if (clientLoginForm) {
+    clientLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorDiv = document.getElementById('clientLoginError');
+        if (errorDiv) errorDiv.classList.remove('show');
+
+        const formData = {
+            email: document.getElementById('clientEmail').value,
+            password: document.getElementById('clientPassword').value
+        };
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/auth/client/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Store token if needed
+                if (data.token) {
+                    localStorage.setItem('clientToken', data.token);
+                    localStorage.setItem('clientInfo', JSON.stringify(data.user));
+                }
+                closeClientModal();
+                
+                // Check if password looks temporary (12 chars, alphanumeric) and prompt for change
+                const password = formData.password;
+                if (password.length === 12 && /^[a-zA-Z0-9]+$/.test(password)) {
+                    currentUserType = 'client';
+                    if (changePasswordModal) {
+                        changePasswordModal.classList.add('active');
+                    }
+                } else {
+                    // Redirect to client dashboard or homepage
+                    window.location.href = '/';
+                }
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = data.message || 'Login failed. Please check your credentials.';
+                    errorDiv.classList.add('show');
+                }
+            }
+        } catch (error) {
+            console.error('Client login error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = 'Connection error. Please make sure the API is running.';
+                errorDiv.classList.add('show');
+            }
         }
     });
 }

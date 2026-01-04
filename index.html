@@ -241,6 +241,9 @@
                     <div class="form-group">
                         <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" name="password" required>
+                        <div style="text-align: right; margin-top: 0.5rem;">
+                            <a href="#" id="brokerForgotPasswordLink" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem;">Forgot Password?</a>
+                        </div>
                     </div>
                     <div id="loginError" class="error-message"></div>
                     <button type="submit" class="btn btn-primary">Login</button>
@@ -321,6 +324,9 @@
                     <div class="form-group">
                         <label for="clientPassword">Password</label>
                         <input type="password" id="clientPassword" name="password" required>
+                        <div style="text-align: right; margin-top: 0.5rem;">
+                            <a href="#" id="clientForgotPasswordLink" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem;">Forgot Password?</a>
+                        </div>
                     </div>
                     <div id="clientLoginError" class="error-message"></div>
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
@@ -402,6 +408,74 @@
                 <div style="text-align: center; margin-top: 1rem;">
                     <a href="#" id="backToManagerLoginLink" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem;">Back to Login</a>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Broker Forgot Password Modal -->
+    <div id="brokerForgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeBrokerForgotPasswordModal">&times;</span>
+            <h2>Reset Password</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Enter your email address and we'll send you a link to reset your password.</p>
+            <form id="brokerForgotPasswordForm">
+                <div class="form-group">
+                    <label for="brokerForgotPasswordEmail">Email</label>
+                    <input type="email" id="brokerForgotPasswordEmail" name="email" required>
+                </div>
+                <div id="brokerForgotPasswordError" class="error-message"></div>
+                <div id="brokerForgotPasswordSuccess" class="success-message" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="#" id="backToBrokerLoginLink" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem;">Back to Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Client Forgot Password Modal -->
+    <div id="clientForgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeClientForgotPasswordModal">&times;</span>
+            <h2>Reset Password</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Enter your email address and we'll send you a link to reset your password.</p>
+            <form id="clientForgotPasswordForm">
+                <div class="form-group">
+                    <label for="clientForgotPasswordEmail">Email</label>
+                    <input type="email" id="clientForgotPasswordEmail" name="email" required>
+                </div>
+                <div id="clientForgotPasswordError" class="error-message"></div>
+                <div id="clientForgotPasswordSuccess" class="success-message" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="#" id="backToClientLoginLink" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem;">Back to Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal (for all user types) -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeChangePasswordModal">&times;</span>
+            <h2>Change Password</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">You are using a temporary password. Please change it to a secure password.</p>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password (Temporary)</label>
+                    <input type="password" id="currentPassword" name="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+                </div>
+                <div id="changePasswordError" class="error-message"></div>
+                <div id="changePasswordSuccess" class="success-message" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary">Change Password</button>
             </form>
         </div>
     </div>
