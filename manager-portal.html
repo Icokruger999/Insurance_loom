@@ -61,6 +61,60 @@
                 </div>
             </section>
 
+            <!-- Detailed Policies View Section -->
+            <section id="detailed-policies" class="content-section">
+                <div class="section-content">
+                    <div id="detailedPoliciesContent">
+                        <div style="background: #f0f8f4; padding: 1.5rem; border-radius: 8px;">
+                            <h2 style="margin: 0 0 1.5rem 0; color: var(--text-primary);">Detailed Policy View</h2>
+                            
+                            <!-- Filters -->
+                            <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Filters</h3>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">Start Date</label>
+                                        <input type="date" id="filterStartDate" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">End Date</label>
+                                        <input type="date" id="filterEndDate" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">Status</label>
+                                        <select id="filterStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                                            <option value="">All Statuses</option>
+                                            <option value="Draft">Draft</option>
+                                            <option value="PendingSubmission">Pending Submission</option>
+                                            <option value="Submitted">Submitted</option>
+                                            <option value="UnderReview">Under Review</option>
+                                            <option value="Approved">Approved</option>
+                                            <option value="Active">Active</option>
+                                            <option value="Rejected">Rejected</option>
+                                            <option value="Cancelled">Cancelled</option>
+                                            <option value="ChangesRequired">Changes Required</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 1rem;">
+                                    <button onclick="loadDetailedPolicies()" style="padding: 0.5rem 1.5rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">Apply Filters</button>
+                                    <button onclick="clearDetailedFilters()" style="padding: 0.5rem 1.5rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">Clear Filters</button>
+                                </div>
+                            </div>
+
+                            <!-- Policies Table -->
+                            <div id="detailedPoliciesList" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <p class="loading-text">Loading policies...</p>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div id="detailedPoliciesPagination" style="margin-top: 1.5rem; display: none; justify-content: center; gap: 0.5rem; align-items: center;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Dashboard Section -->
             <section id="dashboard" class="content-section">
                 <div class="section-content">

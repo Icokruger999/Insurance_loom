@@ -475,6 +475,9 @@ public class PolicyApprovalController : ControllerBase
                 .GroupBy(d => d.PolicyId)
                 .Select(g => new { PolicyId = g.Key, HasDocuments = g.Any() })
                 .ToListAsync();
+            
+            // Convert to dictionary for faster lookup
+            var documentDict = documentCounts.ToDictionary(d => d.PolicyId, d => d.HasDocuments);
 
             // Merge approval data
             var result = policies.Select(p => new
@@ -494,7 +497,7 @@ public class PolicyApprovalController : ControllerBase
                 p.createdAt,
                 p.updatedAt,
                 approvalStatus = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.ApprovalStatus,
-                hasDocuments = documentCounts.Any(d => d.PolicyId == p.id && d.HasDocuments),
+                hasDocuments = documentDict.ContainsKey(p.id) && documentDict[p.id],
                 documentsVerified = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.DocumentsVerified ?? false
             }).ToList();
 
@@ -554,7 +557,9 @@ public class PolicyApprovalController : ControllerBase
             if (broker != null)
             {
                 var brokerUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == broker.UserId);
-                var policyHolderUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == policy.PolicyHolder.UserId);
+                var policyHolderUser = policy.PolicyHolder?.UserId != null 
+                    ? await _context.Users.FirstOrDefaultAsync(u => u.Id == policy.PolicyHolder.UserId)
+                    : null;
                 
                 if (brokerUser != null)
                 {
@@ -800,6 +805,131 @@ public class PolicyApprovalController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "Error fetching region statistics", error = ex.Message });
+        }
+    }
+
+    [HttpGet("detailed")]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> GetDetailedPolicies(
+        [FromQuery] DateTime? startDate = null,
+        [FromQuery] DateTime? endDate = null,
+        [FromQuery] string? status = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
+    {
+        try
+        {
+            var query = _context.Policies
+                .Include(p => p.PolicyHolder)
+                .Include(p => p.Broker)
+                .Include(p => p.ServiceType)
+                .AsQueryable();
+
+            // Filter by date range (created_at)
+            if (startDate.HasValue)
+            {
+                query = query.Where(p => p.CreatedAt >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                query = query.Where(p => p.CreatedAt <= endDate.Value.AddDays(1)); // Include the entire end date
+            }
+
+            // Filter by status
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(p => p.Status == status);
+            }
+
+            // Get total count for pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var policies = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new
+                {
+                    id = p.Id,
+                    policyNumber = p.PolicyNumber,
+                    policyHolderName = p.PolicyHolder != null ? $"{p.PolicyHolder.FirstName} {p.PolicyHolder.LastName}" : "N/A",
+                    policyHolderPhone = p.PolicyHolder != null ? p.PolicyHolder.Phone : null,
+                    policyHolderCity = p.PolicyHolder != null ? p.PolicyHolder.City : null,
+                    policyHolderProvince = p.PolicyHolder != null ? p.PolicyHolder.Province : null,
+                    brokerId = p.BrokerId,
+                    brokerName = p.Broker != null ? $"{p.Broker.FirstName} {p.Broker.LastName}" : "N/A",
+                    serviceType = p.ServiceType != null ? p.ServiceType.ServiceName : "N/A",
+                    coverageAmount = p.CoverageAmount,
+                    premiumAmount = p.PremiumAmount,
+                    status = p.Status,
+                    startDate = p.StartDate,
+                    endDate = p.EndDate,
+                    createdAt = p.CreatedAt,
+                    updatedAt = p.UpdatedAt
+                })
+                .ToListAsync();
+
+            // Get policy IDs for approval lookup
+            var policyIds = policies.Select(p => p.id).ToList();
+
+            // Get approval data with rejection reasons
+            var approvals = await _context.PolicyApprovals
+                .Where(pa => policyIds.Contains(pa.PolicyId))
+                .OrderByDescending(pa => pa.SubmittedDate)
+                .GroupBy(pa => pa.PolicyId)
+                .Select(g => new
+                {
+                    PolicyId = g.Key,
+                    ApprovalStatus = g.First().Status,
+                    RejectionReason = g.First().RejectionReason,
+                    RejectedDate = g.First().RejectedDate,
+                    RejectedBy = g.First().RejectedBy,
+                    ApprovalNotes = g.First().ApprovalNotes,
+                    ReviewNotes = g.First().ReviewNotes,
+                    ChangesRequired = g.First().ChangesRequired
+                })
+                .ToListAsync();
+
+            // Merge approval data
+            var result = policies.Select(p => new
+            {
+                p.id,
+                p.policyNumber,
+                p.policyHolderName,
+                p.policyHolderPhone,
+                p.policyHolderCity,
+                p.policyHolderProvince,
+                p.brokerId,
+                p.brokerName,
+                p.serviceType,
+                p.coverageAmount,
+                p.premiumAmount,
+                p.status,
+                p.startDate,
+                p.endDate,
+                p.createdAt,
+                p.updatedAt,
+                approvalStatus = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.ApprovalStatus,
+                rejectionReason = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.RejectionReason,
+                rejectedDate = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.RejectedDate,
+                approvalNotes = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.ApprovalNotes,
+                reviewNotes = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.ReviewNotes,
+                changesRequired = approvals.FirstOrDefault(a => a.PolicyId == p.id)?.ChangesRequired
+            }).ToList();
+
+            return Ok(new
+            {
+                policies = result,
+                totalCount,
+                page,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error fetching detailed policies", error = ex.Message });
         }
     }
 }

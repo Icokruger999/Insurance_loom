@@ -57,6 +57,7 @@ function initNavigation() {
     
     const sectionTitles = {
         'broker-activity': 'Agent Activity',
+        'detailed-policies': 'Detailed Policy View',
         'dashboard': 'Dashboard',
         'pending-applications': 'Pending Applications',
         'approved-applications': 'Approved Applications',
@@ -112,6 +113,9 @@ async function loadSectionData(sectionId) {
         switch (sectionId) {
             case 'broker-activity':
                 await loadBrokerActivity();
+                break;
+            case 'detailed-policies':
+                await loadDetailedPolicies();
                 break;
             case 'dashboard':
                 await loadDashboard();
