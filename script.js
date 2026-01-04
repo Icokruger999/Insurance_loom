@@ -16,8 +16,8 @@ navLinks.forEach(link => {
     });
 });
 
-// Login Button Handlers
-const loginBtn = document.getElementById('loginBtn');
+// Login Button Handlers - will be initialized in DOMContentLoaded
+let loginBtn = null;
 const loginTypeModal = document.getElementById('loginTypeModal');
 const selectBrokerBtn = document.getElementById('selectBrokerBtn');
 const selectManagerBtn = document.getElementById('selectManagerBtn');
@@ -69,9 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initServicesDropdown();
     
     // Login button event listener - get element after DOM is ready
-    const loginBtnElement = document.getElementById('loginBtn');
-    if (loginBtnElement) {
-        loginBtnElement.addEventListener('click', handleLogin);
+    loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', handleLogin);
         console.log('Login button event listener attached');
     } else {
         console.error('Login button not found');
