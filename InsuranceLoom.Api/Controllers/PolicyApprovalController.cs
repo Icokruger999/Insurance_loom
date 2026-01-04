@@ -780,7 +780,7 @@ public class PolicyApprovalController : ControllerBase
                     premium = g.Sum(p => p.PremiumAmount ?? 0),
                     coverage = g.Sum(p => p.CoverageAmount ?? 0),
                     activePolicies = g.Count(p => p.Status == "Active" || p.Status == "Approved"),
-                    pendingPolicies = g.Count(p => p.Status == "PendingSubmission" || p.Status == "UnderReview" || p.Status == "Pending")
+                    pendingPolicies = g.Count(p => p.Status == "PendingSubmission" || p.Status == "Submitted" || p.Status == "UnderReview" || p.Status == "Draft")
                 })
                 .OrderByDescending(r => r.policies)
                 .ToListAsync();
