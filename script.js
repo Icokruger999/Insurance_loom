@@ -68,7 +68,7 @@ if (typeof window.API_BASE_URL === 'undefined') {
 // Load companies list on page load
 async function loadCompanies() {
     try {
-        const response = await fetch(`/company?activeOnly=true`);
+        const response = await fetch(`${window.API_BASE_URL}/company?activeOnly=true`);
         if (response.ok) {
             const companies = await response.json();
             const companyList = document.getElementById('companyList');
