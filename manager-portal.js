@@ -1138,8 +1138,68 @@ async function loadBrokerActivity() {
                         </div>
                     </div>
                 </div>
+                
+                <!-- Detailed Policy View Section -->
+                <div style="margin-top: 2rem; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h2 style="margin: 0 0 1.5rem 0; color: var(--text-primary);">Detailed Policy View</h2>
+                    
+                    <!-- Filters -->
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem; color: var(--text-primary);">Filters</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">Start Date</label>
+                                <input type="date" id="filterStartDate" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.875rem;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">End Date</label>
+                                <input type="date" id="filterEndDate" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.875rem;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">Status</label>
+                                <select id="filterStatus" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.875rem;">
+                                    <option value="">All Statuses</option>
+                                    <option value="Draft">Draft</option>
+                                    <option value="PendingSubmission">Pending Submission</option>
+                                    <option value="Submitted">Submitted</option>
+                                    <option value="UnderReview">Under Review</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Rejected">Rejected</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="ChangesRequired">Changes Required</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button id="applyFiltersBtn" style="padding: 0.5rem 1.5rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.875rem;">Apply Filters</button>
+                            <button id="clearFiltersBtn" style="padding: 0.5rem 1.5rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.875rem;">Clear Filters</button>
+                        </div>
+                    </div>
+
+                    <!-- Policies Table -->
+                    <div id="detailedPoliciesList" style="min-height: 200px;">
+                        <p class="loading-text">Use filters above to view detailed policies...</p>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="detailedPoliciesPagination" style="margin-top: 1.5rem; display: none; justify-content: center; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    </div>
+                </div>
             </div>
         `;
+        
+        // Attach event listeners to filter buttons after HTML is rendered
+        setTimeout(() => {
+            const applyBtn = document.getElementById('applyFiltersBtn');
+            const clearBtn = document.getElementById('clearFiltersBtn');
+            if (applyBtn) {
+                applyBtn.addEventListener('click', () => window.loadDetailedPolicies(1));
+            }
+            if (clearBtn) {
+                clearBtn.addEventListener('click', window.clearDetailedFilters);
+            }
+        }, 100);
     } catch (error) {
         console.error('Error loading agent activity:', error);
         content.innerHTML = '<p class="loading-text" style="color: var(--danger-color);">Error loading agent activity</p>';
