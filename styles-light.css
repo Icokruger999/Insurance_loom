@@ -849,11 +849,22 @@ section {
 
 /* Footer */
 .footer {
-    background-color: var(--primary-color);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.6) 100%),
+                url('images/near-footer.jpg');
+    background-size: 100% auto;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-blend-mode: darken;
     padding: 2.5rem 0;
     text-align: center;
     color: #ffffff;
     margin-top: 0;
+    position: relative;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: high-quality;
+    -ms-interpolation-mode: bicubic;
 }
 
 .footer .container {
