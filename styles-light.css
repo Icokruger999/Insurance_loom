@@ -449,6 +449,10 @@ body {
     text-align: center;
 }
 
+.hero-subtitle-section .hero-buttons {
+    margin-top: 3rem;
+}
+
 .hero-subtitle {
     font-size: 1.5rem;
     font-weight: 400;
