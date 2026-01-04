@@ -67,6 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCompanies();
     loadServicesForDropdown();
     initServicesDropdown();
+    
+    // Login button event listener - get element after DOM is ready
+    const loginBtnElement = document.getElementById('loginBtn');
+    if (loginBtnElement) {
+        loginBtnElement.addEventListener('click', handleLogin);
+        console.log('Login button event listener attached');
+    } else {
+        console.error('Login button not found');
+    }
 });
 
 // Broker Modal
