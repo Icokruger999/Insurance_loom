@@ -189,6 +189,29 @@ body {
     box-shadow: var(--shadow-md);
 }
 
+.btn-whatsapp {
+    background-color: #25D366;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.625rem 1.5rem;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.btn-whatsapp:hover {
+    background-color: #20BA5A;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    color: #ffffff;
+}
+
 /* Services Dropdown */
 .services-dropdown {
     position: relative;

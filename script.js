@@ -179,10 +179,18 @@ function closeManagerModal() {
 }
 
 function handleLogin(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
     console.log('Login button clicked');
     openLoginTypeModal();
+}
+
+// Login button event listener
+const loginBtn = document.getElementById('loginBtn');
+if (loginBtn) {
+    loginBtn.addEventListener('click', handleLogin);
 }
 
 // Tab switching

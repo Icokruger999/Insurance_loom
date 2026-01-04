@@ -234,3 +234,18 @@ function showSuccessMessage(message) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function showSuccessMessageHTML(htmlContent) {
+    // Create or update success message element with HTML content
+    let successDiv = document.getElementById('applicationSuccess');
+    if (!successDiv) {
+        successDiv = document.createElement('div');
+        successDiv.id = 'applicationSuccess';
+        successDiv.className = 'success-message';
+        successDiv.style.cssText = 'display: block; margin-top: 0.5rem; padding: 1.5rem; background-color: #d1fae5; border-radius: 6px; border: 1px solid #6ee7b7; margin-bottom: 1rem;';
+        const errorDiv = document.getElementById('applicationError');
+        errorDiv.parentNode.insertBefore(successDiv, errorDiv);
+    }
+    successDiv.innerHTML = htmlContent;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
